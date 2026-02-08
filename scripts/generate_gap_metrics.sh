@@ -17,7 +17,23 @@ fi
 count_pattern() {
 	local pattern="$1"
 	local count
-	count="$( (rg -o --no-messages -g 'report-*.txt' "$pattern" "$REPORT_DIR" || true) | wc -l | tr -d '[:space:]' )"
+
+	if command -v rg >/dev/null 2>&1; then
+		count="$( (rg -o --no-messages -g 'report-*.txt' "$pattern" "$REPORT_DIR" || true) | wc -l | tr -d '[:space:]' )"
+	else
+		count=0
+		while IFS= read -r -d '' report_file; do
+			local matches lines
+			matches="$(grep -E -o -- "$pattern" "$report_file" || true)"
+			if [[ -z "$matches" ]]; then
+				continue
+			fi
+
+			lines="$(printf '%s\n' "$matches" | wc -l | tr -d '[:space:]')"
+			count=$((count + lines))
+		done < <(find "$REPORT_DIR" -type f -name 'report-*.txt' -print0)
+	fi
+
 	echo "$count"
 }
 

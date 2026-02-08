@@ -7,6 +7,28 @@ SAMPLES_DIR="$ROOT_DIR/samples"
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
+contains_pattern() {
+  local pattern="$1"
+  local file="$2"
+
+  if command -v rg >/dev/null 2>&1; then
+    rg -q "$pattern" "$file"
+  else
+    grep -Eq "$pattern" "$file"
+  fi
+}
+
+count_pattern() {
+  local pattern="$1"
+  local file="$2"
+
+  if command -v rg >/dev/null 2>&1; then
+    rg -c "$pattern" "$file"
+  else
+    grep -Ec "$pattern" "$file" || true
+  fi
+}
+
 dotnet build "$PROJECT_FILE" /clp:ErrorsOnly >/dev/null
 
 for elf_name in busybox nano; do
@@ -33,13 +55,13 @@ done
 busybox_report="$TEMP_DIR/report-busybox.txt"
 nano_report="$TEMP_DIR/report-nano.txt"
 
-rg -q "SHT_RELR" "$busybox_report"
-rg -q "\\[RELR\\]" "$busybox_report"
-rg -q "DT_FLAGS \\(30\\) = 0x[0-9A-F]+ -> .*DF_BIND_NOW" "$nano_report"
-rg -q "DT_FLAGS_1 \\(1879048187\\) = 0x[0-9A-F]+ -> .*DF_1_" "$nano_report"
+contains_pattern "SHT_RELR" "$busybox_report"
+contains_pattern "\\[RELR\\]" "$busybox_report"
+contains_pattern "DT_FLAGS \\(30\\) = 0x[0-9A-F]+ -> .*DF_BIND_NOW" "$nano_report"
+contains_pattern "DT_FLAGS_1 \\(1879048187\\) = 0x[0-9A-F]+ -> .*DF_1_" "$nano_report"
 
-relr_total="$(rg -c "\\[RELR\\]" "$busybox_report")"
-relr_unknown="$(rg -c "\\[RELR\\].*section=\\(unknown\\)" "$busybox_report" || true)"
+relr_total="$(count_pattern "\\[RELR\\]" "$busybox_report")"
+relr_unknown="$(count_pattern "\\[RELR\\].*section=\\(unknown\\)" "$busybox_report")"
 relr_unknown="${relr_unknown:-0}"
 if [[ "$relr_total" -gt 0 && "$relr_total" -eq "$relr_unknown" ]]; then
   echo "RELR relocations were parsed, but none were mapped to a concrete section." >&2

@@ -54,7 +54,12 @@ assert_report_has_no_generic_fallbacks() {
   )
 
   for pattern in "${patterns[@]}"; do
-    if rg -q "$pattern" "$report_file"; then
+    if command -v rg >/dev/null 2>&1; then
+      if rg -q "$pattern" "$report_file"; then
+        echo "Found generic fallback marker in $sample_name: pattern '$pattern'" >&2
+        return 1
+      fi
+    elif grep -Eq "$pattern" "$report_file"; then
       echo "Found generic fallback marker in $sample_name: pattern '$pattern'" >&2
       return 1
     fi

@@ -2,6 +2,12 @@
 
 ELF parser and reporter for ELF32 and ELF64 binaries (.so, executables, etc.).
 
+## Requirements
+
+* .NET SDK 9.0
+* `bash`
+* `rg` (ripgrep) is optional: all CI/test/coverage scripts fall back to `grep` if `rg` is not available
+
 ## Features
 
 * ELF32 and ELF64 (little/big endian)

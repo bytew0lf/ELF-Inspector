@@ -7,6 +7,17 @@ SAMPLES_DIR="$ROOT_DIR/samples"
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
+contains_pattern() {
+  local pattern="$1"
+  local file="$2"
+
+  if command -v rg >/dev/null 2>&1; then
+    rg -q "$pattern" "$file"
+  else
+    grep -Eq "$pattern" "$file"
+  fi
+}
+
 run_expect_success() {
   local elf_file="$1"
   local output_name="$2"
@@ -20,9 +31,9 @@ run_expect_success() {
   local report_file="$TEMP_DIR/$output_name"
   [[ -f "$report_file" ]] || { echo "Missing report file: $report_file" >&2; return 1; }
 
-  rg -q "^Header$" "$report_file"
-  rg -q "^Relocations \(resolved\)$" "$report_file"
-  rg -q "^Notes$" "$report_file"
+  contains_pattern "^Header$" "$report_file"
+  contains_pattern "^Relocations \(resolved\)$" "$report_file"
+  contains_pattern "^Notes$" "$report_file"
 }
 
 run_expect_failure() {

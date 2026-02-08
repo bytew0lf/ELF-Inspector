@@ -9,12 +9,20 @@ END_MARKER="<!-- COVERAGE_MAP_END -->"
 
 has_parser_pattern() {
 	local pattern="$1"
-	rg -q --no-messages "$pattern" "$ROOT_DIR/Parser" "$ROOT_DIR/Reporting" "$ROOT_DIR/Library"
+	if command -v rg >/dev/null 2>&1; then
+		rg -q --no-messages "$pattern" "$ROOT_DIR/Parser" "$ROOT_DIR/Reporting" "$ROOT_DIR/Library"
+	else
+		grep -R -E -q -- "$pattern" "$ROOT_DIR/Parser" "$ROOT_DIR/Reporting" "$ROOT_DIR/Library"
+	fi
 }
 
 has_test_pattern() {
 	local pattern="$1"
-	rg -q --no-messages "$pattern" "$TEST_FILE"
+	if command -v rg >/dev/null 2>&1; then
+		rg -q --no-messages "$pattern" "$TEST_FILE"
+	else
+		grep -E -q -- "$pattern" "$TEST_FILE"
+	fi
 }
 
 resolve_status() {
@@ -93,11 +101,11 @@ write_readme() {
 		exit 1
 	fi
 
-	if ! rg -q "^${START_MARKER}$" "$README_FILE"; then
+	if ! grep -F -q -- "$START_MARKER" "$README_FILE"; then
 		echo "Missing coverage start marker in README: $START_MARKER" >&2
 		exit 1
 	fi
-	if ! rg -q "^${END_MARKER}$" "$README_FILE"; then
+	if ! grep -F -q -- "$END_MARKER" "$README_FILE"; then
 		echo "Missing coverage end marker in README: $END_MARKER" >&2
 		exit 1
 	fi
