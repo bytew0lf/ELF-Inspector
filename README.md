@@ -1,4 +1,5 @@
 # ELF-Inspector
+[![Build](https://github.com/bytew0lf/ELF-Inspector/actions/workflows/ci.yml/badge.svg)](https://github.com/bytew0lf/ELF-Inspector/actions/workflows/ci.yml)
 
 ELF parser and reporter for ELF32 and ELF64 binaries (.so, executables, etc.).
 
