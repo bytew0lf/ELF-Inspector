@@ -73,7 +73,7 @@ public static partial class ElfReader
 	private const uint GnuPropertyNoCopyOnProtected = 0xA0000001;
 	private const ulong AuxvAtNull = 0;
 
-	public static void ParseNotes(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseNotes(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Notes.Clear();
 		var dedupeKeys = new HashSet<string>(StringComparer.Ordinal);
@@ -89,7 +89,13 @@ public static partial class ElfReader
 		ParseNoteProgramHeaders(data, elf, dedupeKeys);
 	}
 
-	private static void ParseNoteSection(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section, HashSet<string> dedupeKeys)
+	public static void ParseNotes(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseNotes(source, elf);
+	}
+
+	private static void ParseNoteSection(IEndianDataSource data, ElfFile elf, ElfSectionHeader section, HashSet<string> dedupeKeys)
 	{
 		if (section.Size == 0)
 			return;
@@ -105,7 +111,7 @@ public static partial class ElfReader
 		ParseNoteBlock(data, elf, sectionStart, sectionEnd, align, dedupeKeys);
 	}
 
-	private static void ParseNoteProgramHeaders(ReadOnlySpan<byte> data, ElfFile elf, HashSet<string> dedupeKeys)
+	private static void ParseNoteProgramHeaders(IEndianDataSource data, ElfFile elf, HashSet<string> dedupeKeys)
 	{
 		foreach (var programHeader in elf.ProgramHeaders)
 		{
@@ -119,15 +125,15 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseNoteBlock(ReadOnlySpan<byte> data, ElfFile elf, ulong start, ulong end, ulong align, HashSet<string> dedupeKeys)
+	private static void ParseNoteBlock(IEndianDataSource data, ElfFile elf, ulong start, ulong end, ulong align, HashSet<string> dedupeKeys)
 	{
 		var cursor = start;
 
 		while (cursor + 12 <= end)
 		{
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 			{
-				Position = ToInt32(cursor)
+				Position = cursor
 			};
 
 			var nameSize = reader.ReadUInt32();
@@ -138,14 +144,14 @@ public static partial class ElfReader
 			if (cursor + nameSize > end)
 				throw new InvalidDataException("Invalid NOTE name size.");
 
-			var rawName = Encoding.ASCII.GetString(data.Slice(ToInt32(cursor), (int)nameSize));
+			var rawName = Encoding.ASCII.GetString(ReadBytes(data, cursor, nameSize, "NOTE name"));
 			var name = NormalizeNoteNamespace(rawName.TrimEnd('\0'));
 			cursor = AlignUp(cursor + nameSize, align);
 
 			if (cursor + descSize > end)
 				throw new InvalidDataException("Invalid NOTE descriptor size.");
 
-			var descriptor = data.Slice(ToInt32(cursor), (int)descSize).ToArray();
+			var descriptor = ReadBytes(data, cursor, descSize, "NOTE descriptor");
 			cursor = AlignUp(cursor + descSize, align);
 
 			var note = new ElfNote

@@ -123,7 +123,7 @@ public static partial class ElfReader
 	private const long DtAArch64VariantPcs = 0x70000005;
 	private const long DtRiscVVariantCc = 0x70000001;
 
-	public static void ParseDynamic(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseDynamic(IEndianDataSource data, ElfFile elf)
 	{
 		elf.DynamicEntries.Clear();
 		elf.ImportLibraries.Clear();
@@ -149,7 +149,13 @@ public static partial class ElfReader
 		EnrichDynamicEntrySemantics(elf);
 	}
 
-	private static void ParseDynamicSection(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section)
+	public static void ParseDynamic(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseDynamic(source, elf);
+	}
+
+	private static void ParseDynamicSection(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
 	{
 		if (section.Size == 0)
 			return;
@@ -163,7 +169,7 @@ public static partial class ElfReader
 			throw new InvalidDataException("Invalid dynamic entry size.");
 
 		EnsureReadableRange(data, section.Offset, section.Size, "dynamic section");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var neededEntries = new List<ulong>();
 		var entryCount = section.Size / entrySize;
 		EnsureReasonableEntryCount(entryCount, "dynamic entries");
@@ -171,7 +177,7 @@ public static partial class ElfReader
 		for (ulong i = 0; i < entryCount; i++)
 		{
 			var entryOffset = checked(section.Offset + (i * entrySize));
-			reader.Position = ToInt32(entryOffset);
+			reader.Position = entryOffset;
 
 			long tag;
 			ulong value;
@@ -215,7 +221,7 @@ public static partial class ElfReader
 		ExtractImports(data, elf, section, neededEntries);
 	}
 
-	private static void ParseDynamicProgramHeaders(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseDynamicProgramHeaders(IEndianDataSource data, ElfFile elf)
 	{
 		var entrySize = elf.Header.Class == ElfClass.Elf32 ? 8UL : 16UL;
 
@@ -228,10 +234,10 @@ public static partial class ElfReader
 			var entryCount = programHeader.FileSize / entrySize;
 			EnsureReasonableEntryCount(entryCount, "dynamic entries");
 
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 			for (ulong i = 0; i < entryCount; i++)
 			{
-				reader.Position = ToInt32(checked(programHeader.Offset + (i * entrySize)));
+				reader.Position = checked(programHeader.Offset + (i * entrySize));
 
 				long tag;
 				ulong value;
@@ -261,7 +267,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ResolveDynamicStringValues(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ResolveDynamicStringValues(IEndianDataSource data, ElfFile elf)
 	{
 		if (elf.DynamicEntries.Count == 0)
 			return;
@@ -299,7 +305,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static string ReadDynamicStringValue(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader dynamicSection, long tag, ulong value)
+	private static string ReadDynamicStringValue(IEndianDataSource data, ElfFile elf, ElfSectionHeader dynamicSection, long tag, ulong value)
 	{
 		if (!IsStringDynamicTag(tag))
 			return string.Empty;
@@ -316,7 +322,7 @@ public static partial class ElfReader
 		return tag is DtNeeded or DtSoname or DtRPath or DtRunPath or DtConfig or DtDepAudit or DtAudit or DtAuxiliary or DtFilter;
 	}
 
-	private static void ExtractImports(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader dynamicSection, List<ulong> neededEntries)
+	private static void ExtractImports(IEndianDataSource data, ElfFile elf, ElfSectionHeader dynamicSection, List<ulong> neededEntries)
 	{
 		if (neededEntries.Count == 0)
 			return;

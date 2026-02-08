@@ -64,7 +64,7 @@ public static partial class ElfReader
 		public nuint pos;
 	}
 
-	public static void ParseSectionSpecialCases(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseSectionSpecialCases(IEndianDataSource data, ElfFile elf)
 	{
 		elf.CompressedSections.Clear();
 		elf.SectionGroups.Clear();
@@ -73,7 +73,13 @@ public static partial class ElfReader
 		ParseSectionGroups(data, elf);
 	}
 
-	private static void ParseCompressedSections(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseSectionSpecialCases(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseSectionSpecialCases(source, elf);
+	}
+
+	private static void ParseCompressedSections(IEndianDataSource data, ElfFile elf)
 	{
 		foreach (var section in elf.Sections)
 		{
@@ -125,7 +131,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseSectionGroups(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseSectionGroups(IEndianDataSource data, ElfFile elf)
 	{
 		foreach (var section in elf.Sections)
 		{
@@ -136,9 +142,9 @@ public static partial class ElfReader
 			var entryCount = section.Size / 4UL;
 			EnsureReasonableEntryCount(entryCount, "SHT_GROUP entries");
 
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 			{
-				Position = ToInt32(section.Offset)
+				Position = section.Offset
 			};
 
 			var flags = reader.ReadUInt32();
@@ -153,7 +159,7 @@ public static partial class ElfReader
 
 			for (ulong i = 1; i < entryCount; i++)
 			{
-				reader.Position = ToInt32(checked(section.Offset + (i * 4UL)));
+				reader.Position = checked(section.Offset + (i * 4UL));
 				var memberSectionIndex = reader.ReadUInt32();
 				group.MemberSectionIndexes.Add(memberSectionIndex);
 				group.MemberSectionNames.Add(ResolveSectionName(elf, memberSectionIndex));
@@ -189,7 +195,7 @@ public static partial class ElfReader
 	}
 
 	private static bool TryReadSectionPayload(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		ElfSectionHeader section,
 		out byte[] payload,
@@ -217,7 +223,7 @@ public static partial class ElfReader
 		var isGnuCompressed = !string.IsNullOrEmpty(section.Name) && section.Name.StartsWith(".zdebug", StringComparison.Ordinal);
 		if (!isFlagCompressed && !isGnuCompressed)
 		{
-			payload = data.Slice(ToInt32(section.Offset), ToInt32(section.Size)).ToArray();
+			payload = ReadBytes(data, section.Offset, section.Size, "section payload");
 			return true;
 		}
 
@@ -233,9 +239,9 @@ public static partial class ElfReader
 				return false;
 			}
 
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 			{
-				Position = ToInt32(section.Offset)
+				Position = section.Offset
 			};
 
 			if (elf.Header.Class == ElfClass.Elf32)
@@ -258,13 +264,13 @@ public static partial class ElfReader
 
 			if (compressionType == ElfCompressZlib)
 			{
-				var compressedPayload = data.Slice(ToInt32(compressedPayloadOffset), ToInt32(compressedPayloadSize));
+				var compressedPayload = ReadBytes(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
 				return TryDecompressZlibPayload(compressedPayload, declaredUncompressedSize, out payload, out error);
 			}
 
 			if (compressionType == ElfCompressZstd)
 			{
-				var compressedPayload = data.Slice(ToInt32(compressedPayloadOffset), ToInt32(compressedPayloadSize));
+				var compressedPayload = ReadBytes(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
 				return TryDecompressZstdPayload(
 					compressedPayload,
 					declaredUncompressedSize,
@@ -283,7 +289,7 @@ public static partial class ElfReader
 			return false;
 		}
 
-		var zdebugHeader = data.Slice(ToInt32(section.Offset), 12);
+		var zdebugHeader = ReadBytes(data, section.Offset, 12, "GNU .zdebug header");
 		var isZlibHeader = zdebugHeader[0] == (byte)'Z' && zdebugHeader[1] == (byte)'L' && zdebugHeader[2] == (byte)'I' && zdebugHeader[3] == (byte)'B';
 		var isZstdHeader = zdebugHeader[0] == (byte)'Z' && zdebugHeader[1] == (byte)'S' && zdebugHeader[2] == (byte)'T' && zdebugHeader[3] == (byte)'D';
 		if (!isZlibHeader && !isZstdHeader)
@@ -293,12 +299,12 @@ public static partial class ElfReader
 		}
 
 		compressionType = isZstdHeader ? ElfCompressZstd : ElfCompressZlib;
-		declaredUncompressedSize = BinaryPrimitives.ReadUInt64BigEndian(zdebugHeader.Slice(4, 8));
+		declaredUncompressedSize = BinaryPrimitives.ReadUInt64BigEndian(zdebugHeader.AsSpan(4, 8));
 		var gnuPayloadOffset = checked(section.Offset + 12UL);
 		var gnuPayloadSize = section.Size - 12UL;
 		EnsureReadableRange(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
 
-		var gnuPayload = data.Slice(ToInt32(gnuPayloadOffset), ToInt32(gnuPayloadSize));
+		var gnuPayload = ReadBytes(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
 		if (compressionType == ElfCompressZstd)
 		{
 			return TryDecompressZstdPayload(

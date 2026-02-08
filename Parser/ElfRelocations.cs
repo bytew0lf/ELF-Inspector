@@ -25,7 +25,7 @@ public static partial class ElfReader
 {
 	private const ulong ShfAlloc = 0x2;
 
-	public static void ParseRelocations(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseRelocations(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Relocations.Clear();
 
@@ -43,7 +43,13 @@ public static partial class ElfReader
 		ParseRelocationsFromDynamicEntries(data, elf);
 	}
 
-	private static void ParseRelSection(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section)
+	public static void ParseRelocations(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseRelocations(source, elf);
+	}
+
+	private static void ParseRelSection(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
 	{
 		if (section.Size == 0)
 			return;
@@ -57,14 +63,14 @@ public static partial class ElfReader
 			throw new InvalidDataException("Invalid REL entry size.");
 
 		EnsureReadableRange(data, section.Offset, section.Size, "REL section");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCount = section.Size / entrySize;
 		EnsureReasonableEntryCount(entryCount, "REL section");
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
 			var entryOffset = checked(section.Offset + (i * entrySize));
-			reader.Position = ToInt32(entryOffset);
+			reader.Position = entryOffset;
 
 			ulong offset;
 			ulong info;
@@ -84,7 +90,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseRelaSection(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section)
+	private static void ParseRelaSection(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
 	{
 		if (section.Size == 0)
 			return;
@@ -98,14 +104,14 @@ public static partial class ElfReader
 			throw new InvalidDataException("Invalid RELA entry size.");
 
 		EnsureReadableRange(data, section.Offset, section.Size, "RELA section");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCount = section.Size / entrySize;
 		EnsureReasonableEntryCount(entryCount, "RELA section");
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
 			var entryOffset = checked(section.Offset + (i * entrySize));
-			reader.Position = ToInt32(entryOffset);
+			reader.Position = entryOffset;
 
 			ulong offset;
 			ulong info;
@@ -128,7 +134,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseRelrSection(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section)
+	private static void ParseRelrSection(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
 	{
 		if (section.Size == 0)
 			return;
@@ -143,13 +149,13 @@ public static partial class ElfReader
 		EnsureReasonableEntryCount(entryCount, "RELR section");
 
 		var wordBitCount = (int)(wordSize * 8);
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var nextOffset = 0UL;
 		var hasBaseAddress = false;
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
-			reader.Position = ToInt32(checked(section.Offset + (i * entrySize)));
+			reader.Position = checked(section.Offset + (i * entrySize));
 			var encoded = elf.Header.Class == ElfClass.Elf32 ? reader.ReadUInt32() : reader.ReadUInt64();
 
 			if ((encoded & 1UL) == 0)
@@ -176,7 +182,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseRelocationsFromDynamicEntries(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseRelocationsFromDynamicEntries(IEndianDataSource data, ElfFile elf)
 	{
 		if (elf.DynamicEntries.Count == 0)
 			return;
@@ -189,7 +195,7 @@ public static partial class ElfReader
 		ParseDynamicPltRelocationTable(data, elf, seen);
 	}
 
-	private static void ParseDynamicRelocationTable(ReadOnlySpan<byte> data, ElfFile elf, long tableTag, long sizeTag, long entryTag, bool hasAddend, string encoding, string sourceContext, HashSet<string> seen)
+	private static void ParseDynamicRelocationTable(IEndianDataSource data, ElfFile elf, long tableTag, long sizeTag, long entryTag, bool hasAddend, string encoding, string sourceContext, HashSet<string> seen)
 	{
 		if (!TryGetDynamicValue(elf, tableTag, out var tableVirtualAddress))
 			return;
@@ -212,10 +218,10 @@ public static partial class ElfReader
 		var entryCount = tableSize / entrySize;
 		EnsureReasonableEntryCount(entryCount, $"DT_{encoding} relocation entries");
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
 		{
-			reader.Position = ToInt32(checked(tableFileOffset + (i * entrySize)));
+			reader.Position = checked(tableFileOffset + (i * entrySize));
 
 			ulong offset;
 			ulong info;
@@ -239,7 +245,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseDynamicPltRelocationTable(ReadOnlySpan<byte> data, ElfFile elf, HashSet<string> seen)
+	private static void ParseDynamicPltRelocationTable(IEndianDataSource data, ElfFile elf, HashSet<string> seen)
 	{
 		if (!TryGetDynamicValue(elf, DtJmpRel, out var tableVirtualAddress))
 			return;
@@ -266,7 +272,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseDynamicRelocationTableAtAddress(ReadOnlySpan<byte> data, ElfFile elf, ulong tableVirtualAddress, ulong tableSize, ulong entrySize, bool hasAddend, string encoding, string sourceContext, HashSet<string> seen)
+	private static void ParseDynamicRelocationTableAtAddress(IEndianDataSource data, ElfFile elf, ulong tableVirtualAddress, ulong tableSize, ulong entrySize, bool hasAddend, string encoding, string sourceContext, HashSet<string> seen)
 	{
 		var minimumSize = hasAddend
 			? (elf.Header.Class == ElfClass.Elf32 ? 12UL : 24UL)
@@ -280,10 +286,10 @@ public static partial class ElfReader
 		var entryCount = tableSize / entrySize;
 		EnsureReasonableEntryCount(entryCount, $"DT_JMPREL {encoding} relocation entries");
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
 		{
-			reader.Position = ToInt32(checked(tableFileOffset + (i * entrySize)));
+			reader.Position = checked(tableFileOffset + (i * entrySize));
 
 			ulong offset;
 			ulong info;
@@ -307,7 +313,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseDynamicRelrTable(ReadOnlySpan<byte> data, ElfFile elf, HashSet<string> seen)
+	private static void ParseDynamicRelrTable(IEndianDataSource data, ElfFile elf, HashSet<string> seen)
 	{
 		if (!TryGetDynamicValue(elf, DtRelr, out var relrVirtualAddress))
 			return;
@@ -326,13 +332,13 @@ public static partial class ElfReader
 		EnsureReasonableEntryCount(entryCount, "DT_RELR relocation entries");
 
 		var wordBitCount = (int)(wordSize * 8);
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var nextOffset = 0UL;
 		var hasBaseAddress = false;
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
-			reader.Position = ToInt32(checked(relrFileOffset + (i * entrySize)));
+			reader.Position = checked(relrFileOffset + (i * entrySize));
 			var encoded = elf.Header.Class == ElfClass.Elf32 ? reader.ReadUInt32() : reader.ReadUInt64();
 
 			if ((encoded & 1UL) == 0)

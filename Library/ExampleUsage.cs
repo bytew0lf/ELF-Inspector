@@ -4,7 +4,6 @@ public static class ExampleUsage
 {
 	private const int MaxDetailedItems = 500;
 	private const int MaxHashPreviewEntries = 32;
-	private const long MaxInMemoryElfBytes = int.MaxValue;
 
 	public static int RunWithArgs(string[] args)
 	{
@@ -21,28 +20,19 @@ public static class ExampleUsage
 			return 1;
 		}
 
-		var inputLength = new FileInfo(filePath).Length;
-		if (inputLength > MaxInMemoryElfBytes)
-		{
-			Console.Error.WriteLine(
-				$"ELF file is too large for the in-memory parser ({inputLength} bytes > {MaxInMemoryElfBytes} bytes).");
-			return 1;
-		}
-
 		var outputPath = Path.GetFullPath(outputDirectory);
 		Directory.CreateDirectory(outputPath);
 		var reportFilePath = Path.Combine(outputPath, outputFileName);
 
 		try
 		{
-			var data = File.ReadAllBytes(filePath);
 			var parseOptions = new ELFInspector.Parser.ElfParseOptions
 			{
 				HeaderValidationMode = compatHeaderValidation
 					? ELFInspector.Parser.ElfHeaderValidationMode.Compat
 					: ELFInspector.Parser.ElfHeaderValidationMode.Strict
 			};
-			var elf = ELFInspector.Parser.ElfReader.Parse(data, parseOptions);
+			var elf = ELFInspector.Parser.ElfReader.Parse(filePath, parseOptions);
 			var report = ELFInspector.Reporting.ElfReportMapper.Create(elf);
 			var reportText = BuildTextReport(filePath, report, deterministic);
 

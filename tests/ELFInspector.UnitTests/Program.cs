@@ -1,6 +1,7 @@
 using System.Buffers.Binary;
 using System.Reflection;
 using System.Text;
+using ELFInspector.Endianness;
 using ELFInspector.Library;
 using ELFInspector.Parser;
 using ELFInspector.Reporting;
@@ -36,6 +37,73 @@ public sealed class ElfReaderTests
 			Assert.True(elf.Header.Class is ElfClass.Elf32 or ElfClass.Elf64, $"Unsupported class for {Path.GetFileName(file)}.");
 			Assert.True(elf.ProgramHeaders.Count > 0 || elf.Sections.Count > 0, $"No structures parsed for {Path.GetFileName(file)}.");
 		}
+	}
+
+	[Fact]
+	public void Parse_InternalDataSource_LengthOverIntMax_SucceedsForMinimalElf64()
+	{
+		var header = BuildMinimalElf64Header();
+		var source = new SparseEndianDataSource((ulong)int.MaxValue + 4096UL, header);
+		var elf = InvokeInternalParse(source, ElfParseOptions.StrictDefault);
+
+		Assert.Equal(ElfClass.Elf64, elf.Header.Class);
+		Assert.Equal((ushort)2, elf.Header.Type);
+		Assert.Equal((ushort)62, elf.Header.Machine);
+		Assert.Empty(elf.ProgramHeaders);
+		Assert.Empty(elf.Sections);
+	}
+
+	[Fact]
+	public void Parse_FilePath_StreamMode_SparseFileOverIntMax_Succeeds()
+	{
+		var tempFile = Path.Combine(Path.GetTempPath(), $"elf-large-{Guid.NewGuid():N}.bin");
+		try
+		{
+			var header = BuildMinimalElf64Header();
+			using (var stream = new FileStream(tempFile, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read))
+			{
+				stream.Write(header);
+				stream.SetLength((long)int.MaxValue + 4096L);
+			}
+
+			var elf = ElfReader.Parse(tempFile, new ElfParseOptions
+			{
+				DataSourceMode = ElfDataSourceMode.Stream
+			});
+
+			Assert.Equal(ElfClass.Elf64, elf.Header.Class);
+			Assert.Equal((ushort)62, elf.Header.Machine);
+			Assert.Empty(elf.Sections);
+		}
+		finally
+		{
+			if (File.Exists(tempFile))
+				File.Delete(tempFile);
+		}
+	}
+
+	[Fact]
+	public void Parse_FilePath_AutoMode_UsesDataSourceRefactorPath()
+	{
+		var helloFile = GetRequiredSample("hello_x86_64");
+		var elf = ElfReader.Parse(helloFile);
+
+		Assert.Equal(ElfClass.Elf64, elf.Header.Class);
+		Assert.NotEmpty(elf.ProgramHeaders);
+	}
+
+	[Fact]
+	public void Parse_Stream_Mode_SucceedsWithoutMonolithicFileRead()
+	{
+		var helloFile = GetRequiredSample("hello_x86_64");
+		using var stream = new FileStream(helloFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+		var elf = ElfReader.Parse(stream, new ElfParseOptions
+		{
+			DataSourceMode = ElfDataSourceMode.Stream
+		});
+
+		Assert.Equal(ElfClass.Elf64, elf.Header.Class);
+		Assert.NotEmpty(elf.Sections);
 	}
 
 	[Fact]
@@ -1989,6 +2057,69 @@ public sealed class ElfReaderTests
 		Assert.NotNull(method);
 		var result = method!.Invoke(null, new[] { value });
 		return Assert.IsType<string>(result);
+	}
+
+	private static ElfFile InvokeInternalParse(IEndianDataSource source, ElfParseOptions options)
+	{
+		var method = typeof(ElfReader).GetMethod(
+			"Parse",
+			BindingFlags.Static | BindingFlags.NonPublic,
+			null,
+			new[] { typeof(IEndianDataSource), typeof(ElfParseOptions) },
+			null);
+		Assert.NotNull(method);
+
+		var result = method!.Invoke(null, new object[] { source, options });
+		return Assert.IsType<ElfFile>(result);
+	}
+
+	private static byte[] BuildMinimalElf64Header()
+	{
+		var header = new byte[64];
+		header[0] = 0x7F;
+		header[1] = (byte)'E';
+		header[2] = (byte)'L';
+		header[3] = (byte)'F';
+		header[4] = 2; // ELFCLASS64
+		header[5] = 1; // little-endian
+		header[6] = 1; // EI_VERSION
+		header[7] = 0; // System V ABI
+		header[8] = 0; // ABI version
+
+		WriteUInt16(header.AsSpan(16, 2), 2, littleEndian: true); // e_type = ET_EXEC
+		WriteUInt16(header.AsSpan(18, 2), 62, littleEndian: true); // e_machine = EM_X86_64
+		WriteUInt32(header.AsSpan(20, 4), 1U, littleEndian: true); // e_version
+		WriteUInt16(header.AsSpan(52, 2), 64, littleEndian: true); // e_ehsize
+		WriteUInt16(header.AsSpan(54, 2), 0, littleEndian: true); // e_phentsize (no PH table)
+		WriteUInt16(header.AsSpan(58, 2), 0, littleEndian: true); // e_shentsize (no SH table)
+		return header;
+	}
+
+	private sealed class SparseEndianDataSource : IEndianDataSource
+	{
+		private readonly byte[] _prefix;
+
+		public SparseEndianDataSource(ulong length, byte[] prefix)
+		{
+			Length = length;
+			_prefix = prefix ?? Array.Empty<byte>();
+		}
+
+		public ulong Length { get; }
+
+		public void ReadAt(ulong offset, Span<byte> destination)
+		{
+			if (offset > Length || (ulong)destination.Length > Length - offset)
+				throw new InvalidDataException("Read exceeds sparse source bounds.");
+
+			destination.Clear();
+			if (offset >= (ulong)_prefix.Length || destination.Length == 0)
+				return;
+
+			var available = (ulong)_prefix.Length - offset;
+			var bytesToCopy = (int)Math.Min((ulong)destination.Length, available);
+			_prefix.AsSpan((int)offset, bytesToCopy).CopyTo(destination);
+		}
 	}
 
 	private static bool IsRawFallbackRelocationTypeName(ushort machine, ElfRelocation relocation)

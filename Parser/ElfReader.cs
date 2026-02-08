@@ -11,6 +11,96 @@ public static partial class ElfReader
 	private const ushort Elf32SectionHeaderEntrySize = 40;
 	private const ushort Elf64SectionHeaderEntrySize = 64;
 
+	public static ElfFile Parse(string filePath)
+	{
+		return Parse(filePath, ElfParseOptions.StrictDefault);
+	}
+
+	public static ElfFile Parse(string filePath, ElfParseOptions? options)
+	{
+		if (string.IsNullOrWhiteSpace(filePath))
+			throw new ArgumentException("ELF file path must not be empty.", nameof(filePath));
+		if (!File.Exists(filePath))
+			throw new FileNotFoundException("ELF file not found.", filePath);
+
+		options ??= ElfParseOptions.StrictDefault;
+		switch (options.DataSourceMode)
+		{
+			case ElfDataSourceMode.InMemory:
+			{
+				using var source = ElfDataSourceFactory.CreateInMemory(File.ReadAllBytes(filePath));
+				return Parse(source, options);
+			}
+			case ElfDataSourceMode.Stream:
+			{
+				using var source = ElfDataSourceFactory.CreateStream(filePath);
+				return Parse(source, options);
+			}
+			case ElfDataSourceMode.MemoryMapped:
+			{
+				using var source = ElfDataSourceFactory.CreateMemoryMapped(filePath);
+				return Parse(source, options);
+			}
+			case ElfDataSourceMode.Auto:
+			default:
+			{
+				try
+				{
+					using var source = ElfDataSourceFactory.CreateMemoryMapped(filePath);
+					return Parse(source, options);
+				}
+				catch (Exception ex) when (ex is IOException or NotSupportedException or PlatformNotSupportedException or UnauthorizedAccessException)
+				{
+					using var source = ElfDataSourceFactory.CreateStream(filePath);
+					return Parse(source, options);
+				}
+			}
+		}
+	}
+
+	public static ElfFile Parse(Stream stream)
+	{
+		return Parse(stream, ElfParseOptions.StrictDefault);
+	}
+
+	public static ElfFile Parse(Stream stream, ElfParseOptions? options)
+	{
+		if (stream == null)
+			throw new ArgumentNullException(nameof(stream));
+		if (!stream.CanRead)
+			throw new ArgumentException("ELF stream must be readable.", nameof(stream));
+
+		options ??= ElfParseOptions.StrictDefault;
+		if (options.DataSourceMode == ElfDataSourceMode.InMemory)
+		{
+			using var source = ElfDataSourceFactory.CreateInMemory(ReadAllBytes(stream));
+			return Parse(source, options);
+		}
+
+		var tempFilePath = Path.Combine(Path.GetTempPath(), $"elf-inspector-{Guid.NewGuid():N}.bin");
+		try
+		{
+			using (var tempFile = new FileStream(tempFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 128 * 1024, FileOptions.SequentialScan))
+			{
+				stream.CopyTo(tempFile);
+			}
+
+			return Parse(tempFilePath, options);
+		}
+		finally
+		{
+			try
+			{
+				if (File.Exists(tempFilePath))
+					File.Delete(tempFilePath);
+			}
+			catch
+			{
+				// Best-effort cleanup for temporary stream staging files.
+			}
+		}
+	}
+
 	public static ElfFile Parse(ReadOnlySpan<byte> data)
 	{
 		return Parse(data, ElfParseOptions.StrictDefault);
@@ -19,37 +109,43 @@ public static partial class ElfReader
 	public static ElfFile Parse(ReadOnlySpan<byte> data, ElfParseOptions? options)
 	{
 		options ??= ElfParseOptions.StrictDefault;
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		return Parse(source, options);
+	}
 
-		// Check for ELF magic.
-		if (data.Length < 16 || data[0] != 0x7F || data[1] != (byte)'E' || data[2] != (byte)'L' || data[3] != (byte)'F')
+	private static ElfFile Parse(IEndianDataSource data, ElfParseOptions options)
+	{
+		var ident = ReadBytes(data, 0, 16, "identification");
+
+		if (ident[0] != 0x7F || ident[1] != (byte)'E' || ident[2] != (byte)'L' || ident[3] != (byte)'F')
 			throw new InvalidDataException("Not an ELF file");
 
 		var header = new ElfHeader
 		{
-			Class = (ElfClass)data[4],
-			DataEncoding = (ElfData)data[5],
-			IdentVersion = data[6],
-			OsAbi = data[7],
-			AbiVersion = data[8]
+			Class = (ElfClass)ident[4],
+			DataEncoding = (ElfData)ident[5],
+			IdentVersion = ident[6],
+			OsAbi = ident[7],
+			AbiVersion = ident[8]
 		};
 
 		if (header.Class is not (ElfClass.Elf32 or ElfClass.Elf64))
 			throw new NotSupportedException("Unsupported ELF class");
 		if (header.DataEncoding is not (ElfData.LittleEndian or ElfData.BigEndian))
 			throw new NotSupportedException("Unsupported ELF data encoding");
-		ValidateHeaderPrefix(data, header, options);
+		ValidateHeaderPrefix(ident, header, options);
 
-		var reader = new EndianBinaryReader(data, header.IsLittleEndian);
-
+		var reader = new EndianDataReader(data, header.IsLittleEndian);
 		switch (header.Class)
-			{
-				case ElfClass.Elf32:
-					Parse32(reader, header);
-					break;
-				case ElfClass.Elf64:
-					Parse64(reader, header);
-					break;
-			}
+		{
+			case ElfClass.Elf32:
+				Parse32(reader, header);
+				break;
+			case ElfClass.Elf64:
+				Parse64(reader, header);
+				break;
+		}
+
 		ValidateHeaderPostParse(data, header, options);
 
 		var elf = new ElfFile
@@ -58,7 +154,6 @@ public static partial class ElfReader
 			ParseOptions = options
 		};
 
-		// Parse order follows gABI relationships between tables.
 		ParseSectionHeaders(data, elf);
 		ParseProgramHeaders(data, elf);
 		ParseDynamic(data, elf);
@@ -74,7 +169,7 @@ public static partial class ElfReader
 		return elf;
 	}
 
-	private static void Parse32(EndianBinaryReader r, ElfHeader header)
+	private static void Parse32(EndianDataReader r, ElfHeader header)
 	{
 		r.Position = 16;
 		header.Type = r.ReadUInt16();
@@ -92,7 +187,7 @@ public static partial class ElfReader
 		header.SectionHeaderStringIndex = r.ReadUInt16();
 	}
 
-	private static void Parse64(EndianBinaryReader r, ElfHeader header)
+	private static void Parse64(EndianDataReader r, ElfHeader header)
 	{
 		r.Position = 16;
 		header.Type = r.ReadUInt16();
@@ -118,9 +213,9 @@ public static partial class ElfReader
 		return (int)value;
 	}
 
-	private static void EnsureReadableRange(ReadOnlySpan<byte> data, ulong offset, ulong size, string blockName)
+	private static void EnsureReadableRange(IEndianDataSource data, ulong offset, ulong size, string blockName)
 	{
-		var dataLength = (ulong)data.Length;
+		var dataLength = data.Length;
 		if (offset > dataLength || size > dataLength - offset)
 			throw new InvalidDataException($"ELF {blockName} exceeds file bounds.");
 	}
@@ -150,7 +245,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ValidateHeaderPrefix(ReadOnlySpan<byte> data, ElfHeader header, ElfParseOptions options)
+	private static void ValidateHeaderPrefix(ReadOnlySpan<byte> ident, ElfHeader header, ElfParseOptions options)
 	{
 		if (options.HeaderValidationMode != ElfHeaderValidationMode.Strict)
 			return;
@@ -160,12 +255,12 @@ public static partial class ElfReader
 
 		for (var i = 9; i < 16; i++)
 		{
-			if (data[i] != 0)
+			if (ident[i] != 0)
 				throw new InvalidDataException($"Invalid ELF identification padding at e_ident[{i}].");
 		}
 	}
 
-	private static void ValidateHeaderPostParse(ReadOnlySpan<byte> data, ElfHeader header, ElfParseOptions options)
+	private static void ValidateHeaderPostParse(IEndianDataSource data, ElfHeader header, ElfParseOptions options)
 	{
 		if (options.HeaderValidationMode != ElfHeaderValidationMode.Strict)
 			return;
@@ -210,7 +305,7 @@ public static partial class ElfReader
 		ValidateSectionHeaderConsistency(data, header);
 	}
 
-	private static void ValidateProgramHeaderConsistency(ReadOnlySpan<byte> data, ElfHeader header)
+	private static void ValidateProgramHeaderConsistency(IEndianDataSource data, ElfHeader header)
 	{
 		var hasProgramHeaderMetadata = header.ProgramHeaderOffset != 0
 			|| header.ProgramHeaderEntrySize != 0
@@ -227,14 +322,12 @@ public static partial class ElfReader
 		if (declaredCount == 0)
 			throw new InvalidDataException("Program header metadata is present but e_phnum is zero.");
 		if (header.ProgramHeaderCount == PnXNum && (header.SectionHeaderOffset == 0 || header.SectionHeaderEntrySize == 0))
-		{
 			throw new InvalidDataException("Extended program header numbering requires a readable section header table.");
-		}
 
 		EnsureTableReadable(data, header.ProgramHeaderOffset, header.ProgramHeaderEntrySize, declaredCount, "program header table");
 	}
 
-	private static void ValidateSectionHeaderConsistency(ReadOnlySpan<byte> data, ElfHeader header)
+	private static void ValidateSectionHeaderConsistency(IEndianDataSource data, ElfHeader header)
 	{
 		var hasSectionHeaderMetadata = header.SectionHeaderOffset != 0
 			|| header.SectionHeaderEntrySize != 0
@@ -260,7 +353,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void EnsureTableReadable(ReadOnlySpan<byte> data, ulong tableOffset, ushort entrySize, ulong entryCount, string tableName)
+	private static void EnsureTableReadable(IEndianDataSource data, ulong tableOffset, ushort entrySize, ulong entryCount, string tableName)
 	{
 		ulong tableSize;
 		try
@@ -273,5 +366,23 @@ public static partial class ElfReader
 		}
 
 		EnsureReadableRange(data, tableOffset, tableSize, tableName);
+	}
+
+	private static byte[] ReadBytes(IEndianDataSource data, ulong offset, ulong size, string blockName)
+	{
+		EnsureReadableRange(data, offset, size, blockName);
+		if (size > int.MaxValue)
+			throw new InvalidDataException($"ELF {blockName} exceeds the maximum contiguous read window.");
+
+		var bytes = new byte[(int)size];
+		data.ReadAt(offset, bytes);
+		return bytes;
+	}
+
+	private static byte[] ReadAllBytes(Stream stream)
+	{
+		using var memoryStream = new MemoryStream();
+		stream.CopyTo(memoryStream);
+		return memoryStream.ToArray();
 	}
 }

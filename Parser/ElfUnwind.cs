@@ -80,7 +80,7 @@ public static partial class ElfReader
 		public CfiInterpreterState InitialState { get; } = new();
 	}
 
-	public static void ParseUnwindData(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseUnwindData(IEndianDataSource data, ElfFile elf)
 	{
 		var unwind = new ElfUnwindInfo();
 		ParseEhFrameData(data, elf, unwind.EhFrame);
@@ -89,7 +89,13 @@ public static partial class ElfReader
 		elf.Unwind = unwind;
 	}
 
-	private static void ParseEhFrameData(ReadOnlySpan<byte> data, ElfFile elf, ElfEhFrameInfo result)
+	public static void ParseUnwindData(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseUnwindData(source, elf);
+	}
+
+	private static void ParseEhFrameData(IEndianDataSource data, ElfFile elf, ElfEhFrameInfo result)
 	{
 		var ehFrameSection = elf.Sections.FirstOrDefault(section => string.Equals(section.Name, ".eh_frame", StringComparison.Ordinal));
 		if (ehFrameSection == null)
@@ -854,7 +860,7 @@ public static partial class ElfReader
 		return true;
 	}
 
-	private static void ParseEhFrameHeaderData(ReadOnlySpan<byte> data, ElfFile elf, ElfEhFrameHeaderInfo result)
+	private static void ParseEhFrameHeaderData(IEndianDataSource data, ElfFile elf, ElfEhFrameHeaderInfo result)
 	{
 		var ehFrameHeaderSection = elf.Sections.FirstOrDefault(section => string.Equals(section.Name, ".eh_frame_hdr", StringComparison.Ordinal));
 		if (ehFrameHeaderSection == null)
@@ -1208,7 +1214,7 @@ public static partial class ElfReader
 			: BinaryPrimitives.ReadInt64BigEndian(span);
 	}
 
-	private static void ParseDebugSections(ReadOnlySpan<byte> data, ElfFile elf, List<ElfDebugSectionInfo> result)
+	private static void ParseDebugSections(IEndianDataSource data, ElfFile elf, List<ElfDebugSectionInfo> result)
 	{
 		result.Clear();
 

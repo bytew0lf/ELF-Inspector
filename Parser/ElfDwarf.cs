@@ -2,7 +2,7 @@ namespace ELFInspector.Parser;
 
 public static partial class ElfReader
 {
-	public static void ParseDwarfIndex(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseDwarfIndex(IEndianDataSource data, ElfFile elf)
 	{
 		var dwarf = new ElfDwarfIndexInfo();
 
@@ -61,6 +61,12 @@ public static partial class ElfReader
 		ParseDwarfSemantics(data, elf, dwarf, debugInfoSection, debugAbbrevSection);
 
 		elf.Dwarf = dwarf;
+	}
+
+	public static void ParseDwarfIndex(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseDwarfIndex(source, elf);
 	}
 
 	private static ElfSectionHeader FindDebugSection(ElfFile elf, string canonicalName)

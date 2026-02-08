@@ -5,7 +5,7 @@ public static partial class ElfReader
 	private const uint ShtHash = 5;
 	private const uint ShtGnuHash = 0x6FFFFFF6;
 
-	public static void ParseHashTables(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseHashTables(IEndianDataSource data, ElfFile elf)
 	{
 		elf.SysvHashTable = null;
 		elf.GnuHashTable = null;
@@ -16,7 +16,13 @@ public static partial class ElfReader
 		BuildHashLookupPaths(elf);
 	}
 
-	private static void ParseSysvHashTable(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseHashTables(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseHashTables(source, elf);
+	}
+
+	private static void ParseSysvHashTable(IEndianDataSource data, ElfFile elf)
 	{
 		if (!TryGetDynamicValue(elf, DtHash, out var hashAddress))
 			return;
@@ -29,9 +35,9 @@ public static partial class ElfReader
 			return;
 
 		EnsureReadableRange(data, tableOffset, 8, "DT_HASH");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 		{
-			Position = ToInt32(tableOffset)
+			Position = tableOffset
 		};
 
 		var bucketCount = reader.ReadUInt32();
@@ -50,20 +56,20 @@ public static partial class ElfReader
 
 		for (ulong i = 0; i < bucketEntriesToRead; i++)
 		{
-			reader.Position = ToInt32(checked(tableOffset + 8UL + (i * 4UL)));
+			reader.Position = checked(tableOffset + 8UL + (i * 4UL));
 			table.Buckets.Add(reader.ReadUInt32());
 		}
 
 		for (ulong i = 0; i < chainEntriesToRead; i++)
 		{
-			reader.Position = ToInt32(checked(tableOffset + 8UL + (bucketEntriesToRead * 4UL) + (i * 4UL)));
+			reader.Position = checked(tableOffset + 8UL + (bucketEntriesToRead * 4UL) + (i * 4UL));
 			table.Chains.Add(reader.ReadUInt32());
 		}
 
 		elf.SysvHashTable = table;
 	}
 
-	private static void ParseGnuHashTable(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseGnuHashTable(IEndianDataSource data, ElfFile elf)
 	{
 		if (!TryGetDynamicValue(elf, DtGnuHash, out var hashAddress))
 			return;
@@ -76,9 +82,9 @@ public static partial class ElfReader
 			return;
 
 		EnsureReadableRange(data, tableOffset, 16, "DT_GNU_HASH");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 		{
-			Position = ToInt32(tableOffset)
+			Position = tableOffset
 		};
 
 		var bucketCount = reader.ReadUInt32();
@@ -105,7 +111,7 @@ public static partial class ElfReader
 
 		for (ulong i = 0; i < bloomWordsToRead; i++)
 		{
-			reader.Position = ToInt32(checked(tableOffset + headerSize + (i * bloomWordSize)));
+			reader.Position = checked(tableOffset + headerSize + (i * bloomWordSize));
 			table.BloomWords.Add(elf.Header.Class == ElfClass.Elf32 ? reader.ReadUInt32() : reader.ReadUInt64());
 		}
 
@@ -116,7 +122,7 @@ public static partial class ElfReader
 
 		for (ulong i = 0; i < bucketsToRead; i++)
 		{
-			reader.Position = ToInt32(checked(bucketStart + (i * 4UL)));
+			reader.Position = checked(bucketStart + (i * 4UL));
 			table.Buckets.Add(reader.ReadUInt32());
 		}
 
@@ -127,7 +133,7 @@ public static partial class ElfReader
 
 		for (ulong i = 0; i < inferredChainCount; i++)
 		{
-			reader.Position = ToInt32(checked(chainStart + (i * 4UL)));
+			reader.Position = checked(chainStart + (i * 4UL));
 			table.Chains.Add(reader.ReadUInt32());
 		}
 
@@ -158,7 +164,7 @@ public static partial class ElfReader
 		return false;
 	}
 
-	private static ulong DetermineGnuHashChainCount(ReadOnlySpan<byte> data, ElfFile elf, ulong chainStart, ulong maxChainsByRange, uint symbolOffset, IReadOnlyList<uint> buckets)
+	private static ulong DetermineGnuHashChainCount(IEndianDataSource data, ElfFile elf, ulong chainStart, ulong maxChainsByRange, uint symbolOffset, IReadOnlyList<uint> buckets)
 	{
 		if (maxChainsByRange == 0 || buckets.Count == 0)
 			return 0;
@@ -178,7 +184,7 @@ public static partial class ElfReader
 	}
 
 	private static bool TryInferGnuHashChainCountFromTerminator(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		ulong chainStart,
 		ulong maxChainsByRange,
@@ -194,13 +200,13 @@ public static partial class ElfReader
 		if (startIndex >= maxChainsByRange)
 			return false;
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (var chainIndex = startIndex; chainIndex < maxChainsByRange && chainIndex < MaxParserEntryCount; chainIndex++)
 		{
 			var chainOffset = checked(chainStart + (chainIndex * 4UL));
 			EnsureReadableRange(data, chainOffset, 4, "DT_GNU_HASH chain");
 
-			reader.Position = ToInt32(chainOffset);
+			reader.Position = chainOffset;
 			var chainValue = reader.ReadUInt32();
 
 			if ((chainValue & 1U) == 0)

@@ -5,7 +5,8 @@ ELF Parser & Reporter für ELF32 & ELF64-Binaries (.so, Exec, etc.)
 ## Features
 
 * ELF32 & ELF64 (Little/Big Endian)
-* InMemory Parsing
+* Data-Source Parsing: InMemory, Stream, MemoryMapped (mmap)
+* Large-File-Kern mit `ulong`-Offset-Adressierung (>2GB Offsets ohne globalen `int`-Buffer)
 * Sections & Program Headers
 * Symbol Tables inkl. Versionierung
 * Relocations (REL/RELA/RELR)

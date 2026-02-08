@@ -42,10 +42,17 @@ public static partial class ElfReader
 
 	public static void ParseCoreDumpInfo(ElfFile elf)
 	{
-		ParseCoreDumpInfo(ReadOnlySpan<byte>.Empty, elf);
+		using var empty = ElfDataSourceFactory.CreateInMemory(Array.Empty<byte>());
+		ParseCoreDumpInfo(empty, elf);
 	}
 
 	public static void ParseCoreDumpInfo(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseCoreDumpInfo(source, elf);
+	}
+
+	public static void ParseCoreDumpInfo(IEndianDataSource data, ElfFile elf)
 	{
 		var core = new ElfCoreDumpInfo
 		{

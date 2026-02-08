@@ -75,7 +75,7 @@ public static partial class ElfReader
 	private const ushort SymbolVersionGlobal = 1;
 	private const uint ShnUndef = 0;
 
-	public static void ParseSymbolTables(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseSymbolTables(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Symbols.Clear();
 		elf.ImportedSymbols.Clear();
@@ -101,7 +101,13 @@ public static partial class ElfReader
 		AssignFallbackImportLibraries(elf);
 	}
 
-	private static Dictionary<uint, uint[]> ParseSymbolSectionIndices(ReadOnlySpan<byte> data, ElfFile elf)
+	public static void ParseSymbolTables(ReadOnlySpan<byte> data, ElfFile elf)
+	{
+		using var source = ElfDataSourceFactory.CreateInMemory(data);
+		ParseSymbolTables(source, elf);
+	}
+
+	private static Dictionary<uint, uint[]> ParseSymbolSectionIndices(IEndianDataSource data, ElfFile elf)
 	{
 		var result = new Dictionary<uint, uint[]>();
 
@@ -123,10 +129,10 @@ public static partial class ElfReader
 			EnsureReasonableEntryCount(entryCount, "SHT_SYMTAB_SHNDX");
 
 			var values = new uint[ToInt32(entryCount)];
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 			for (ulong i = 0; i < entryCount; i++)
 			{
-				reader.Position = ToInt32(checked(section.Offset + (i * entrySize)));
+				reader.Position = checked(section.Offset + (i * entrySize));
 				values[i] = reader.ReadUInt32();
 			}
 
@@ -137,7 +143,7 @@ public static partial class ElfReader
 		return result;
 	}
 
-	private static void ParseSymbolTable(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader tableSection, uint tableSectionIndex, uint[] extendedSectionIndices)
+	private static void ParseSymbolTable(IEndianDataSource data, ElfFile elf, ElfSectionHeader tableSection, uint tableSectionIndex, uint[] extendedSectionIndices)
 	{
 		if (tableSection.Size == 0)
 			return;
@@ -154,12 +160,12 @@ public static partial class ElfReader
 		var entryCount = tableSection.Size / entrySize;
 		EnsureReasonableEntryCount(entryCount, "symbol table");
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
 			var entryOffset = checked(tableSection.Offset + (i * entrySize));
-			reader.Position = ToInt32(entryOffset);
+			reader.Position = entryOffset;
 
 			uint nameIndex;
 			ulong value;
@@ -212,7 +218,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static void ParseDynamicSymbolTableFallback(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseDynamicSymbolTableFallback(IEndianDataSource data, ElfFile elf)
 	{
 		if (!TryGetDynamicValue(elf, DtSymTab, out var symTabVirtualAddress))
 			return;
@@ -248,12 +254,12 @@ public static partial class ElfReader
 		EnsureReadableRange(data, symTabFileOffset, totalSymbolBytes, "dynamic symbol table");
 		EnsureReadableRange(data, strTabFileOffset, stringTableSize, "dynamic string table");
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		const uint syntheticTableIndex = uint.MaxValue;
 
 		for (ulong i = 0; i < symbolCount; i++)
 		{
-			reader.Position = ToInt32(checked(symTabFileOffset + (i * entrySize)));
+			reader.Position = checked(symTabFileOffset + (i * entrySize));
 
 			uint nameIndex;
 			ulong value;
@@ -302,7 +308,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static bool TryDetermineDynamicSymbolCount(ReadOnlySpan<byte> data, ElfFile elf, ulong symTabVirtualAddress, ulong strTabVirtualAddress, ulong entrySize, out ulong count)
+	private static bool TryDetermineDynamicSymbolCount(IEndianDataSource data, ElfFile elf, ulong symTabVirtualAddress, ulong strTabVirtualAddress, ulong entrySize, out ulong count)
 	{
 		if (TryGetDynamicSymbolCountFromSysvHash(data, elf, out count))
 			return true;
@@ -329,7 +335,7 @@ public static partial class ElfReader
 		return false;
 	}
 
-	private static bool TryGetDynamicSymbolCountFromSysvHash(ReadOnlySpan<byte> data, ElfFile elf, out ulong count)
+	private static bool TryGetDynamicSymbolCountFromSysvHash(IEndianDataSource data, ElfFile elf, out ulong count)
 	{
 		count = 0;
 		if (!TryGetDynamicValue(elf, DtHash, out var hashVirtualAddress))
@@ -338,9 +344,9 @@ public static partial class ElfReader
 			return false;
 
 		EnsureReadableRange(data, hashFileOffset, 8, "DT_HASH");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 		{
-			Position = ToInt32(hashFileOffset)
+			Position = hashFileOffset
 		};
 
 		reader.ReadUInt32(); // nbucket
@@ -348,7 +354,7 @@ public static partial class ElfReader
 		return count > 0;
 	}
 
-	private static bool TryGetDynamicSymbolCountFromGnuHash(ReadOnlySpan<byte> data, ElfFile elf, out ulong count)
+	private static bool TryGetDynamicSymbolCountFromGnuHash(IEndianDataSource data, ElfFile elf, out ulong count)
 	{
 		count = 0;
 		if (!TryGetDynamicValue(elf, DtGnuHash, out var gnuHashVirtualAddress))
@@ -359,9 +365,9 @@ public static partial class ElfReader
 			return false;
 
 		EnsureReadableRange(data, gnuHashFileOffset, 16, "DT_GNU_HASH");
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian)
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 		{
-			Position = ToInt32(gnuHashFileOffset)
+			Position = gnuHashFileOffset
 		};
 
 		var bucketCount = reader.ReadUInt32();
@@ -387,7 +393,7 @@ public static partial class ElfReader
 		var maxBucket = 0UL;
 		for (ulong i = 0; i < bucketCount; i++)
 		{
-			reader.Position = ToInt32(checked(bucketOffset + (i * 4UL)));
+			reader.Position = checked(bucketOffset + (i * 4UL));
 			var bucketValue = reader.ReadUInt32();
 			if (bucketValue > maxBucket)
 				maxBucket = bucketValue;
@@ -406,7 +412,7 @@ public static partial class ElfReader
 			if (chainCursor + 4UL > gnuHashEnd)
 				return false;
 
-			reader.Position = ToInt32(chainCursor);
+			reader.Position = chainCursor;
 			var chainValue = reader.ReadUInt32();
 
 			if ((chainValue & 1U) != 0)
@@ -434,7 +440,7 @@ public static partial class ElfReader
 		return extendedSectionIndices[symbolIndex];
 	}
 
-	private static void ResolveDynamicSymbolVersions(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ResolveDynamicSymbolVersions(IEndianDataSource data, ElfFile elf)
 	{
 		var versionIndexMapByDynsym = ParseVersionSymbolTables(data, elf);
 		if (versionIndexMapByDynsym.Count == 0)
@@ -473,7 +479,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static Dictionary<uint, ushort[]> ParseVersionSymbolTables(ReadOnlySpan<byte> data, ElfFile elf)
+	private static Dictionary<uint, ushort[]> ParseVersionSymbolTables(IEndianDataSource data, ElfFile elf)
 	{
 		var result = new Dictionary<uint, ushort[]>();
 
@@ -493,11 +499,11 @@ public static partial class ElfReader
 			EnsureReasonableEntryCount(count, "GNU version symbols");
 
 			var versions = new ushort[ToInt32(count)];
-			var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
 			for (ulong i = 0; i < count; i++)
 			{
-				reader.Position = ToInt32(checked(section.Offset + (i * entrySize)));
+				reader.Position = checked(section.Offset + (i * entrySize));
 				versions[i] = reader.ReadUInt16();
 			}
 
@@ -509,7 +515,7 @@ public static partial class ElfReader
 		return result;
 	}
 
-	private static void ParseVersionSymbolTableFromDynamic(ReadOnlySpan<byte> data, ElfFile elf, Dictionary<uint, ushort[]> result)
+	private static void ParseVersionSymbolTableFromDynamic(IEndianDataSource data, ElfFile elf, Dictionary<uint, ushort[]> result)
 	{
 		if (!TryGetDynamicValue(elf, DtVerSym, out var versionTableVirtualAddress))
 			return;
@@ -531,10 +537,10 @@ public static partial class ElfReader
 		EnsureReadableRange(data, versionTableFileOffset, checked(entryCount * 2UL), "DT_VERSYM");
 
 		var versions = new ushort[ToInt32(entryCount)];
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
 		{
-			reader.Position = ToInt32(checked(versionTableFileOffset + (i * 2UL)));
+			reader.Position = checked(versionTableFileOffset + (i * 2UL));
 			versions[i] = reader.ReadUInt16();
 		}
 
@@ -561,10 +567,10 @@ public static partial class ElfReader
 		return symbolCount > 0;
 	}
 
-	private static Dictionary<ushort, (string LibraryName, string VersionName)> ParseVersionNeeds(ReadOnlySpan<byte> data, ElfFile elf)
+	private static Dictionary<ushort, (string LibraryName, string VersionName)> ParseVersionNeeds(IEndianDataSource data, ElfFile elf)
 	{
 		var result = new Dictionary<ushort, (string LibraryName, string VersionName)>();
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
 		foreach (var section in elf.Sections)
 		{
@@ -579,7 +585,7 @@ public static partial class ElfReader
 
 			while (entryCursor + 16 <= sectionEnd)
 			{
-				reader.Position = ToInt32(entryCursor);
+				reader.Position = entryCursor;
 				reader.ReadUInt16(); // vn_version
 				var auxCount = reader.ReadUInt16();
 				var fileNameOffset = reader.ReadUInt32();
@@ -591,7 +597,7 @@ public static partial class ElfReader
 
 				for (var i = 0; i < auxCount && auxCursor + 16 <= sectionEnd; i++)
 				{
-					reader.Position = ToInt32(auxCursor);
+					reader.Position = auxCursor;
 					reader.ReadUInt32(); // vna_hash
 					reader.ReadUInt16(); // vna_flags
 					var versionIndex = (ushort)(reader.ReadUInt16() & 0x7FFF);
@@ -626,7 +632,7 @@ public static partial class ElfReader
 		return result;
 	}
 
-	private static void ParseVersionNeedsFromDynamic(ReadOnlySpan<byte> data, ElfFile elf, Dictionary<ushort, (string LibraryName, string VersionName)> result)
+	private static void ParseVersionNeedsFromDynamic(IEndianDataSource data, ElfFile elf, Dictionary<ushort, (string LibraryName, string VersionName)> result)
 	{
 		if (!TryGetDynamicValue(elf, DtVerNeed, out var versionNeedsVirtualAddress))
 			return;
@@ -646,12 +652,12 @@ public static partial class ElfReader
 			return;
 		maxEntries = Math.Min(maxEntries, MaxParserEntryCount);
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCursor = versionNeedsFileOffset;
 
 		for (ulong entryIndex = 0; entryIndex < maxEntries && entryCursor + 16UL <= versionNeedsEnd; entryIndex++)
 		{
-			reader.Position = ToInt32(entryCursor);
+			reader.Position = entryCursor;
 			reader.ReadUInt16(); // vn_version
 			var auxCount = reader.ReadUInt16();
 			var fileNameOffset = reader.ReadUInt32();
@@ -664,7 +670,7 @@ public static partial class ElfReader
 				var auxCursor = entryCursor + auxOffset;
 				for (ulong auxIndex = 0; auxIndex < auxCount && auxCursor + 16UL <= versionNeedsEnd; auxIndex++)
 				{
-					reader.Position = ToInt32(auxCursor);
+					reader.Position = auxCursor;
 					reader.ReadUInt32(); // vna_hash
 					reader.ReadUInt16(); // vna_flags
 					var versionIndex = (ushort)(reader.ReadUInt16() & 0x7FFF);
@@ -695,10 +701,10 @@ public static partial class ElfReader
 		}
 	}
 
-	private static Dictionary<ushort, string> ParseVersionDefinitions(ReadOnlySpan<byte> data, ElfFile elf)
+	private static Dictionary<ushort, string> ParseVersionDefinitions(IEndianDataSource data, ElfFile elf)
 	{
 		var result = new Dictionary<ushort, string>();
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
 		foreach (var section in elf.Sections)
 		{
@@ -713,7 +719,7 @@ public static partial class ElfReader
 
 			while (entryCursor + 20 <= sectionEnd)
 			{
-				reader.Position = ToInt32(entryCursor);
+				reader.Position = entryCursor;
 				reader.ReadUInt16(); // vd_version
 				reader.ReadUInt16(); // vd_flags
 				var versionIndex = reader.ReadUInt16();
@@ -727,7 +733,7 @@ public static partial class ElfReader
 					var auxCursor = checked(entryCursor + auxOffset);
 					if (auxCursor + 8 <= sectionEnd)
 					{
-						reader.Position = ToInt32(auxCursor);
+						reader.Position = auxCursor;
 						var nameOffset = reader.ReadUInt32();
 						var versionName = ReadString(data, elf, section.Link, nameOffset);
 						if (!result.ContainsKey(versionIndex))
@@ -749,7 +755,7 @@ public static partial class ElfReader
 		return result;
 	}
 
-	private static void ParseVersionDefinitionsFromDynamic(ReadOnlySpan<byte> data, ElfFile elf, Dictionary<ushort, string> result)
+	private static void ParseVersionDefinitionsFromDynamic(IEndianDataSource data, ElfFile elf, Dictionary<ushort, string> result)
 	{
 		if (!TryGetDynamicValue(elf, DtVerDef, out var versionDefinitionsVirtualAddress))
 			return;
@@ -769,12 +775,12 @@ public static partial class ElfReader
 			return;
 		maxEntries = Math.Min(maxEntries, MaxParserEntryCount);
 
-		var reader = new EndianBinaryReader(data, elf.Header.IsLittleEndian);
+		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCursor = versionDefinitionsFileOffset;
 
 		for (ulong entryIndex = 0; entryIndex < maxEntries && entryCursor + 20UL <= versionDefinitionsEnd; entryIndex++)
 		{
-			reader.Position = ToInt32(entryCursor);
+			reader.Position = entryCursor;
 			reader.ReadUInt16(); // vd_version
 			reader.ReadUInt16(); // vd_flags
 			var versionIndex = reader.ReadUInt16();
@@ -788,7 +794,7 @@ public static partial class ElfReader
 				var auxCursor = entryCursor + auxOffset;
 				if (auxCursor + 8UL <= versionDefinitionsEnd)
 				{
-					reader.Position = ToInt32(auxCursor);
+					reader.Position = auxCursor;
 					var nameOffset = reader.ReadUInt32();
 					var versionName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, nameOffset);
 					if (!result.ContainsKey(versionIndex))
@@ -846,7 +852,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static string ReadString(ReadOnlySpan<byte> data, ElfFile elf, uint strIndex, uint offset)
+	private static string ReadString(IEndianDataSource data, ElfFile elf, uint strIndex, uint offset)
 	{
 		if (strIndex >= elf.Sections.Count)
 			return string.Empty;
@@ -855,7 +861,7 @@ public static partial class ElfReader
 		return ReadStringFromFileOffset(data, strSection.Offset, strSection.Size, offset);
 	}
 
-	private static string ReadStringFromFileOffset(ReadOnlySpan<byte> data, ulong tableOffset, ulong tableSize, ulong offset)
+	private static string ReadStringFromFileOffset(IEndianDataSource data, ulong tableOffset, ulong tableSize, ulong offset)
 	{
 		if (tableSize == 0 || offset >= tableSize)
 			return string.Empty;
@@ -864,18 +870,31 @@ public static partial class ElfReader
 
 		var start = checked(tableOffset + offset);
 		var endLimit = checked(tableOffset + tableSize);
-		if (start >= (ulong)data.Length)
+		if (start >= data.Length)
 			return string.Empty;
-		if (endLimit > (ulong)data.Length)
-			endLimit = (ulong)data.Length;
+		if (endLimit > data.Length)
+			endLimit = data.Length;
 
-		var startIndex = ToInt32(start);
-		var endIndex = startIndex;
-		var absoluteEnd = ToInt32(endLimit);
+		const int chunkSize = 256;
+		using var buffer = new MemoryStream();
+		var cursor = start;
+		while (cursor < endLimit)
+		{
+			var remaining = endLimit - cursor;
+			var currentSize = (ulong)Math.Min(chunkSize, remaining);
+			var chunk = ReadBytes(data, cursor, currentSize, "string table content");
+			var terminator = Array.IndexOf(chunk, (byte)0);
+			if (terminator >= 0)
+			{
+				if (terminator > 0)
+					buffer.Write(chunk, 0, terminator);
+				break;
+			}
 
-		while (endIndex < absoluteEnd && data[endIndex] != 0)
-			endIndex++;
+			buffer.Write(chunk, 0, chunk.Length);
+			cursor = checked(cursor + currentSize);
+		}
 
-		return Encoding.UTF8.GetString(data.Slice(startIndex, endIndex - startIndex));
+		return Encoding.UTF8.GetString(buffer.ToArray());
 	}
 }

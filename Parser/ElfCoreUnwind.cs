@@ -13,7 +13,7 @@ public static partial class ElfReader
 		public bool Executable { get; init; }
 	}
 
-	private static void ParseCoreThreadUnwind(ReadOnlySpan<byte> data, ElfFile elf, ElfCoreDumpInfo core)
+	private static void ParseCoreThreadUnwind(IEndianDataSource data, ElfFile elf, ElfCoreDumpInfo core)
 	{
 		core.UnwindThreads.Clear();
 		if (!core.IsCoreDump || core.Threads.Count == 0)
@@ -97,7 +97,7 @@ public static partial class ElfReader
 		}
 	}
 
-	private static List<CoreMemorySegment> BuildCoreMemorySegments(ReadOnlySpan<byte> data, ElfFile elf)
+	private static List<CoreMemorySegment> BuildCoreMemorySegments(IEndianDataSource data, ElfFile elf)
 	{
 		var result = new List<CoreMemorySegment>();
 		for (var i = 0; i < elf.ProgramHeaders.Count; i++)
@@ -106,7 +106,7 @@ public static partial class ElfReader
 			if (segment.Type != PtLoad || segment.FileSize == 0)
 				continue;
 
-			if (segment.Offset > (ulong)data.Length || segment.FileSize > (ulong)data.Length - segment.Offset)
+			if (segment.Offset > data.Length || segment.FileSize > data.Length - segment.Offset)
 				continue;
 
 			var end = segment.VirtualAddress + segment.MemorySize;
@@ -302,7 +302,7 @@ public static partial class ElfReader
 	}
 
 	private static bool TryUnwindByEhFrameCfi(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		List<CoreMemorySegment> segments,
 		ulong initialIp,
@@ -532,7 +532,7 @@ public static partial class ElfReader
 	}
 
 	private static bool TryUnwindByFramePointer(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		List<CoreMemorySegment> segments,
 		ulong initialIp,
@@ -597,7 +597,7 @@ public static partial class ElfReader
 	}
 
 	private static void TryUnwindByStackScan(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		List<CoreMemorySegment> segments,
 		ulong initialSp,
@@ -635,7 +635,7 @@ public static partial class ElfReader
 	}
 
 	private static bool TryReadCoreMemoryWord(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		bool isLittleEndian,
 		int wordSize,
 		List<CoreMemorySegment> segments,
@@ -654,22 +654,23 @@ public static partial class ElfReader
 			return false;
 
 		var fileOffset = segment.FileOffset + relative;
-		if (fileOffset > (ulong)data.Length || (ulong)wordSize > (ulong)data.Length - fileOffset)
+		if (fileOffset > data.Length || (ulong)wordSize > data.Length - fileOffset)
 			return false;
 
-		var offset = ToInt32(fileOffset);
-		value = wordSize switch
-		{
-			4 => isLittleEndian
-				? BinaryPrimitives.ReadUInt32LittleEndian(data.Slice(offset, 4))
-				: BinaryPrimitives.ReadUInt32BigEndian(data.Slice(offset, 4)),
-			8 => isLittleEndian
-				? BinaryPrimitives.ReadUInt64LittleEndian(data.Slice(offset, 8))
-				: BinaryPrimitives.ReadUInt64BigEndian(data.Slice(offset, 8)),
-			_ => 0
-		};
+		if (wordSize is not (4 or 8))
+			return false;
 
-		return wordSize is 4 or 8;
+		Span<byte> buffer = stackalloc byte[8];
+		var target = buffer.Slice(0, wordSize);
+		data.ReadAt(fileOffset, target);
+		value = wordSize == 4
+			? (isLittleEndian
+				? BinaryPrimitives.ReadUInt32LittleEndian(target)
+				: BinaryPrimitives.ReadUInt32BigEndian(target))
+			: (isLittleEndian
+				? BinaryPrimitives.ReadUInt64LittleEndian(target)
+				: BinaryPrimitives.ReadUInt64BigEndian(target));
+		return true;
 	}
 
 	private static CoreMemorySegment FindCoreMemorySegment(List<CoreMemorySegment> segments, ulong address)

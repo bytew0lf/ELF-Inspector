@@ -6,6 +6,14 @@ public enum ElfHeaderValidationMode
 	Compat = 1
 }
 
+public enum ElfDataSourceMode
+{
+	Auto = 0,
+	MemoryMapped = 1,
+	Stream = 2,
+	InMemory = 3
+}
+
 public sealed class ElfParseOptions
 {
 	private static readonly TimeSpan DefaultZstdToolTimeout = TimeSpan.FromSeconds(15);
@@ -18,6 +26,7 @@ public sealed class ElfParseOptions
 	public bool EnableExternalZstdToolFallback { get; init; } = true;
 	public TimeSpan ExternalZstdToolTimeout { get; init; } = DefaultZstdToolTimeout;
 	public string ExternalZstdToolPath { get; init; } = string.Empty;
+	public ElfDataSourceMode DataSourceMode { get; init; } = ElfDataSourceMode.Auto;
 	public int? HashLookupPathSymbolLimit { get; init; } = DefaultHashLookupPathSymbolLimit;
 	public int HashLookupPathChainVisitLimit { get; init; } = DefaultHashLookupPathChainVisitLimit;
 }

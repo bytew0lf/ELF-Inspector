@@ -22,7 +22,7 @@ public static partial class ElfReader
 	private const uint PtInterp = 3;
 	private const uint PtNote = 4;
 
-	private static void ParseSectionHeaders(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseSectionHeaders(IEndianDataSource data, ElfFile elf)
 	{
 		var header = elf.Header;
 		if (header.SectionHeaderOffset == 0 || header.SectionHeaderEntrySize == 0)
@@ -62,14 +62,14 @@ public static partial class ElfReader
 		}
 	}
 
-	private static ElfSectionHeader ReadSectionHeaderEntry(ReadOnlySpan<byte> data, ElfHeader header, ulong index)
+	private static ElfSectionHeader ReadSectionHeaderEntry(IEndianDataSource data, ElfHeader header, ulong index)
 	{
 		var entryOffset = checked(header.SectionHeaderOffset + (index * header.SectionHeaderEntrySize));
 		EnsureReadableRange(data, entryOffset, header.SectionHeaderEntrySize, "section header");
 
-		var reader = new EndianBinaryReader(data, header.IsLittleEndian)
+		var reader = new EndianDataReader(data, header.IsLittleEndian)
 		{
-			Position = ToInt32(entryOffset)
+			Position = entryOffset
 		};
 
 		if (header.Class == ElfClass.Elf32)
@@ -104,7 +104,7 @@ public static partial class ElfReader
 		};
 	}
 
-	private static void ParseProgramHeaders(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ParseProgramHeaders(IEndianDataSource data, ElfFile elf)
 	{
 		var header = elf.Header;
 		if (header.ProgramHeaderOffset == 0 || header.ProgramHeaderEntrySize == 0)
@@ -131,14 +131,14 @@ public static partial class ElfReader
 		ResolveInterpreterPath(data, elf);
 	}
 
-	private static ElfProgramHeader ReadProgramHeaderEntry(ReadOnlySpan<byte> data, ElfHeader header, ulong index)
+	private static ElfProgramHeader ReadProgramHeaderEntry(IEndianDataSource data, ElfHeader header, ulong index)
 	{
 		var entryOffset = checked(header.ProgramHeaderOffset + (index * header.ProgramHeaderEntrySize));
 		EnsureReadableRange(data, entryOffset, header.ProgramHeaderEntrySize, "program header");
 
-		var reader = new EndianBinaryReader(data, header.IsLittleEndian)
+		var reader = new EndianDataReader(data, header.IsLittleEndian)
 		{
-			Position = ToInt32(entryOffset)
+			Position = entryOffset
 		};
 
 		if (header.Class == ElfClass.Elf32)
@@ -169,22 +169,19 @@ public static partial class ElfReader
 		};
 	}
 
-	private static void ResolveInterpreterPath(ReadOnlySpan<byte> data, ElfFile elf)
+	private static void ResolveInterpreterPath(IEndianDataSource data, ElfFile elf)
 	{
 		var interp = elf.ProgramHeaders.FirstOrDefault(ph => ph.Type == PtInterp);
 		if (interp == null || interp.FileSize == 0)
 			return;
 
 		EnsureReadableRange(data, interp.Offset, interp.FileSize, "PT_INTERP");
+		var bytes = ReadBytes(data, interp.Offset, interp.FileSize, "PT_INTERP");
 
-		var start = ToInt32(interp.Offset);
-		var size = ToInt32(interp.FileSize);
-		var bytes = data.Slice(start, size);
-
-		var end = bytes.IndexOf((byte)0);
+		var end = Array.IndexOf(bytes, (byte)0);
 		if (end < 0)
 			end = bytes.Length;
 
-		elf.InterpreterPath = Encoding.ASCII.GetString(bytes.Slice(0, end));
+		elf.InterpreterPath = Encoding.ASCII.GetString(bytes.AsSpan(0, end));
 	}
 }

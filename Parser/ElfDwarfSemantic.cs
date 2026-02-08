@@ -149,7 +149,7 @@ public static partial class ElfReader
 	}
 
 	private static void ParseDwarfSemantics(
-		ReadOnlySpan<byte> data,
+		IEndianDataSource data,
 		ElfFile elf,
 		ElfDwarfIndexInfo dwarf,
 		ElfSectionHeader debugInfoSection,
@@ -216,7 +216,7 @@ public static partial class ElfReader
 		BuildDwarfSymbolMappings(elf, dwarf.SemanticUnits, dwarf.SymbolMappings, mappingContext);
 	}
 
-	private static byte[] TryReadOptionalDebugSectionPayload(ReadOnlySpan<byte> data, ElfFile elf, ElfSectionHeader section)
+	private static byte[] TryReadOptionalDebugSectionPayload(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
 	{
 		if (section == null)
 			return Array.Empty<byte>();
