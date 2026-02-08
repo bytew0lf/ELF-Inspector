@@ -79,7 +79,7 @@ Sections
 - [1] .note.gnu.build-id: SHT_NOTE (7), flags=ALLOC, addr=0x194, off=0x194, size=0x24
 - [2] .interp: SHT_PROGBITS (1), flags=ALLOC, addr=0x1B8, off=0x1B8, size=0x1A
 - [3] .MIPS.abiflags: SHT_MIPS_ABIFLAGS (1879048234), flags=ALLOC, addr=0x1D8, off=0x1D8, size=0x18
-- [4] .reginfo: SHT_LOPROC+0x6 (1879048198), flags=ALLOC, addr=0x1F0, off=0x1F0, size=0x18
+- [4] .reginfo: SHT_MIPS_REGINFO (1879048198), flags=ALLOC, addr=0x1F0, off=0x1F0, size=0x18
 - [5] .MIPS.xhash: SHT_MIPS_XHASH (1879048235), flags=ALLOC, addr=0x208, off=0x208, size=0x54
 - [6] .dynamic: SHT_DYNAMIC (6), flags=ALLOC, addr=0x25C, off=0x25C, size=0x118
 - [7] .dynsym: SHT_DYNSYM (11), flags=ALLOC, addr=0x374, off=0x374, size=0xC0
@@ -115,7 +115,7 @@ Segments
 - [0] PT_PHDR (6), flags=R--, off=0x34, vaddr=0x34, filesz=0x160, memsz=0x160
 - [1] PT_INTERP (3), flags=R--, off=0x1B8, vaddr=0x1B8, filesz=0x1A, memsz=0x1A
 - [2] PT_MIPS_ABIFLAGS (1879048195), flags=R--, off=0x1D8, vaddr=0x1D8, filesz=0x18, memsz=0x18
-- [3] PT_LOPROC+0x0 (1879048192), flags=R--, off=0x1F0, vaddr=0x1F0, filesz=0x18, memsz=0x18
+- [3] PT_MIPS_REGINFO (1879048192), flags=R--, off=0x1F0, vaddr=0x1F0, filesz=0x18, memsz=0x18
 - [4] PT_LOAD (1), flags=R-X, off=0x0, vaddr=0x0, filesz=0x89C, memsz=0x89C
 - [5] PT_LOAD (1), flags=RW-, off=0x89C, vaddr=0x1089C, filesz=0x78, memsz=0x94
 - [6] PT_DYNAMIC (2), flags=R--, off=0x25C, vaddr=0x25C, filesz=0x118, memsz=0x118

@@ -13,6 +13,10 @@ ELF parser and reporter for ELF32 and ELF64 binaries (.so, executables, etc.).
 * Dynamic section plus imports/exports
 * GNU/SYSV hash tables
 * Notes
+* Hardened CFI/unwind decoding (unknown/truncated CFA instructions are preserved without hard abort)
+* ET_CORE thread/register decoding with scored `NT_PRSTATUS` layout selection plus generic Linux fallback
+* Extended DWARF semantic hints (including boolean attributes) while preserving unknown forms
+* Extended mapping coverage for architecture-specific values (including MIPS REGINFO section/segment names)
 * Security/loader features in the report (PIE, RELRO, NX, BIND_NOW, canary/FORTIFY hints)
 
 <!-- COVERAGE_MAP_START -->
@@ -38,9 +42,9 @@ Status legend:
 | Relocation type names per architecture | full | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
 | Hash Tables | full | `DT_HASH` and `DT_GNU_HASH` (buckets/chains/bloom), configurable lookup-path evaluation |
 | Notes | full | `SHT_NOTE`/`PT_NOTE`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
-| Unwind | full | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE parsing, CFA rules, basic stack walk for core cases |
-| DWARF/Debug | full | Index + partial semantics for `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` including robust partial decoding |
-| ET_CORE | full | `PT_NOTE`-based process/thread/register/signal evaluation plus thread-unwind branch in report |
+| Unwind | full | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, core stack-walk strategies |
+| DWARF/Debug | full | Index + partial semantics for `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` incl. enum/bool semantic hints and robust partial decoding |
+| ET_CORE | full | `PT_NOTE`-based process/thread/register/signal evaluation with scored `NT_PRSTATUS` layout selection and thread-unwind branch |
 | Security/Loader features | full | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
 | Text report | full | Deterministic output, structured sections including hash/security |
 <!-- COVERAGE_MAP_END -->

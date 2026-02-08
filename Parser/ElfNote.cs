@@ -668,7 +668,7 @@ public static partial class ElfReader
 			if (currentSignal.HasValue)
 				details.Add($"cursig={currentSignal.Value}");
 			var wordSize = GetCoreWordSize(header);
-			if (TryGetCorePrStatusLayout(header, descriptor.Length, wordSize, out var layout))
+			if (TryGetCorePrStatusLayout(header, descriptor.AsSpan(), wordSize, out var layout))
 			{
 				var tid = TryReadCoreInt32At(span, layout.ThreadIdOffset, header.IsLittleEndian);
 				if (tid.HasValue)

@@ -174,7 +174,7 @@ public static partial class ElfReader
 		var span = descriptor.AsSpan();
 		var isLittleEndian = header.IsLittleEndian;
 		var wordSize = GetCoreWordSize(header);
-		var hasKnownLayout = TryGetCorePrStatusLayout(header, descriptor.Length, wordSize, out var layout);
+		var hasKnownLayout = TryGetCorePrStatusLayout(header, span, wordSize, out var layout);
 
 		var signalOffset = hasKnownLayout ? layout.SignalOffset : 0;
 		var currentSignalOffset = hasKnownLayout ? layout.CurrentSignalOffset : 12;
@@ -449,14 +449,47 @@ public static partial class ElfReader
 		return null;
 	}
 
-	private static bool TryGetCorePrStatusLayout(ElfHeader header, int descriptorLength, int wordSize, out CorePrStatusLayout layout)
+	private static bool TryGetCorePrStatusLayout(ElfHeader header, ReadOnlySpan<byte> descriptor, int wordSize, out CorePrStatusLayout layout)
 	{
+		var descriptorLength = descriptor.Length;
 		layout = default;
+		var hasCandidate = false;
+		var bestScore = int.MinValue;
+
+		foreach (var candidate in EnumerateKnownCorePrStatusLayouts(header, wordSize))
+		{
+			if (!IsLayoutReadable(candidate, descriptorLength, wordSize))
+				continue;
+
+			var score = ScoreCorePrStatusLayoutCandidate(header, descriptor, candidate, wordSize);
+			if (hasCandidate && score <= bestScore)
+				continue;
+
+			layout = candidate;
+			bestScore = score;
+			hasCandidate = true;
+		}
+
+		if (TryGetGenericLinuxCorePrStatusLayout(header, descriptor, descriptorLength, wordSize, out var genericLayout))
+		{
+			var genericScore = ScoreCorePrStatusLayoutCandidate(header, descriptor, genericLayout, wordSize);
+			if (!hasCandidate || genericScore > bestScore)
+			{
+				layout = genericLayout;
+				hasCandidate = true;
+			}
+		}
+
+		return hasCandidate;
+	}
+
+	private static IEnumerable<CorePrStatusLayout> EnumerateKnownCorePrStatusLayouts(ElfHeader header, int wordSize)
+	{
 		if (wordSize == 8)
 		{
 			if (header.Machine == EmX86_64)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -465,12 +498,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmAArch64)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -479,12 +512,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmPpc64)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -493,12 +526,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmS390)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -507,12 +540,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmRiscV)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -521,12 +554,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmMips)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -535,12 +568,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmSparc64)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -549,12 +582,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmLoongArch)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 32,
@@ -563,14 +596,14 @@ public static partial class ElfReader
 					parentProcessIdOffset: 36,
 					processGroupIdOffset: 40,
 					sessionIdOffset: 44);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 		}
 		else if (wordSize == 4)
 		{
 			if (header.Machine == Em386)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -579,12 +612,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmArm)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -593,12 +626,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmPpc)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -607,12 +640,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmMips)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -621,12 +654,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmSparc)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -635,12 +668,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmS390)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -649,12 +682,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmRiscV)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -663,12 +696,12 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
 			}
 
 			if (header.Machine == EmLoongArch)
 			{
-				layout = new CorePrStatusLayout(
+				yield return new CorePrStatusLayout(
 					signalOffset: 0,
 					currentSignalOffset: 12,
 					threadIdOffset: 24,
@@ -677,11 +710,145 @@ public static partial class ElfReader
 					parentProcessIdOffset: 28,
 					processGroupIdOffset: 32,
 					sessionIdOffset: 36);
-				return IsLayoutReadable(layout, descriptorLength, wordSize);
+				yield break;
+			}
+		}
+	}
+
+	private static bool TryGetGenericLinuxCorePrStatusLayout(ElfHeader header, ReadOnlySpan<byte> descriptor, int descriptorLength, int wordSize, out CorePrStatusLayout layout)
+	{
+		layout = default;
+		if (!TryGetExpectedCoreRegisterCount(header.Machine, wordSize, out var registerCount))
+			return false;
+
+		var threadOffsets = wordSize == 8
+			? new[] { 32, 24, 40 }
+			: new[] { 24, 20, 28, 32 };
+		var registersOffsets = wordSize == 8
+			? new[] { 112, 120, 128, 136, 144, 160 }
+			: new[] { 72, 80, 88, 96, 104, 112 };
+
+		var found = false;
+		var bestScore = int.MinValue;
+		for (var i = 0; i < threadOffsets.Length; i++)
+		{
+			var threadOffset = threadOffsets[i];
+			for (var j = 0; j < registersOffsets.Length; j++)
+			{
+				var registersOffset = registersOffsets[j];
+				var candidate = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: threadOffset,
+					registersOffset: registersOffset,
+					registerCount: registerCount,
+					parentProcessIdOffset: threadOffset + 4,
+					processGroupIdOffset: threadOffset + 8,
+					sessionIdOffset: threadOffset + 12);
+
+				if (!IsLayoutReadable(candidate, descriptorLength, wordSize))
+					continue;
+
+				var score = ScoreCorePrStatusLayoutCandidate(header, descriptor, candidate, wordSize);
+				if (found && score <= bestScore)
+					continue;
+
+				layout = candidate;
+				bestScore = score;
+				found = true;
 			}
 		}
 
+		return found;
+	}
+
+	private static bool TryGetExpectedCoreRegisterCount(ushort machine, int wordSize, out int registerCount)
+	{
+		registerCount = 0;
+		if (wordSize == 8)
+		{
+			registerCount = machine switch
+			{
+				EmX86_64 => 27,
+				EmAArch64 => 34,
+				EmPpc64 => 48,
+				EmS390 => 18,
+				EmRiscV => 33,
+				EmMips => 45,
+				EmSparc64 => 36,
+				EmLoongArch => 34,
+				_ => 0
+			};
+			return registerCount > 0;
+		}
+
+		if (wordSize == 4)
+		{
+			registerCount = machine switch
+			{
+				Em386 => 17,
+				EmArm => 18,
+				EmPpc => 48,
+				EmMips => 45,
+				EmSparc => 38,
+				EmS390 => 18,
+				EmRiscV => 33,
+				EmLoongArch => 34,
+				_ => 0
+			};
+			return registerCount > 0;
+		}
+
 		return false;
+	}
+
+	private static int ScoreCorePrStatusLayoutCandidate(ElfHeader header, ReadOnlySpan<byte> descriptor, CorePrStatusLayout layout, int wordSize)
+	{
+		var score = 0;
+		var isLittleEndian = header.IsLittleEndian;
+
+		if (TryReadCoreInt32At(descriptor, layout.ThreadIdOffset, isLittleEndian) is int tid && tid > 0 && tid < 1_000_000)
+			score += 4;
+		if (layout.ParentProcessIdOffset.HasValue
+			&& TryReadCoreInt32At(descriptor, layout.ParentProcessIdOffset.Value, isLittleEndian) is int ppid
+			&& ppid > 0
+			&& ppid < 1_000_000)
+		{
+			score += 2;
+		}
+		if (layout.ProcessGroupIdOffset.HasValue
+			&& TryReadCoreInt32At(descriptor, layout.ProcessGroupIdOffset.Value, isLittleEndian) is int pgrp
+			&& pgrp > 0
+			&& pgrp < 1_000_000)
+		{
+			score += 2;
+		}
+		if (layout.SessionIdOffset.HasValue
+			&& TryReadCoreInt32At(descriptor, layout.SessionIdOffset.Value, isLittleEndian) is int sid
+			&& sid > 0
+			&& sid < 1_000_000)
+		{
+			score += 2;
+		}
+
+		if (TryReadCoreInt32At(descriptor, layout.SignalOffset, isLittleEndian) is int signal && signal is >= 0 and <= 128)
+			score += 1;
+		if (TryReadCoreUInt16At(descriptor, layout.CurrentSignalOffset, isLittleEndian) is int currentSignal && currentSignal is >= 0 and <= 128)
+			score += 1;
+
+		var registerNonZeroScore = 0;
+		var previewRegisters = Math.Min(layout.RegisterCount, 6);
+		for (var i = 0; i < previewRegisters; i++)
+		{
+			var offset = checked(layout.RegistersOffset + (i * wordSize));
+			if (!TryReadCoreWordAt(descriptor, offset, isLittleEndian, wordSize, out var value))
+				break;
+			if (value != 0)
+				registerNonZeroScore++;
+		}
+		score += registerNonZeroScore;
+
+		return score;
 	}
 
 	private static bool IsLayoutReadable(CorePrStatusLayout layout, int descriptorLength, int wordSize)

@@ -79,9 +79,9 @@ Status legend:
 | Relocation type names per architecture | $relocation_arch_status | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
 | Hash Tables | $hash_status | \`DT_HASH\` and \`DT_GNU_HASH\` (buckets/chains/bloom), configurable lookup-path evaluation |
 | Notes | $notes_status | \`SHT_NOTE\`/\`PT_NOTE\`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
-| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE parsing, CFA rules, basic stack walk for core cases |
-| DWARF/Debug | $dwarf_status | Index + partial semantics for \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` including robust partial decoding |
-| ET_CORE | $core_status | \`PT_NOTE\`-based process/thread/register/signal evaluation plus thread-unwind branch in report |
+| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, core stack-walk strategies |
+| DWARF/Debug | $dwarf_status | Index + partial semantics for \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` incl. enum/bool semantic hints and robust partial decoding |
+| ET_CORE | $core_status | \`PT_NOTE\`-based process/thread/register/signal evaluation with scored \`NT_PRSTATUS\` layout selection and thread-unwind branch |
 | Security/Loader features | $security_status | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
 | Text report | $textreport_status | Deterministic output, structured sections including hash/security |
 EOF
@@ -105,7 +105,7 @@ write_readme() {
 	local generated_file tmp_file
 	generated_file="$(mktemp)"
 	tmp_file="$(mktemp)"
-	trap 'rm -f "$generated_file" "$tmp_file"' EXIT
+	trap 'rm -f "${generated_file:-}" "${tmp_file:-}"' EXIT
 
 	print_matrix >"$generated_file"
 

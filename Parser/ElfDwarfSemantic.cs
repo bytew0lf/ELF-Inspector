@@ -35,19 +35,39 @@ public static partial class ElfReader
 	private const ulong DwAtLanguage = 0x13;
 	private const ulong DwAtVisibility = 0x17;
 	private const ulong DwAtInline = 0x20;
+	private const ulong DwAtIsOptional = 0x21;
+	private const ulong DwAtPrototyped = 0x27;
 	private const ulong DwAtAccessibility = 0x32;
+	private const ulong DwAtArtificial = 0x34;
 	private const ulong DwAtCallingConvention = 0x36;
 	private const ulong DwAtIdentifierCase = 0x42;
 	private const ulong DwAtType = 0x49;
+	private const ulong DwAtVariableParameter = 0x4B;
 	private const ulong DwAtExternal = 0x3F;
 	private const ulong DwAtEncoding = 0x3E;
 	private const ulong DwAtVirtuality = 0x4C;
+	private const ulong DwAtMutable = 0x61;
+	private const ulong DwAtThreadsScaled = 0x62;
+	private const ulong DwAtExplicit = 0x63;
+	private const ulong DwAtElemental = 0x66;
+	private const ulong DwAtPure = 0x67;
+	private const ulong DwAtRecursive = 0x68;
+	private const ulong DwAtMainSubprogram = 0x6A;
+	private const ulong DwAtConstExpr = 0x6C;
+	private const ulong DwAtEnumClass = 0x6D;
 	private const ulong DwAtDecimalSign = 0x5E;
 	private const ulong DwAtEndianity = 0x65;
 	private const ulong DwAtLinkageName = 0x6E;
 	private const ulong DwAtMipsLinkageName = 0x2007;
 	private const ulong DwAtRanges = 0x55;
 	private const ulong DwAtDeclaration = 0x3C;
+	private const ulong DwAtCallAllCalls = 0x79;
+	private const ulong DwAtCallAllSourceCalls = 0x7A;
+	private const ulong DwAtCallAllTailCalls = 0x7B;
+	private const ulong DwAtCallTailCall = 0x81;
+	private const ulong DwAtNoreturn = 0x86;
+	private const ulong DwAtExportSymbols = 0x88;
+	private const ulong DwAtDeleted = 0x89;
 	private const ulong DwAtDefaulted = 0x8A;
 	private const ulong DwAtStrOffsetsBase = 0x72;
 	private const ulong DwAtAddrBase = 0x73;
@@ -883,12 +903,19 @@ public static partial class ElfReader
 
 	private static void ApplyDwarfAttributeSemanticHints(ElfDwarfAttributeValue attribute)
 	{
-		if (!TryGetUnsignedDwarfAttributeScalar(attribute, out var rawValue))
+		if (TryGetUnsignedDwarfAttributeScalar(attribute, out var rawValue)
+			&& TryGetDwarfAttributeSemanticText(attribute.Name, rawValue, out var semanticText))
+		{
+			attribute.StringValue = $"{semanticText} (0x{rawValue:X})";
 			return;
-		if (!TryGetDwarfAttributeSemanticText(attribute.Name, rawValue, out var semanticText))
-			return;
+		}
 
-		attribute.StringValue = $"{semanticText} (0x{rawValue:X})";
+		if (TryGetBooleanDwarfAttributeScalar(attribute, out var boolValue)
+			&& TryGetDwarfBooleanAttributeSemanticText(attribute.Name, boolValue, out var boolSemantic))
+		{
+			var numeric = boolValue ? 1 : 0;
+			attribute.StringValue = $"{boolSemantic} (0x{numeric:X})";
+		}
 	}
 
 	private static bool TryGetUnsignedDwarfAttributeScalar(ElfDwarfAttributeValue attribute, out ulong value)
@@ -906,6 +933,33 @@ public static partial class ElfReader
 		if (attribute.Kind == ElfDwarfAttributeValueKind.Signed && attribute.SignedValue >= 0)
 		{
 			value = (ulong)attribute.SignedValue;
+			return true;
+		}
+
+		return false;
+	}
+
+	private static bool TryGetBooleanDwarfAttributeScalar(ElfDwarfAttributeValue attribute, out bool value)
+	{
+		value = false;
+		if (attribute == null)
+			return false;
+
+		if (attribute.Kind == ElfDwarfAttributeValueKind.Flag)
+		{
+			value = attribute.BoolValue;
+			return true;
+		}
+
+		if (attribute.Kind == ElfDwarfAttributeValueKind.Unsigned)
+		{
+			value = attribute.UnsignedValue != 0;
+			return true;
+		}
+
+		if (attribute.Kind == ElfDwarfAttributeValueKind.Signed)
+		{
+			value = attribute.SignedValue != 0;
 			return true;
 		}
 
@@ -953,9 +1007,108 @@ public static partial class ElfReader
 			case DwAtDefaulted:
 				text = GetDwarfDefaultedName(value);
 				return true;
+			case DwAtStrOffsetsBase:
+				text = "DW_AT_str_offsets_base";
+				return true;
+			case DwAtAddrBase:
+				text = "DW_AT_addr_base";
+				return true;
+			case DwAtRnglistsBase:
+				text = "DW_AT_rnglists_base";
+				return true;
+			case DwAtLoclistsBase:
+				text = "DW_AT_loclists_base";
+				return true;
+			case DwAtRanges:
+				text = "DW_AT_ranges";
+				return true;
+			case DwAtLocation:
+				text = "DW_AT_location";
+				return true;
 			default:
 				return false;
 		}
+	}
+
+	private static bool TryGetDwarfBooleanAttributeSemanticText(ulong attributeName, bool value, out string text)
+	{
+		text = string.Empty;
+		switch (attributeName)
+		{
+			case DwAtExternal:
+				text = FormatDwarfBooleanSemantic("DW_AT_external", value);
+				return true;
+			case DwAtDeclaration:
+				text = FormatDwarfBooleanSemantic("DW_AT_declaration", value);
+				return true;
+			case DwAtIsOptional:
+				text = FormatDwarfBooleanSemantic("DW_AT_is_optional", value);
+				return true;
+			case DwAtPrototyped:
+				text = FormatDwarfBooleanSemantic("DW_AT_prototyped", value);
+				return true;
+			case DwAtArtificial:
+				text = FormatDwarfBooleanSemantic("DW_AT_artificial", value);
+				return true;
+			case DwAtVariableParameter:
+				text = FormatDwarfBooleanSemantic("DW_AT_variable_parameter", value);
+				return true;
+			case DwAtMutable:
+				text = FormatDwarfBooleanSemantic("DW_AT_mutable", value);
+				return true;
+			case DwAtThreadsScaled:
+				text = FormatDwarfBooleanSemantic("DW_AT_threads_scaled", value);
+				return true;
+			case DwAtExplicit:
+				text = FormatDwarfBooleanSemantic("DW_AT_explicit", value);
+				return true;
+			case DwAtElemental:
+				text = FormatDwarfBooleanSemantic("DW_AT_elemental", value);
+				return true;
+			case DwAtPure:
+				text = FormatDwarfBooleanSemantic("DW_AT_pure", value);
+				return true;
+			case DwAtRecursive:
+				text = FormatDwarfBooleanSemantic("DW_AT_recursive", value);
+				return true;
+			case DwAtMainSubprogram:
+				text = FormatDwarfBooleanSemantic("DW_AT_main_subprogram", value);
+				return true;
+			case DwAtConstExpr:
+				text = FormatDwarfBooleanSemantic("DW_AT_const_expr", value);
+				return true;
+			case DwAtEnumClass:
+				text = FormatDwarfBooleanSemantic("DW_AT_enum_class", value);
+				return true;
+			case DwAtCallAllCalls:
+				text = FormatDwarfBooleanSemantic("DW_AT_call_all_calls", value);
+				return true;
+			case DwAtCallAllSourceCalls:
+				text = FormatDwarfBooleanSemantic("DW_AT_call_all_source_calls", value);
+				return true;
+			case DwAtCallAllTailCalls:
+				text = FormatDwarfBooleanSemantic("DW_AT_call_all_tail_calls", value);
+				return true;
+			case DwAtCallTailCall:
+				text = FormatDwarfBooleanSemantic("DW_AT_call_tail_call", value);
+				return true;
+			case DwAtNoreturn:
+				text = FormatDwarfBooleanSemantic("DW_AT_noreturn", value);
+				return true;
+			case DwAtExportSymbols:
+				text = FormatDwarfBooleanSemantic("DW_AT_export_symbols", value);
+				return true;
+			case DwAtDeleted:
+				text = FormatDwarfBooleanSemantic("DW_AT_deleted", value);
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private static string FormatDwarfBooleanSemantic(string name, bool value)
+	{
+		return $"{name}={(value ? "true" : "false")}";
 	}
 
 	private static string GetDwarfOrderingName(ulong value)

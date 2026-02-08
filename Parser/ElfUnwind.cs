@@ -44,6 +44,7 @@ public static partial class ElfReader
 	private const byte DwCfaValOffset = 0x14;
 	private const byte DwCfaValOffsetSf = 0x15;
 	private const byte DwCfaValExpression = 0x16;
+	private const byte DwCfaGnuWindowSave = 0x2D;
 	private const byte DwCfaGnuArgsSize = 0x2E;
 	private const byte DwCfaGnuNegativeOffsetExtended = 0x2F;
 
@@ -545,7 +546,10 @@ public static partial class ElfReader
 			{
 				var register = (ulong)(opcode & 0x3F);
 				if (!TryReadUleb128Bounded(payload, ref cursor, end, out var rawOffset))
+				{
+					AppendTruncated("DW_CFA_offset");
 					break;
+				}
 				var offset = MultiplyAlign(rawOffset, dataAlignmentFactor);
 				if (register == returnAddressRegister)
 				{
@@ -571,36 +575,54 @@ public static partial class ElfReader
 					break;
 				case DwCfaSetLoc:
 					if (!TryReadUnsignedWord(payload, isLittleEndian, wordSize, ref cursor, out var loc))
-						return;
+					{
+						AppendTruncated("DW_CFA_set_loc");
+						break;
+					}
 					instructions.Add($"DW_CFA_set_loc 0x{loc:X}");
 					break;
 				case DwCfaAdvanceLoc1:
 				{
 					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, end, 1, out var delta))
-						return;
+					{
+						AppendTruncated("DW_CFA_advance_loc1");
+						break;
+					}
 					instructions.Add($"DW_CFA_advance_loc1 {delta}");
 					break;
 				}
 				case DwCfaAdvanceLoc2:
 				{
 					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, end, 2, out var delta))
-						return;
+					{
+						AppendTruncated("DW_CFA_advance_loc2");
+						break;
+					}
 					instructions.Add($"DW_CFA_advance_loc2 {delta}");
 					break;
 				}
 				case DwCfaAdvanceLoc4:
 				{
 					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, end, 4, out var delta))
-						return;
+					{
+						AppendTruncated("DW_CFA_advance_loc4");
+						break;
+					}
 					instructions.Add($"DW_CFA_advance_loc4 {delta}");
 					break;
 				}
 				case DwCfaOffsetExtended:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_offset_extended");
+						break;
+					}
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_offset_extended");
+						break;
+					}
 					var offset = MultiplyAlign(rawOffset, dataAlignmentFactor);
 					if (register == returnAddressRegister)
 					{
@@ -613,14 +635,20 @@ public static partial class ElfReader
 				case DwCfaRestoreExtended:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_restore_extended");
+						break;
+					}
 					instructions.Add($"DW_CFA_restore_extended r{register}");
 					break;
 				}
 				case DwCfaUndefined:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_undefined");
+						break;
+					}
 					if (register == returnAddressRegister)
 						state.HasReturnAddressOffset = false;
 					instructions.Add($"DW_CFA_undefined r{register}");
@@ -629,16 +657,25 @@ public static partial class ElfReader
 				case DwCfaSameValue:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_same_value");
+						break;
+					}
 					instructions.Add($"DW_CFA_same_value r{register}");
 					break;
 				}
 				case DwCfaRegister:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register1))
-						return;
+					{
+						AppendTruncated("DW_CFA_register");
+						break;
+					}
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register2))
-						return;
+					{
+						AppendTruncated("DW_CFA_register");
+						break;
+					}
 					instructions.Add($"DW_CFA_register r{register1} -> r{register2}");
 					break;
 				}
@@ -661,9 +698,15 @@ public static partial class ElfReader
 				case DwCfaDefCfa:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa");
+						break;
+					}
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var offset))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa");
+						break;
+					}
 					state.HasCfaRule = true;
 					state.CfaRegister = register;
 					state.CfaOffset = unchecked((long)offset);
@@ -673,7 +716,10 @@ public static partial class ElfReader
 				case DwCfaDefCfaRegister:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_register");
+						break;
+					}
 					state.HasCfaRule = true;
 					state.CfaRegister = register;
 					instructions.Add($"DW_CFA_def_cfa_register r{register}");
@@ -682,7 +728,10 @@ public static partial class ElfReader
 				case DwCfaDefCfaOffset:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var offset))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_offset");
+						break;
+					}
 					state.HasCfaRule = true;
 					state.CfaOffset = unchecked((long)offset);
 					instructions.Add($"DW_CFA_def_cfa_offset {offset}");
@@ -691,7 +740,10 @@ public static partial class ElfReader
 				case DwCfaDefCfaExpression:
 				{
 					if (!TrySkipCfiBlock(payload, ref cursor, end, out var expressionLength))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_expression");
+						break;
+					}
 					state.HasCfaRule = false;
 					instructions.Add($"DW_CFA_def_cfa_expression len={expressionLength}");
 					break;
@@ -699,18 +751,30 @@ public static partial class ElfReader
 				case DwCfaExpression:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_expression");
+						break;
+					}
 					if (!TrySkipCfiBlock(payload, ref cursor, end, out var expressionLength))
-						return;
+					{
+						AppendTruncated("DW_CFA_expression");
+						break;
+					}
 					instructions.Add($"DW_CFA_expression r{register}, len={expressionLength}");
 					break;
 				}
 				case DwCfaOffsetExtendedSf:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_offset_extended_sf");
+						break;
+					}
 					if (!TryReadSleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_offset_extended_sf");
+						break;
+					}
 					var offset = MultiplyAlignSigned(rawOffset, dataAlignmentFactor);
 					if (register == returnAddressRegister)
 					{
@@ -723,9 +787,15 @@ public static partial class ElfReader
 				case DwCfaDefCfaSf:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_sf");
+						break;
+					}
 					if (!TryReadSleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_sf");
+						break;
+					}
 					var offset = MultiplyAlignSigned(rawOffset, dataAlignmentFactor);
 					state.HasCfaRule = true;
 					state.CfaRegister = register;
@@ -736,7 +806,10 @@ public static partial class ElfReader
 				case DwCfaDefCfaOffsetSf:
 				{
 					if (!TryReadSleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_def_cfa_offset_sf");
+						break;
+					}
 					var offset = MultiplyAlignSigned(rawOffset, dataAlignmentFactor);
 					state.HasCfaRule = true;
 					state.CfaOffset = offset;
@@ -746,9 +819,15 @@ public static partial class ElfReader
 				case DwCfaValOffset:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_offset");
+						break;
+					}
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_offset");
+						break;
+					}
 					var offset = MultiplyAlign(rawOffset, dataAlignmentFactor);
 					if (register == returnAddressRegister)
 					{
@@ -761,9 +840,15 @@ public static partial class ElfReader
 				case DwCfaValOffsetSf:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_offset_sf");
+						break;
+					}
 					if (!TryReadSleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_offset_sf");
+						break;
+					}
 					var offset = MultiplyAlignSigned(rawOffset, dataAlignmentFactor);
 					if (register == returnAddressRegister)
 					{
@@ -776,25 +861,43 @@ public static partial class ElfReader
 				case DwCfaValExpression:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_expression");
+						break;
+					}
 					if (!TrySkipCfiBlock(payload, ref cursor, end, out var expressionLength))
-						return;
+					{
+						AppendTruncated("DW_CFA_val_expression");
+						break;
+					}
 					instructions.Add($"DW_CFA_val_expression r{register}, len={expressionLength}");
 					break;
 				}
+				case DwCfaGnuWindowSave:
+					instructions.Add("DW_CFA_GNU_window_save");
+					break;
 				case DwCfaGnuArgsSize:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var size))
-						return;
+					{
+						AppendTruncated("DW_CFA_GNU_args_size");
+						break;
+					}
 					instructions.Add($"DW_CFA_GNU_args_size {size}");
 					break;
 				}
 				case DwCfaGnuNegativeOffsetExtended:
 				{
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var register))
-						return;
+					{
+						AppendTruncated("DW_CFA_GNU_negative_offset_extended");
+						break;
+					}
 					if (!TryReadUleb128Bounded(payload, ref cursor, end, out var rawOffset))
-						return;
+					{
+						AppendTruncated("DW_CFA_GNU_negative_offset_extended");
+						break;
+					}
 					var offset = -MultiplyAlign(rawOffset, dataAlignmentFactor);
 					if (register == returnAddressRegister)
 					{
@@ -805,9 +908,17 @@ public static partial class ElfReader
 					break;
 				}
 				default:
-					instructions.Add($"DW_CFA_0x{opcode:X2}");
-					return;
+					instructions.Add($"DW_CFA_unknown_0x{opcode:X2}");
+					break;
 			}
+		}
+
+		if (iterations >= MaxParserEntryCount && cursor < end)
+			instructions.Add("DW_CFA_parser_limit_reached");
+
+		void AppendTruncated(string opcodeName)
+		{
+			instructions.Add($"{opcodeName} <truncated>");
 		}
 
 		static long MultiplyAlign(ulong value, long align)
