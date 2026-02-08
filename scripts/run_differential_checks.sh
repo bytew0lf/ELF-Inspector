@@ -9,6 +9,10 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 
 detect_reference_tool() {
 	if [[ -n "${READELF_TOOL:-}" ]]; then
+		if [[ -x "$READELF_TOOL" ]]; then
+			echo "$READELF_TOOL"
+			return 0
+		fi
 		if command -v "$READELF_TOOL" >/dev/null 2>&1; then
 			echo "$READELF_TOOL"
 			return 0
@@ -17,9 +21,18 @@ detect_reference_tool() {
 		return 1
 	fi
 
-	for candidate in readelf eu-readelf llvm-readelf; do
+	for candidate in readelf eu-readelf llvm-readelf greadelf; do
 		if command -v "$candidate" >/dev/null 2>&1; then
 			echo "$candidate"
+			return 0
+		fi
+	done
+
+	for candidate_path in \
+		/opt/homebrew/opt/binutils/bin/greadelf \
+		/usr/local/opt/binutils/bin/greadelf; do
+		if [[ -x "$candidate_path" ]]; then
+			echo "$candidate_path"
 			return 0
 		fi
 	done
@@ -71,6 +84,30 @@ extract_first_token() {
 	}' <<<"$value"
 }
 
+extract_report_text_field() {
+	local key="$1"
+	local file="$2"
+	awk -F': *' -v key="$key" '
+		$0 ~ ("^" key ":[[:space:]]*") {
+			print $2
+			exit
+		}
+	' "$file"
+}
+
+extract_report_numeric_field() {
+	local key="$1"
+	local file="$2"
+	awk -F': *' -v key="$key" '
+		$0 ~ ("^" key ":[[:space:]]*[0-9]+") {
+			value = $2
+			sub(/[^0-9].*$/, "", value)
+			print value
+			exit
+		}
+	' "$file"
+}
+
 assert_equal() {
 	local sample="$1"
 	local field="$2"
@@ -88,7 +125,7 @@ assert_equal() {
 }
 
 if ! ref_tool="$(detect_reference_tool)"; then
-	echo "Differential checks skipped: no reference tool found (readelf/eu-readelf/llvm-readelf)." >&2
+	echo "Differential checks skipped: no reference tool found (readelf/eu-readelf/llvm-readelf/greadelf)." >&2
 	exit 0
 fi
 
@@ -133,11 +170,11 @@ for sample in "${samples[@]}"; do
 	ref_class="$(normalize_class "$ref_class_raw")"
 	ref_endian="$(normalize_endianness "$ref_data_raw")"
 
-	report_class="$(awk -F': *' '/^Class:/{print $2; exit}' "$report_file")"
-	report_endian="$(awk -F': *' '/^Endianness:/{print $2; exit}' "$report_file")"
-	report_entry="$(awk -F': *' '/^EntryPoint:/{print $2; exit}' "$report_file")"
-	report_segments="$(awk -F': *' '/^Segments:/{print $2; exit}' "$report_file")"
-	report_sections="$(awk -F': *' '/^Sections:/{print $2; exit}' "$report_file")"
+	report_class="$(extract_report_text_field "Class" "$report_file")"
+	report_endian="$(extract_report_text_field "Endianness" "$report_file")"
+	report_entry="$(extract_report_text_field "EntryPoint" "$report_file")"
+	report_segments="$(extract_report_numeric_field "Segments" "$report_file")"
+	report_sections="$(extract_report_numeric_field "Sections" "$report_file")"
 
 	ref_dynamic_output="$("$ref_tool" -d "$sample_file" 2>/dev/null || true)"
 	if grep -qi "no dynamic section" <<<"$ref_dynamic_output"; then
@@ -145,7 +182,7 @@ for sample in "${samples[@]}"; do
 	else
 		ref_dynamic_count="$(grep -cE '^[[:space:]]*0x' <<<"$ref_dynamic_output" || true)"
 	fi
-	report_dynamic_count="$(awk -F': *' '/^Dynamic Entries:/{print $2; exit}' "$report_file")"
+	report_dynamic_count="$(extract_report_numeric_field "Dynamic Entries" "$report_file")"
 
 	ref_entry_normalized="$(echo "$ref_entry" | tr '[:upper:]' '[:lower:]')"
 	report_entry_normalized="$(echo "$report_entry" | tr '[:upper:]' '[:lower:]')"
