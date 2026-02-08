@@ -279,10 +279,10 @@ public static partial class ElfReader
 			NtCoreArmSsve => "NT_ARM_SSVE",
 			NtCoreArmZa => "NT_ARM_ZA",
 			NtCoreArmZt => "NT_ARM_ZT",
-			NtCoreArmFpmr => "NT_ARM_FPMR",
-			_ => string.Empty
-		};
-	}
+				NtCoreArmFpmr => "NT_ARM_FPMR",
+				_ => string.Empty
+			};
+		}
 
 	private static bool IsKnownCoreNoteType(uint type)
 	{
@@ -377,6 +377,9 @@ public static partial class ElfReader
 			var linuxCoreName = GetCoreNoteTypeName(type);
 			if (!string.IsNullOrEmpty(linuxCoreName))
 				return linuxCoreName;
+			var linuxArchSpecific = FormatUnknownCoreNoteTypeName(type, includeCoreFallback: false);
+			if (!string.IsNullOrEmpty(linuxArchSpecific))
+				return linuxArchSpecific;
 
 			return type switch
 			{
@@ -388,7 +391,7 @@ public static partial class ElfReader
 		if (IsCoreNoteNamespace(name))
 		{
 			var coreName = GetCoreNoteTypeName(type);
-			return string.IsNullOrEmpty(coreName) ? $"NT_CORE_0x{type:X}" : coreName;
+			return string.IsNullOrEmpty(coreName) ? FormatUnknownCoreNoteTypeName(type, includeCoreFallback: true) : coreName;
 		}
 
 		return FormatUnknownNoteTypeName(name, type);
@@ -451,7 +454,7 @@ public static partial class ElfReader
 		if (IsCoreNoteNamespace(name))
 			return DecodeCoreNoteDescriptor(header, type, descriptor);
 
-		return DecodeUnknownNoteDescriptor(descriptor);
+		return DecodeUnknownNoteDescriptor(descriptor, header.IsLittleEndian);
 	}
 
 	private static string NormalizeNoteNamespace(string name)
@@ -498,10 +501,40 @@ public static partial class ElfReader
 		return $"NT_{sanitizedNamespace}_0x{type:X}";
 	}
 
-	private static string DecodeUnknownNoteDescriptor(byte[] descriptor)
+	private static string FormatUnknownCoreNoteTypeName(uint type, bool includeCoreFallback)
+	{
+		if (type >= 0x100 && type <= 0x1FF)
+			return $"NT_PPC_0x{type:X}";
+		if (type >= 0x200 && type <= 0x2FF)
+			return $"NT_X86_0x{type:X}";
+		if (type >= 0x300 && type <= 0x3FF)
+			return $"NT_S390_0x{type:X}";
+		if (type >= 0x400 && type <= 0x4FF)
+			return $"NT_ARM_0x{type:X}";
+
+		return includeCoreFallback ? $"NT_CORE_0x{type:X}" : string.Empty;
+	}
+
+	private static string DecodeUnknownNoteDescriptor(byte[] descriptor, bool isLittleEndian)
 	{
 		if (descriptor.Length == 0)
 			return string.Empty;
+
+		if (descriptor.Length == 4)
+		{
+			var value = isLittleEndian
+				? BinaryPrimitives.ReadUInt32LittleEndian(descriptor)
+				: BinaryPrimitives.ReadUInt32BigEndian(descriptor);
+			return $"u32={value} (0x{value:X})";
+		}
+
+		if (descriptor.Length == 8)
+		{
+			var value = isLittleEndian
+				? BinaryPrimitives.ReadUInt64LittleEndian(descriptor)
+				: BinaryPrimitives.ReadUInt64BigEndian(descriptor);
+			return $"u64={value} (0x{value:X})";
+		}
 
 		var ascii = DecodeAsciiDescriptor(descriptor);
 		if (!string.IsNullOrEmpty(ascii) && !ascii.StartsWith("bytes=", StringComparison.Ordinal))
@@ -625,10 +658,10 @@ public static partial class ElfReader
 			NtCoreArmSsve => DecodeCoreRegisterSetDescriptor("arm_ssve", descriptor),
 			NtCoreArmZa => DecodeCoreRegisterSetDescriptor("arm_za", descriptor),
 			NtCoreArmZt => DecodeCoreRegisterSetDescriptor("arm_zt", descriptor),
-			NtCoreArmFpmr => DecodeCoreRegisterSetDescriptor("arm_fpmr", descriptor),
-			_ => string.Empty
-		};
-	}
+				NtCoreArmFpmr => DecodeCoreRegisterSetDescriptor("arm_fpmr", descriptor),
+				_ => DecodeUnknownNoteDescriptor(descriptor, header.IsLittleEndian)
+			};
+		}
 
 	private static string DecodeGnuAbiTag(bool isLittleEndian, byte[] descriptor)
 	{
@@ -892,7 +925,7 @@ public static partial class ElfReader
 				return $"linux_note_0x{type:X}=0x{value:X}";
 			}
 
-			return DecodeUnknownNoteDescriptor(descriptor);
+			return DecodeUnknownNoteDescriptor(descriptor, isLittleEndian);
 		}
 
 	private static string DecodeX86XstateDescriptor(ElfHeader header, byte[] descriptor)

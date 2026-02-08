@@ -187,9 +187,9 @@ public sealed class ElfReaderTests
 		Assert.Equal("R_MIPS_REL16", InvokeRelocationTypeName(8, 33));
 		Assert.Equal("R_ARM_TLS_DTPMOD32", InvokeRelocationTypeName(40, 17));
 		Assert.Equal("R_ARM_GOT_BREL", InvokeRelocationTypeName(40, 26));
-		Assert.Equal("R_ARM_4095", InvokeRelocationTypeName(40, 4095));
-		Assert.Equal("R_RISCV_4095", InvokeRelocationTypeName(243, 4095));
-		Assert.Equal("R_9999_7", InvokeRelocationTypeName(9999, 7));
+		Assert.Equal("R_ARM_UNKNOWN_4095", InvokeRelocationTypeName(40, 4095));
+		Assert.Equal("R_RISCV_UNKNOWN_4095", InvokeRelocationTypeName(243, 4095));
+		Assert.Equal("R_MACHINE_9999_7", InvokeRelocationTypeName(9999, 7));
 	}
 
 	[Fact]
@@ -283,13 +283,21 @@ public sealed class ElfReaderTests
 	public void Parse_DynamicTags_ProcessorSpecificSemantics_AvoidGenericProcValueFallback()
 	{
 		var helloMips = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample("hello_mips")));
+		var mipsFlags = helloMips.DynamicEntries.First(entry => entry.TagName == "DT_MIPS_FLAGS");
+		Assert.Contains("RHF_", mipsFlags.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.Contains("mask=0x", mipsFlags.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.DoesNotContain("proc_tag=", mipsFlags.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.DoesNotContain("processor_specific(", mipsFlags.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+
 		var mipsLocalGotNo = helloMips.DynamicEntries.First(entry => entry.TagName == "DT_MIPS_LOCAL_GOTNO");
 		Assert.Contains("local_got_entries=", mipsLocalGotNo.DecodedValue ?? string.Empty, StringComparison.Ordinal);
 		Assert.DoesNotContain("proc_value", mipsLocalGotNo.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.DoesNotContain("proc_tag=", mipsLocalGotNo.DecodedValue ?? string.Empty, StringComparison.Ordinal);
 
 		var helloPpc64 = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample("hello_ppc64le")));
 		var ppc64Opt = helloPpc64.DynamicEntries.First(entry => entry.TagName == "DT_PPC64_OPT");
 		Assert.DoesNotContain("proc_value", ppc64Opt.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.DoesNotContain("proc_tag=", ppc64Opt.DecodedValue ?? string.Empty, StringComparison.Ordinal);
 		Assert.Equal("0", ppc64Opt.DecodedValue);
 	}
 
@@ -1137,6 +1145,40 @@ public sealed class ElfReaderTests
 		var note = Assert.Single(elf.Notes);
 		Assert.Equal("NT_SIGINFO", note.TypeName);
 		Assert.Contains("signal=11", note.DecodedDescription, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void ParseNotes_CoreNamespace_UnknownArchRange_UsesArchSpecificTypeName()
+	{
+		var descriptor = new byte[4];
+		WriteUInt32(descriptor.AsSpan(0, 4), 0x12345678, littleEndian: true);
+		var noteSectionData = BuildNoteSection(CreateNote("CORE", 0x3FE, descriptor));
+		var elfData = new byte[0x200];
+		var offset = 0x80;
+		Array.Copy(noteSectionData, 0, elfData, offset, noteSectionData.Length);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".note.core.unknown",
+			Type = 7,
+			Offset = (ulong)offset,
+			Size = (ulong)noteSectionData.Length,
+			AddressAlign = 4
+		});
+
+		ElfReader.ParseNotes(elfData, elf);
+
+		var note = Assert.Single(elf.Notes);
+		Assert.Equal("NT_S390_0x3FE", note.TypeName);
+		Assert.Equal("u32=305419896 (0x12345678)", note.DecodedDescription);
 	}
 
 	[Fact]

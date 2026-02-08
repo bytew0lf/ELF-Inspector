@@ -715,9 +715,9 @@ public static partial class ElfReader
 			AppendMachineSpecificDynamicCorrelations(elf);
 		}
 
-	private static string GetStructuredDynamicValue(ElfFile elf, long tag, ulong value, ulong wordSize, ushort machine)
-	{
-		if (IsAddressDynamicTag(machine, tag))
+		private static string GetStructuredDynamicValue(ElfFile elf, long tag, ulong value, ulong wordSize, ushort machine)
+		{
+			if (IsAddressDynamicTag(machine, tag))
 		{
 			if (TryDescribeVirtualAddress(elf, value, out var description))
 				return description;
@@ -753,11 +753,11 @@ public static partial class ElfReader
 			return $"addr=0x{value:X}";
 		}
 
-		if (tag >= DtValRangeLo && tag <= DtValRangeHi)
-			return $"value=0x{value:X}";
+			if (tag >= DtValRangeLo && tag <= DtValRangeHi)
+				return $"value=0x{value:X}";
 
 			if (tag >= DtProcRangeLo && tag <= DtProcRangeHi)
-				return $"proc_tag=0x{tag:X}, value=0x{value:X}";
+				return GetProcessorSpecificRangeDynamicValue(elf, machine, tag, value);
 
 			return string.Empty;
 		}
@@ -796,6 +796,9 @@ public static partial class ElfReader
 					case DtMipsRldVersion:
 					case DtMipsIVersion:
 						decoded = $"version={value}";
+						return true;
+					case DtMipsFlags:
+						decoded = $"mask=0x{value:X}";
 						return true;
 					case DtMipsMsym:
 						decoded = $"symbol_index={value}";
@@ -873,6 +876,20 @@ public static partial class ElfReader
 		}
 
 			return false;
+		}
+
+		private static string GetProcessorSpecificRangeDynamicValue(ElfFile elf, ushort machine, long tag, ulong value)
+		{
+			var knownTagName = GetProcessorSpecificDynamicTagName(machine, tag);
+			if (string.IsNullOrEmpty(knownTagName))
+				return $"processor_specific(tag=DT_PROC_0x{tag:X}, value=0x{value:X})";
+
+			// Avoid duplicate detail text where DecodeDynamicValue/TryGetProcessorSpecificDynamicValue already
+			// provides the semantic payload.
+			if (tag is DtMipsFlags or DtPpcOpt or DtPpc64Opt or DtAArch64BtiPlt or DtAArch64PacPlt or DtAArch64VariantPcs or DtRiscVVariantCc)
+				return string.Empty;
+
+			return $"{knownTagName}: value=0x{value:X}";
 		}
 
 		private static void AppendMachineSpecificDynamicCorrelations(ElfFile elf)

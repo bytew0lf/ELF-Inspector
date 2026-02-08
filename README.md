@@ -57,6 +57,8 @@ Generate fallback/GAP metrics from golden reports:
 scripts/generate_gap_metrics.sh
 ```
 
+The GAP metrics include generic fallback counters for mappings, dynamic tag/value decoding, and note type/descriptor decoding.
+
 Verify fallback/GAP thresholds used by CI:
 
 ```bash

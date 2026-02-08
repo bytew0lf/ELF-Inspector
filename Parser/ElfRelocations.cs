@@ -998,12 +998,12 @@ public static partial class ElfReader
 
 		private static string FormatRelocationTypeFallback(string architecturePrefix, uint type)
 		{
-			return $"{architecturePrefix}_{type}";
+			return $"{architecturePrefix}_UNKNOWN_{type}";
 		}
 
 		private static string FormatMachineRelocationTypeFallback(ushort machine, uint type)
 		{
-			return $"R_{machine}_{type}";
+			return $"R_MACHINE_{machine}_{type}";
 		}
 
 	private static string GetMipsRelocationTypeName(uint type)

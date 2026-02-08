@@ -171,7 +171,7 @@ Dynamic Entries
 - DT_RELSZ (18) = 0x40 -> size=64 (0x40), entries=4
 - DT_RELENT (19) = 0x10 -> entry_size=16
 - DT_MIPS_RLD_VERSION (1879048193) = 0x1 -> version=1
-- DT_MIPS_FLAGS (1879048197) = 0x2 -> RHF_NOTPOT; proc_tag=0x70000005, value=0x2
+- DT_MIPS_FLAGS (1879048197) = 0x2 -> RHF_NOTPOT; mask=0x2
 - DT_MIPS_BASE_ADDRESS (1879048198) = 0x0 -> addr=0x0
 - DT_MIPS_LOCAL_GOTNO (1879048202) = 0xA -> local_got_entries=10, global_got_entries=6
 - DT_MIPS_SYMTABNO (1879048209) = 0xC -> dynamic_symbol_count=12, got_coverage=16
