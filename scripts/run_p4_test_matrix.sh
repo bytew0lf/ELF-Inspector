@@ -21,9 +21,11 @@ contains_pattern() {
 count_pattern() {
   local pattern="$1"
   local file="$2"
+  local count
 
   if command -v rg >/dev/null 2>&1; then
-    rg -c "$pattern" "$file"
+    count="$(rg -c "$pattern" "$file" || true)"
+    echo "${count:-0}"
   else
     grep -Ec "$pattern" "$file" || true
   fi
