@@ -49,10 +49,26 @@ normalize_class() {
 	esac
 }
 
-extract_single_value() {
-	local regex="$1"
+extract_header_field() {
+	local key="$1"
 	local input="$2"
-	sed -nE "s/${regex}/\\1/p" <<<"$input" | head -n1
+	awk -F: -v key="$key" '
+		$0 ~ "^[[:space:]]*" key ":" {
+			value = substr($0, index($0, ":") + 1)
+			gsub(/^[[:space:]]+/, "", value)
+			print value
+			exit
+		}
+	' <<<"$input"
+}
+
+extract_first_token() {
+	local value="$1"
+	awk '{
+		if (NF > 0) {
+			print $1
+		}
+	}' <<<"$value"
 }
 
 assert_equal() {
@@ -108,20 +124,20 @@ for sample in "${samples[@]}"; do
 		continue
 	fi
 
-	ref_class_raw="$(extract_single_value '^[[:space:]]*Class:[[:space:]]*(ELF[0-9][0-9]).*' "$header_output")"
-	ref_data_raw="$(extract_single_value '^[[:space:]]*Data:[[:space:]]*(.*)$' "$header_output")"
-	ref_entry="$(extract_single_value '^[[:space:]]*Entry point address:[[:space:]]*(0x[0-9A-Fa-f]+).*$' "$header_output")"
-	ref_segments="$(extract_single_value '^[[:space:]]*Number of program headers:[[:space:]]*([0-9]+).*$' "$header_output")"
-	ref_sections="$(extract_single_value '^[[:space:]]*Number of section headers:[[:space:]]*([0-9]+).*$' "$header_output")"
+	ref_class_raw="$(extract_first_token "$(extract_header_field "Class" "$header_output")")"
+	ref_data_raw="$(extract_header_field "Data" "$header_output")"
+	ref_entry="$(extract_first_token "$(extract_header_field "Entry point address" "$header_output")")"
+	ref_segments="$(extract_first_token "$(extract_header_field "Number of program headers" "$header_output")")"
+	ref_sections="$(extract_first_token "$(extract_header_field "Number of section headers" "$header_output")")"
 
 	ref_class="$(normalize_class "$ref_class_raw")"
 	ref_endian="$(normalize_endianness "$ref_data_raw")"
 
-	report_class="$(sed -n 's/^Class:[[:space:]]*\\(Elf[0-9][0-9]\\)$/\1/p' "$report_file" | head -n1)"
-	report_endian="$(sed -n 's/^Endianness:[[:space:]]*\\(.*\\)$/\1/p' "$report_file" | head -n1)"
-	report_entry="$(sed -n 's/^EntryPoint:[[:space:]]*\\(0x[0-9A-Fa-f]\\+\\)$/\1/p' "$report_file" | head -n1)"
-	report_segments="$(sed -n 's/^Segments:[[:space:]]*\\([0-9]\\+\\)$/\1/p' "$report_file" | head -n1)"
-	report_sections="$(sed -n 's/^Sections:[[:space:]]*\\([0-9]\\+\\)$/\1/p' "$report_file" | head -n1)"
+	report_class="$(awk -F': *' '/^Class:/{print $2; exit}' "$report_file")"
+	report_endian="$(awk -F': *' '/^Endianness:/{print $2; exit}' "$report_file")"
+	report_entry="$(awk -F': *' '/^EntryPoint:/{print $2; exit}' "$report_file")"
+	report_segments="$(awk -F': *' '/^Segments:/{print $2; exit}' "$report_file")"
+	report_sections="$(awk -F': *' '/^Sections:/{print $2; exit}' "$report_file")"
 
 	ref_dynamic_output="$("$ref_tool" -d "$sample_file" 2>/dev/null || true)"
 	if grep -qi "no dynamic section" <<<"$ref_dynamic_output"; then
@@ -129,7 +145,7 @@ for sample in "${samples[@]}"; do
 	else
 		ref_dynamic_count="$(grep -cE '^[[:space:]]*0x' <<<"$ref_dynamic_output" || true)"
 	fi
-	report_dynamic_count="$(sed -n 's/^Dynamic Entries:[[:space:]]*\\([0-9]\\+\\)$/\1/p' "$report_file" | head -n1)"
+	report_dynamic_count="$(awk -F': *' '/^Dynamic Entries:/{print $2; exit}' "$report_file")"
 
 	ref_entry_normalized="$(echo "$ref_entry" | tr '[:upper:]' '[:lower:]')"
 	report_entry_normalized="$(echo "$report_entry" | tr '[:upper:]' '[:lower:]')"
