@@ -18,6 +18,14 @@ public static partial class ElfReader
 	private const ulong DwAtLocation = 0x02;
 	private const ulong DwAtLowPc = 0x11;
 	private const ulong DwAtHighPc = 0x12;
+	private const ulong DwAtLanguage = 0x13;
+	private const ulong DwAtVisibility = 0x17;
+	private const ulong DwAtInline = 0x20;
+	private const ulong DwAtAccessibility = 0x32;
+	private const ulong DwAtCallingConvention = 0x36;
+	private const ulong DwAtEncoding = 0x3E;
+	private const ulong DwAtVirtuality = 0x4C;
+	private const ulong DwAtEndianity = 0x65;
 	private const ulong DwAtLinkageName = 0x6E;
 	private const ulong DwAtMipsLinkageName = 0x2007;
 	private const ulong DwAtRanges = 0x55;
@@ -89,6 +97,8 @@ public static partial class ElfReader
 	private const ulong DwFormAddrx2 = 0x2A;
 	private const ulong DwFormAddrx3 = 0x2B;
 	private const ulong DwFormAddrx4 = 0x2C;
+	private const ulong DwFormGnuRefAlt = 0x1F20;
+	private const ulong DwFormGnuStrpAlt = 0x1F21;
 	private const ulong DwTagLoUser = 0x4080;
 	private const ulong DwTagHiUser = 0xFFFF;
 	private const ulong DwAtLoUser = 0x2000;
@@ -383,7 +393,8 @@ public static partial class ElfReader
 					abbrevTable,
 					debugStrPayload,
 					debugLineStrPayload,
-					unit.RootDies);
+					unit.RootDies,
+					unit.PreservedRegions);
 			}
 			else
 			{
@@ -407,7 +418,8 @@ public static partial class ElfReader
 		Dictionary<ulong, DwarfAbbrevEntry> abbrevTable,
 		ReadOnlySpan<byte> debugStrPayload,
 		ReadOnlySpan<byte> debugLineStrPayload,
-		List<ElfDwarfDie> roots)
+		List<ElfDwarfDie> roots,
+		List<ElfDwarfPreservedRegion> preservedRegions)
 	{
 		roots.Clear();
 		var stack = new Stack<ElfDwarfDie>();
@@ -444,31 +456,43 @@ public static partial class ElfReader
 				HasChildren = abbrevEntry.HasChildren
 			};
 
-			var parseFailed = false;
-			for (var i = 0; i < abbrevEntry.Attributes.Count; i++)
-			{
-				var spec = abbrevEntry.Attributes[i];
-				if (!TryReadDwarfAttributeValue(
-					infoPayload,
-					ref cursor,
-					unitEnd,
+				var parseFailed = false;
+				for (var i = 0; i < abbrevEntry.Attributes.Count; i++)
+				{
+					var spec = abbrevEntry.Attributes[i];
+					var attributeValueOffset = cursor;
+					if (!TryReadDwarfAttributeValue(
+						infoPayload,
+						ref cursor,
+						unitEnd,
 					isLittleEndian,
 					isDwarf64,
 					version,
 					addressSize,
 					unitOffset,
-					spec,
-					debugStrPayload,
-					debugLineStrPayload,
-					out var attribute))
-				{
-					die.Attributes.Add(CreateDwarfDecodeErrorAttribute(spec));
-					parseFailed = true;
-					break;
-				}
+						spec,
+						debugStrPayload,
+						debugLineStrPayload,
+						out var attribute))
+					{
+						var relativeOffset = attributeValueOffset >= (int)unitOffset
+							? (ulong)(attributeValueOffset - (int)unitOffset)
+							: 0UL;
+						die.Attributes.Add(CreateDwarfDecodeErrorAttribute(spec, relativeOffset));
+						PreserveDwarfUnitRegion(
+							infoPayload,
+							unitOffset,
+							attributeValueOffset,
+							unitEnd,
+							$"attribute-decode-failure:{GetDwarfAttributeName(spec.Name)}:{GetDwarfFormName(spec.Form)}",
+							preservedRegions);
+						parseFailed = true;
+						break;
+					}
 
-				die.Attributes.Add(attribute);
-			}
+					ApplyDwarfAttributeSemanticHints(attribute);
+					die.Attributes.Add(attribute);
+				}
 
 			if (parseFailed)
 			{
@@ -505,6 +529,7 @@ public static partial class ElfReader
 		ReadOnlySpan<byte> debugLineStrPayload,
 		out ElfDwarfAttributeValue value)
 	{
+		var valueStart = cursor;
 		value = new ElfDwarfAttributeValue
 		{
 			Name = spec.Name,
@@ -513,7 +538,11 @@ public static partial class ElfReader
 			FormText = GetDwarfFormName(spec.Form),
 			Kind = ElfDwarfAttributeValueKind.None,
 			StringValue = string.Empty,
-			BytesValue = Array.Empty<byte>()
+			BytesValue = Array.Empty<byte>(),
+			UnitRelativeValueOffset = valueStart >= (int)unitOffset ? (ulong)(valueStart - (int)unitOffset) : 0,
+			ConsumedByteCount = 0,
+			DecodeStatus = ElfDwarfDecodeStatus.Exact,
+			DecodeNote = string.Empty
 		};
 
 		var offsetSize = isDwarf64 ? 8 : 4;
@@ -522,15 +551,15 @@ public static partial class ElfReader
 			case DwFormAddr:
 			{
 				var size = addressSize == 0 ? offsetSize : addressSize;
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var addr))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Address;
-				value.UnsignedValue = addr;
-				return true;
-			}
-			case DwFormData1:
-			case DwFormData2:
-			case DwFormData4:
+						if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var addr))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Address;
+						value.UnsignedValue = addr;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormData1:
+					case DwFormData2:
+					case DwFormData4:
 			case DwFormData8:
 			{
 				var size = spec.Form switch
@@ -540,74 +569,80 @@ public static partial class ElfReader
 					DwFormData4 => 4,
 					_ => 8
 				};
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var data))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Unsigned;
-				value.UnsignedValue = data;
-				return true;
-			}
-			case DwFormUData:
-			case DwFormStrx:
-			case DwFormAddrx:
+						if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var data))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Unsigned;
+						value.UnsignedValue = data;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormUData:
+					case DwFormStrx:
+					case DwFormAddrx:
 			case DwFormLoclistx:
 			case DwFormRnglistx:
 			{
-				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var data))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Unsigned;
-				value.UnsignedValue = data;
-				return true;
-			}
-			case DwFormSData:
-			{
-				if (!TryReadSleb128Bounded(payload, ref cursor, unitEnd, out var data))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Signed;
-				value.SignedValue = data;
-				return true;
-			}
-			case DwFormFlag:
-			{
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 1, out var flag))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Flag;
-				value.BoolValue = flag != 0;
-				value.UnsignedValue = flag;
-				return true;
-			}
-			case DwFormFlagPresent:
-			{
-				value.Kind = ElfDwarfAttributeValueKind.Flag;
-				value.BoolValue = true;
-				value.UnsignedValue = 1;
-				return true;
-			}
-			case DwFormString:
-			{
-				if (!TryReadNullTerminatedAscii(payload, ref cursor, unitEnd, out var text))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.String;
-				value.StringValue = text;
-				return true;
-			}
-			case DwFormStrp:
-			case DwFormLineStrp:
-			{
+						if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var data))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Unsigned;
+						value.UnsignedValue = data;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormSData:
+					{
+						if (!TryReadSleb128Bounded(payload, ref cursor, unitEnd, out var data))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Signed;
+						value.SignedValue = data;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormFlag:
+					{
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 1, out var flag))
+						return false;
+						value.Kind = ElfDwarfAttributeValueKind.Flag;
+						value.BoolValue = flag != 0;
+						value.UnsignedValue = flag;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormFlagPresent:
+					{
+						value.Kind = ElfDwarfAttributeValueKind.Flag;
+						value.BoolValue = true;
+						value.UnsignedValue = 1;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormString:
+					{
+						if (!TryReadNullTerminatedAscii(payload, ref cursor, unitEnd, out var text))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.String;
+						value.StringValue = text;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormStrp:
+					case DwFormLineStrp:
+				{
 				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, offsetSize, out var offset))
 					return false;
 
 				var table = spec.Form == DwFormLineStrp ? debugLineStrPayload : debugStrPayload;
-				if (!TryReadDwarfStringAtOffset(table, offset, out var text))
-					text = $"<str@0x{offset:X}>";
+					if (!TryReadDwarfStringAtOffset(table, offset, out var text))
+					{
+							text = $"<str@0x{offset:X}>";
+							value.Kind = ElfDwarfAttributeValueKind.String;
+							value.UnsignedValue = offset;
+							value.StringValue = text;
+							return CompleteDwarfAttributeValue(ref value, cursor, valueStart, ElfDwarfDecodeStatus.Partial, "string table lookup failed");
+						}
 
-				value.Kind = ElfDwarfAttributeValueKind.String;
-				value.UnsignedValue = offset;
-				value.StringValue = text;
-				return true;
-			}
-			case DwFormStrx1:
-			case DwFormStrx2:
-			case DwFormStrx3:
+						value.Kind = ElfDwarfAttributeValueKind.String;
+						value.UnsignedValue = offset;
+						value.StringValue = text;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormStrx1:
+				case DwFormStrx2:
+				case DwFormStrx3:
 			case DwFormStrx4:
 			case DwFormAddrx1:
 			case DwFormAddrx2:
@@ -621,15 +656,15 @@ public static partial class ElfReader
 					DwFormStrx3 or DwFormAddrx3 => 3,
 					_ => 4
 				};
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var idx))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Unsigned;
-				value.UnsignedValue = idx;
-				return true;
-			}
-			case DwFormRef1:
-			case DwFormRef2:
-			case DwFormRef4:
+						if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var idx))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Unsigned;
+						value.UnsignedValue = idx;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormRef1:
+					case DwFormRef2:
+				case DwFormRef4:
 			case DwFormRef8:
 			{
 				var size = spec.Form switch
@@ -639,61 +674,71 @@ public static partial class ElfReader
 					DwFormRef4 => 4,
 					_ => 8
 				};
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var localRef))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Reference;
-				value.UnsignedValue = unitOffset + localRef;
-				return true;
-			}
-			case DwFormRefUData:
-			{
-				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var localRef))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Reference;
-				value.UnsignedValue = unitOffset + localRef;
-				return true;
-			}
-			case DwFormRefAddr:
-			{
-				var size = version <= 2 ? (addressSize == 0 ? offsetSize : addressSize) : offsetSize;
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var refAddr))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Reference;
-				value.UnsignedValue = refAddr;
-				return true;
-			}
-			case DwFormRefSig8:
-			case DwFormSecOffset:
-			case DwFormRefSup4:
-			case DwFormRefSup8:
-			{
-				var size = spec.Form switch
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var localRef))
+						return false;
+						value.Kind = ElfDwarfAttributeValueKind.Reference;
+						value.UnsignedValue = unitOffset + localRef;
+						value.StringValue = $"die_ref=0x{value.UnsignedValue:X}";
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormRefUData:
+					{
+						if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var localRef))
+							return false;
+						value.Kind = ElfDwarfAttributeValueKind.Reference;
+						value.UnsignedValue = unitOffset + localRef;
+						value.StringValue = $"die_ref=0x{value.UnsignedValue:X}";
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormRefAddr:
+					{
+					var size = version <= 2 ? (addressSize == 0 ? offsetSize : addressSize) : offsetSize;
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var refAddr))
+						return false;
+						value.Kind = ElfDwarfAttributeValueKind.Reference;
+						value.UnsignedValue = refAddr;
+						value.StringValue = $"die_ref=0x{value.UnsignedValue:X}";
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+				case DwFormRefSig8:
+				case DwFormSecOffset:
+				case DwFormRefSup4:
+				case DwFormRefSup8:
+				case DwFormGnuRefAlt:
 				{
-					DwFormRefSig8 => 8,
-					DwFormRefSup4 => 4,
-					DwFormRefSup8 => 8,
-					_ => offsetSize
-				};
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var refValue))
-					return false;
-				value.Kind = spec.Form == DwFormRefSig8
-					? ElfDwarfAttributeValueKind.Unsigned
-					: ElfDwarfAttributeValueKind.Reference;
-				value.UnsignedValue = refValue;
-				return true;
-			}
-			case DwFormStrpSup:
-			{
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, offsetSize, out var offset))
-					return false;
-				value.Kind = ElfDwarfAttributeValueKind.String;
-				value.UnsignedValue = offset;
-				value.StringValue = $"<str_sup@0x{offset:X}>";
-				return true;
-			}
-			case DwFormExprLoc:
-			case DwFormBlock:
-			case DwFormBlock1:
+					var size = spec.Form switch
+					{
+						DwFormRefSig8 => 8,
+						DwFormRefSup4 => 4,
+						DwFormRefSup8 => 8,
+						DwFormGnuRefAlt => offsetSize,
+						_ => offsetSize
+					};
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, size, out var refValue))
+						return false;
+					value.Kind = spec.Form is DwFormRefSig8
+						? ElfDwarfAttributeValueKind.Unsigned
+						: ElfDwarfAttributeValueKind.Reference;
+						value.UnsignedValue = refValue;
+						if (value.Kind == ElfDwarfAttributeValueKind.Reference)
+							value.StringValue = $"die_ref=0x{value.UnsignedValue:X}";
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+				case DwFormStrpSup:
+				case DwFormGnuStrpAlt:
+				{
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, offsetSize, out var offset))
+						return false;
+					value.Kind = ElfDwarfAttributeValueKind.String;
+						value.UnsignedValue = offset;
+						value.StringValue = spec.Form == DwFormGnuStrpAlt
+							? $"<str_alt@0x{offset:X}>"
+							: $"<str_sup@0x{offset:X}>";
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart, ElfDwarfDecodeStatus.Partial, "supplementary string table not available");
+					}
+				case DwFormExprLoc:
+				case DwFormBlock:
+				case DwFormBlock1:
 			case DwFormBlock2:
 			case DwFormBlock4:
 			{
@@ -721,30 +766,30 @@ public static partial class ElfReader
 					return false;
 
 				var bytes = payload.Slice(cursor, (int)blockLength).ToArray();
-				cursor = checked(cursor + (int)blockLength);
-				value.Kind = ElfDwarfAttributeValueKind.Bytes;
-				value.BytesValue = bytes;
-				value.UnsignedValue = blockLength;
-				return true;
-			}
-			case DwFormImplicitConst:
-			{
-				value.Kind = ElfDwarfAttributeValueKind.Signed;
-				value.SignedValue = spec.ImplicitConstValue ?? 0;
-				return true;
-			}
-			case DwFormData16:
-			{
+					cursor = checked(cursor + (int)blockLength);
+						value.Kind = ElfDwarfAttributeValueKind.Bytes;
+						value.BytesValue = bytes;
+						value.UnsignedValue = blockLength;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormImplicitConst:
+					{
+						value.Kind = ElfDwarfAttributeValueKind.Signed;
+						value.SignedValue = spec.ImplicitConstValue ?? 0;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+					case DwFormData16:
+					{
 				if (cursor + 16 > unitEnd)
 					return false;
-				value.Kind = ElfDwarfAttributeValueKind.Bytes;
-				value.BytesValue = payload.Slice(cursor, 16).ToArray();
-				value.UnsignedValue = 16;
-				cursor += 16;
-				return true;
-			}
-			case DwFormIndirect:
-			{
+					value.Kind = ElfDwarfAttributeValueKind.Bytes;
+						value.BytesValue = payload.Slice(cursor, 16).ToArray();
+						value.UnsignedValue = 16;
+						cursor += 16;
+						return CompleteDwarfAttributeValue(ref value, cursor, valueStart);
+					}
+				case DwFormIndirect:
+				{
 				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var actualForm))
 					return false;
 
@@ -764,36 +809,265 @@ public static partial class ElfReader
 					addressSize,
 					unitOffset,
 					indirectSpec,
-					debugStrPayload,
-					debugLineStrPayload,
-					out value);
-			}
-			default:
-			{
-				var formName = GetDwarfFormName(spec.Form);
-				if (TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var rawUleb))
-				{
-					value.Kind = ElfDwarfAttributeValueKind.Unsigned;
-					value.UnsignedValue = rawUleb;
-					value.StringValue = $"<unknown-form-fallback:uleb128:form={formName}>";
-					return true;
+						debugStrPayload,
+						debugLineStrPayload,
+						out value);
 				}
-
-				if (cursor < unitEnd)
+				default:
 				{
-					value.Kind = ElfDwarfAttributeValueKind.Bytes;
-					value.BytesValue = new[] { payload[cursor++] };
-					value.UnsignedValue = 1;
-					value.StringValue = $"<unknown-form-fallback:byte:form={formName}>";
-					return true;
-				}
+					var formName = GetDwarfFormName(spec.Form);
+					var fallbackStart = cursor;
+					if (TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var rawUleb))
+					{
+						value.Kind = ElfDwarfAttributeValueKind.Unsigned;
+						value.UnsignedValue = rawUleb;
+						var consumed = cursor - fallbackStart;
+							if (consumed > 0)
+								value.BytesValue = payload.Slice(fallbackStart, consumed).ToArray();
+							value.StringValue = $"<unknown-form-fallback:uleb128:form={formName}>";
+							return CompleteDwarfAttributeValue(ref value, cursor, valueStart, ElfDwarfDecodeStatus.PreservedUnknown, "unknown form preserved via uleb128");
+						}
 
-				return false;
-			}
+					if (cursor < unitEnd)
+					{
+						value.Kind = ElfDwarfAttributeValueKind.Bytes;
+							value.BytesValue = new[] { payload[cursor++] };
+							value.UnsignedValue = 1;
+							value.StringValue = $"<unknown-form-fallback:byte:form={formName}>";
+							return CompleteDwarfAttributeValue(ref value, cursor, valueStart, ElfDwarfDecodeStatus.PreservedUnknown, "unknown form preserved via single-byte fallback");
+						}
+
+					return false;
+				}
 		}
 	}
 
-	private static ElfDwarfAttributeValue CreateDwarfDecodeErrorAttribute(DwarfAbbrevAttributeSpec spec)
+	private static bool CompleteDwarfAttributeValue(
+		ref ElfDwarfAttributeValue value,
+		int cursor,
+		int valueStart,
+		ElfDwarfDecodeStatus status = ElfDwarfDecodeStatus.Exact,
+		string note = "")
+	{
+		value.ConsumedByteCount = cursor >= valueStart ? (ulong)(cursor - valueStart) : 0UL;
+		value.DecodeStatus = status;
+		if (!string.IsNullOrEmpty(note))
+			value.DecodeNote = note;
+
+		return true;
+	}
+
+	private static void ApplyDwarfAttributeSemanticHints(ElfDwarfAttributeValue attribute)
+	{
+		if (!TryGetUnsignedDwarfAttributeScalar(attribute, out var rawValue))
+			return;
+		if (!TryGetDwarfAttributeSemanticText(attribute.Name, rawValue, out var semanticText))
+			return;
+
+		attribute.StringValue = $"{semanticText} (0x{rawValue:X})";
+	}
+
+	private static bool TryGetUnsignedDwarfAttributeScalar(ElfDwarfAttributeValue attribute, out ulong value)
+	{
+		value = 0;
+		if (attribute == null)
+			return false;
+
+		if (attribute.Kind == ElfDwarfAttributeValueKind.Unsigned)
+		{
+			value = attribute.UnsignedValue;
+			return true;
+		}
+
+		if (attribute.Kind == ElfDwarfAttributeValueKind.Signed && attribute.SignedValue >= 0)
+		{
+			value = (ulong)attribute.SignedValue;
+			return true;
+		}
+
+		return false;
+	}
+
+	private static bool TryGetDwarfAttributeSemanticText(ulong attributeName, ulong value, out string text)
+	{
+		text = string.Empty;
+		switch (attributeName)
+		{
+			case DwAtLanguage:
+				text = GetDwarfLanguageName(value);
+				return true;
+			case DwAtEncoding:
+				text = GetDwarfEncodingName(value);
+				return true;
+			case DwAtInline:
+				text = GetDwarfInlineName(value);
+				return true;
+			case DwAtAccessibility:
+				text = GetDwarfAccessibilityName(value);
+				return true;
+			case DwAtVisibility:
+				text = GetDwarfVisibilityName(value);
+				return true;
+			case DwAtCallingConvention:
+				text = GetDwarfCallingConventionName(value);
+				return true;
+			case DwAtVirtuality:
+				text = GetDwarfVirtualityName(value);
+				return true;
+			case DwAtEndianity:
+				text = GetDwarfEndianityName(value);
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private static string GetDwarfLanguageName(ulong value)
+	{
+		return value switch
+		{
+			0x0001 => "DW_LANG_C89",
+			0x0002 => "DW_LANG_C",
+			0x0003 => "DW_LANG_Ada83",
+			0x0004 => "DW_LANG_C_plus_plus",
+			0x0005 => "DW_LANG_Cobol74",
+			0x0006 => "DW_LANG_Cobol85",
+			0x0007 => "DW_LANG_Fortran77",
+			0x0008 => "DW_LANG_Fortran90",
+			0x0009 => "DW_LANG_Pascal83",
+			0x000A => "DW_LANG_Modula2",
+			0x000B => "DW_LANG_Java",
+			0x000C => "DW_LANG_C99",
+			0x000D => "DW_LANG_Ada95",
+			0x000E => "DW_LANG_Fortran95",
+			0x000F => "DW_LANG_PLI",
+			0x0010 => "DW_LANG_ObjC",
+			0x0011 => "DW_LANG_ObjC_plus_plus",
+			0x0012 => "DW_LANG_UPC",
+			0x0013 => "DW_LANG_D",
+			0x0014 => "DW_LANG_Python",
+			0x0015 => "DW_LANG_OpenCL",
+			0x0016 => "DW_LANG_Go",
+			0x0017 => "DW_LANG_Modula3",
+			0x0018 => "DW_LANG_Haskell",
+			0x0019 => "DW_LANG_C_plus_plus_03",
+			0x001A => "DW_LANG_C_plus_plus_11",
+			0x001B => "DW_LANG_OCaml",
+			0x001C => "DW_LANG_Rust",
+			0x001D => "DW_LANG_C11",
+			0x001E => "DW_LANG_Swift",
+			0x001F => "DW_LANG_Julia",
+			0x0020 => "DW_LANG_Dylan",
+			0x0021 => "DW_LANG_C_plus_plus_14",
+			0x0022 => "DW_LANG_Fortran03",
+			0x0023 => "DW_LANG_Fortran08",
+			0x0024 => "DW_LANG_RenderScript",
+			0x0025 => "DW_LANG_BLISS",
+			0x0026 => "DW_LANG_Kotlin",
+			0x0027 => "DW_LANG_Zig",
+			0x0028 => "DW_LANG_Crystal",
+			0x0029 => "DW_LANG_C_plus_plus_17",
+			0x002A => "DW_LANG_C_plus_plus_20",
+			_ => FormatUnknownDwarfCode("DW_LANG", value, 0x8000, 0xFFFF)
+		};
+	}
+
+	private static string GetDwarfEncodingName(ulong value)
+	{
+		return value switch
+		{
+			0x01 => "DW_ATE_address",
+			0x02 => "DW_ATE_boolean",
+			0x03 => "DW_ATE_complex_float",
+			0x04 => "DW_ATE_float",
+			0x05 => "DW_ATE_signed",
+			0x06 => "DW_ATE_signed_char",
+			0x07 => "DW_ATE_unsigned",
+			0x08 => "DW_ATE_unsigned_char",
+			0x09 => "DW_ATE_imaginary_float",
+			0x0A => "DW_ATE_packed_decimal",
+			0x0B => "DW_ATE_numeric_string",
+			0x0C => "DW_ATE_edited",
+			0x0D => "DW_ATE_signed_fixed",
+			0x0E => "DW_ATE_unsigned_fixed",
+			0x0F => "DW_ATE_decimal_float",
+			0x10 => "DW_ATE_UTF",
+			0x11 => "DW_ATE_UCS",
+			0x12 => "DW_ATE_ASCII",
+			_ => FormatUnknownDwarfCode("DW_ATE", value, 0x80, 0xFF)
+		};
+	}
+
+	private static string GetDwarfInlineName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_INL_not_inlined",
+			1 => "DW_INL_inlined",
+			2 => "DW_INL_declared_not_inlined",
+			3 => "DW_INL_declared_inlined",
+			_ => $"DW_INL_0x{value:X}"
+		};
+	}
+
+	private static string GetDwarfAccessibilityName(ulong value)
+	{
+		return value switch
+		{
+			1 => "DW_ACCESS_public",
+			2 => "DW_ACCESS_protected",
+			3 => "DW_ACCESS_private",
+			_ => $"DW_ACCESS_0x{value:X}"
+		};
+	}
+
+	private static string GetDwarfVisibilityName(ulong value)
+	{
+		return value switch
+		{
+			1 => "DW_VIS_local",
+			2 => "DW_VIS_exported",
+			3 => "DW_VIS_qualified",
+			_ => $"DW_VIS_0x{value:X}"
+		};
+	}
+
+	private static string GetDwarfCallingConventionName(ulong value)
+	{
+		return value switch
+		{
+			1 => "DW_CC_normal",
+			2 => "DW_CC_program",
+			3 => "DW_CC_nocall",
+			4 => "DW_CC_pass_by_reference",
+			5 => "DW_CC_pass_by_value",
+			_ => FormatUnknownDwarfCode("DW_CC", value, 0x40, 0xFF)
+		};
+	}
+
+	private static string GetDwarfVirtualityName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_VIRTUALITY_none",
+			1 => "DW_VIRTUALITY_virtual",
+			2 => "DW_VIRTUALITY_pure_virtual",
+			_ => $"DW_VIRTUALITY_0x{value:X}"
+		};
+	}
+
+	private static string GetDwarfEndianityName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_END_default",
+			1 => "DW_END_big",
+			2 => "DW_END_little",
+			_ => FormatUnknownDwarfCode("DW_END", value, 0x40, 0xFF)
+		};
+	}
+
+	private static ElfDwarfAttributeValue CreateDwarfDecodeErrorAttribute(DwarfAbbrevAttributeSpec spec, ulong unitRelativeOffset)
 	{
 		return new ElfDwarfAttributeValue
 		{
@@ -803,8 +1077,41 @@ public static partial class ElfReader
 			FormText = GetDwarfFormName(spec.Form),
 			Kind = ElfDwarfAttributeValueKind.None,
 			StringValue = "<decode-error>",
-			BytesValue = Array.Empty<byte>()
+			BytesValue = Array.Empty<byte>(),
+			UnitRelativeValueOffset = unitRelativeOffset,
+			ConsumedByteCount = 0,
+			DecodeStatus = ElfDwarfDecodeStatus.DecodeError,
+			DecodeNote = "attribute decode failed"
 		};
+	}
+
+	private static void PreserveDwarfUnitRegion(
+		ReadOnlySpan<byte> payload,
+		ulong unitOffset,
+		int startOffset,
+		int endOffset,
+		string reason,
+		List<ElfDwarfPreservedRegion> output)
+	{
+		if (output == null || startOffset < 0 || endOffset < startOffset || endOffset > payload.Length)
+			return;
+
+		var previewLength = Math.Min(32, endOffset - startOffset);
+		var previewHex = previewLength <= 0
+			? string.Empty
+			: Convert.ToHexString(payload.Slice(startOffset, previewLength));
+		var relativeOffset = startOffset >= (int)unitOffset
+			? (ulong)(startOffset - (int)unitOffset)
+			: 0UL;
+		var length = (ulong)(endOffset - startOffset);
+
+		output.Add(new ElfDwarfPreservedRegion
+		{
+			UnitRelativeOffset = relativeOffset,
+			UnitRelativeLength = length,
+			Reason = reason ?? string.Empty,
+			PreviewHex = previewHex
+		});
 	}
 
 	private static bool TryReadDwarfStringAtOffset(ReadOnlySpan<byte> table, ulong offset, out string text)
@@ -2087,12 +2394,14 @@ public static partial class ElfReader
 			DwFormStrx3 => "DW_FORM_strx3",
 			DwFormStrx4 => "DW_FORM_strx4",
 			DwFormAddrx1 => "DW_FORM_addrx1",
-			DwFormAddrx2 => "DW_FORM_addrx2",
-			DwFormAddrx3 => "DW_FORM_addrx3",
-			DwFormAddrx4 => "DW_FORM_addrx4",
-			_ => FormatUnknownDwarfCode("DW_FORM", form, DwFormLoUser, DwFormHiUser)
-		};
-	}
+				DwFormAddrx2 => "DW_FORM_addrx2",
+				DwFormAddrx3 => "DW_FORM_addrx3",
+				DwFormAddrx4 => "DW_FORM_addrx4",
+				DwFormGnuRefAlt => "DW_FORM_GNU_ref_alt",
+				DwFormGnuStrpAlt => "DW_FORM_GNU_strp_alt",
+				_ => FormatUnknownDwarfCode("DW_FORM", form, DwFormLoUser, DwFormHiUser)
+			};
+		}
 
 	private static string FormatUnknownDwarfCode(string prefix, ulong value, ulong loUser, ulong hiUser)
 	{

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPORT_DIR="${1:-$ROOT_DIR/samples/golden}"
+
+if [[ ! -d "$REPORT_DIR" ]]; then
+	echo "Report directory not found: $REPORT_DIR" >&2
+	exit 1
+fi
+
+if ! compgen -G "$REPORT_DIR/report-*.txt" >/dev/null; then
+	echo "No golden reports found in: $REPORT_DIR" >&2
+	exit 1
+fi
+
+count_pattern() {
+	local pattern="$1"
+	local count
+	count="$( (rg -o --no-messages -g 'report-*.txt' "$pattern" "$REPORT_DIR" || true) | wc -l | tr -d '[:space:]' )"
+	echo "$count"
+}
+
+machine_fallback="$(count_pattern "EM_[0-9]+")"
+osabi_fallback="$(count_pattern "ELFOSABI_[0-9]+")"
+section_numeric_fallback="$(count_pattern "SHT_[0-9]+")"
+segment_numeric_fallback="$(count_pattern "PT_[0-9]+")"
+relocation_fallback="$(count_pattern "R_[A-Z0-9]+_UNKNOWN_[0-9]+|R_MACHINE_[0-9]+|REL_[0-9]+")"
+note_fallback="$(count_pattern "NOTE_0x[0-9A-Fa-f]+|NT_[A-Z0-9]+_0x[0-9A-Fa-f]+")"
+dynamic_tag_fallback="$(count_pattern "DT_0x[0-9A-Fa-f]+")"
+
+total_fallback="$((machine_fallback + osabi_fallback + section_numeric_fallback + segment_numeric_fallback + relocation_fallback + note_fallback + dynamic_tag_fallback))"
+
+cat <<EOF
+machine_fallback=$machine_fallback
+osabi_fallback=$osabi_fallback
+section_numeric_fallback=$section_numeric_fallback
+segment_numeric_fallback=$segment_numeric_fallback
+relocation_fallback=$relocation_fallback
+note_fallback=$note_fallback
+dynamic_tag_fallback=$dynamic_tag_fallback
+total_fallback=$total_fallback
+EOF

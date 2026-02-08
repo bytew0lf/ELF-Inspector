@@ -77,9 +77,9 @@ Sections
 - [0] (unnamed): SHT_NULL (0), flags=0, addr=0x0, off=0x0, size=0x0
 - [1] .note.gnu.build-id: SHT_NOTE (7), flags=ALLOC, addr=0x194, off=0x194, size=0x24
 - [2] .interp: SHT_PROGBITS (1), flags=ALLOC, addr=0x1B8, off=0x1B8, size=0x1A
-- [3] .MIPS.abiflags: SHT_LOPROC+0x2A (1879048234), flags=ALLOC, addr=0x1D8, off=0x1D8, size=0x18
+- [3] .MIPS.abiflags: SHT_MIPS_ABIFLAGS (1879048234), flags=ALLOC, addr=0x1D8, off=0x1D8, size=0x18
 - [4] .reginfo: SHT_LOPROC+0x6 (1879048198), flags=ALLOC, addr=0x1F0, off=0x1F0, size=0x18
-- [5] .MIPS.xhash: SHT_LOPROC+0x2B (1879048235), flags=ALLOC, addr=0x208, off=0x208, size=0x54
+- [5] .MIPS.xhash: SHT_MIPS_XHASH (1879048235), flags=ALLOC, addr=0x208, off=0x208, size=0x54
 - [6] .dynamic: SHT_DYNAMIC (6), flags=ALLOC, addr=0x25C, off=0x25C, size=0x118
 - [7] .dynsym: SHT_DYNSYM (11), flags=ALLOC, addr=0x374, off=0x374, size=0xC0
 - [8] .dynstr: SHT_STRTAB (3), flags=ALLOC, addr=0x434, off=0x434, size=0xC1
@@ -113,7 +113,7 @@ Segments
 --------
 - [0] PT_PHDR (6), flags=R--, off=0x34, vaddr=0x34, filesz=0x160, memsz=0x160
 - [1] PT_INTERP (3), flags=R--, off=0x1B8, vaddr=0x1B8, filesz=0x1A, memsz=0x1A
-- [2] PT_LOPROC+0x3 (1879048195), flags=R--, off=0x1D8, vaddr=0x1D8, filesz=0x18, memsz=0x18
+- [2] PT_MIPS_ABIFLAGS (1879048195), flags=R--, off=0x1D8, vaddr=0x1D8, filesz=0x18, memsz=0x18
 - [3] PT_LOPROC+0x0 (1879048192), flags=R--, off=0x1F0, vaddr=0x1F0, filesz=0x18, memsz=0x18
 - [4] PT_LOAD (1), flags=R-X, off=0x0, vaddr=0x0, filesz=0x89C, memsz=0x89C
 - [5] PT_LOAD (1), flags=RW-, off=0x89C, vaddr=0x1089C, filesz=0x78, memsz=0x94
@@ -173,12 +173,12 @@ Dynamic Entries
 - DT_RELSZ (18) = 0x20 -> size=32 (0x20), entries=4
 - DT_RELENT (19) = 0x8 -> entry_size=8
 - DT_MIPS_RLD_VERSION (1879048193) = 0x1 -> version=1
-- DT_MIPS_FLAGS (1879048197) = 0x2 -> RHF_NOTPOT; proc_value=0x2
+- DT_MIPS_FLAGS (1879048197) = 0x2 -> RHF_NOTPOT; proc_tag=0x70000005, value=0x2
 - DT_MIPS_BASE_ADDRESS (1879048198) = 0x0 -> addr=0x0
-- DT_MIPS_LOCAL_GOTNO (1879048202) = 0xA -> count=10
-- DT_MIPS_SYMTABNO (1879048209) = 0xC -> count=12
-- DT_MIPS_UNREFEXTNO (1879048210) = 0x1F -> count=31
-- DT_MIPS_GOTSYM (1879048211) = 0x6 -> count=6
+- DT_MIPS_LOCAL_GOTNO (1879048202) = 0xA -> local_got_entries=10, global_got_entries=6
+- DT_MIPS_SYMTABNO (1879048209) = 0xC -> dynamic_symbol_count=12, got_coverage=16
+- DT_MIPS_UNREFEXTNO (1879048210) = 0x1F -> unresolved_external_count=31
+- DT_MIPS_GOTSYM (1879048211) = 0x6 -> first_global_got_symbol=6
 - DT_MIPS_XHASH (1879048246) = 0x208 -> addr=0x208, file_off=0x208, section=.MIPS.xhash
 - DT_FLAGS_1 (1879048187) = 0x8000000 -> DF_1_PIE
 - DT_VERNEED (1879048190) = 0x510 -> addr=0x510, file_off=0x510, section=.gnu.version_r

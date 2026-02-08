@@ -333,17 +333,24 @@ public static class ElfReportMapper
 				IncludeDirectoryCount = table.IncludeDirectoryCount,
 				FileNameEntryCount = table.FileNameEntryCount
 			}).ToList(),
-			SemanticUnits = dwarf.SemanticUnits.Select(unit => new DwarfSemanticUnitReport
-			{
-				Offset = unit.Offset,
-				UnitLength = unit.UnitLength,
-				IsDwarf64 = unit.IsDwarf64,
-				Version = unit.Version,
-				UnitType = unit.UnitType,
-				AbbrevOffset = unit.AbbrevOffset,
-				AddressSize = unit.AddressSize,
-				RootDies = unit.RootDies.Select(MapDwarfDie).ToList()
-			}).ToList(),
+				SemanticUnits = dwarf.SemanticUnits.Select(unit => new DwarfSemanticUnitReport
+				{
+					Offset = unit.Offset,
+					UnitLength = unit.UnitLength,
+					IsDwarf64 = unit.IsDwarf64,
+					Version = unit.Version,
+					UnitType = unit.UnitType,
+					AbbrevOffset = unit.AbbrevOffset,
+					AddressSize = unit.AddressSize,
+					RootDies = unit.RootDies.Select(MapDwarfDie).ToList(),
+					PreservedRegions = unit.PreservedRegions.Select(region => new DwarfPreservedRegionReport
+					{
+						UnitRelativeOffset = region.UnitRelativeOffset,
+						UnitRelativeLength = region.UnitRelativeLength,
+						Reason = region.Reason,
+						PreviewHex = region.PreviewHex
+					}).ToList()
+				}).ToList(),
 			SymbolMappings = dwarf.SymbolMappings.Select(mapping => new DwarfSymbolMappingReport
 			{
 				SymbolName = mapping.SymbolName,
@@ -364,24 +371,28 @@ public static class ElfReportMapper
 			Tag = die.Tag,
 			TagText = die.TagText,
 			HasChildren = die.HasChildren,
-			Attributes = die.Attributes.Select(attribute => new DwarfAttributeReport
-			{
-				Name = attribute.Name,
-				NameText = attribute.NameText,
-				Form = attribute.Form,
-				FormText = attribute.FormText,
-				Kind = attribute.Kind.ToString(),
-				UnsignedValue = attribute.UnsignedValue,
-				SignedValue = attribute.SignedValue,
-				BoolValue = attribute.BoolValue,
-				StringValue = attribute.StringValue,
-				BytesHex = attribute.BytesValue == null || attribute.BytesValue.Length == 0
-					? string.Empty
-					: Convert.ToHexString(attribute.BytesValue)
-			}).ToList(),
-			Children = die.Children.Select(MapDwarfDie).ToList()
-		};
-	}
+				Attributes = die.Attributes.Select(attribute => new DwarfAttributeReport
+				{
+					Name = attribute.Name,
+					NameText = attribute.NameText,
+					Form = attribute.Form,
+					FormText = attribute.FormText,
+					Kind = attribute.Kind.ToString(),
+					UnsignedValue = attribute.UnsignedValue,
+					SignedValue = attribute.SignedValue,
+					BoolValue = attribute.BoolValue,
+					StringValue = attribute.StringValue,
+					BytesHex = attribute.BytesValue == null || attribute.BytesValue.Length == 0
+						? string.Empty
+						: Convert.ToHexString(attribute.BytesValue),
+					UnitRelativeValueOffset = attribute.UnitRelativeValueOffset,
+					ConsumedByteCount = attribute.ConsumedByteCount,
+					DecodeStatus = attribute.DecodeStatus.ToString(),
+					DecodeNote = attribute.DecodeNote
+				}).ToList(),
+				Children = die.Children.Select(MapDwarfDie).ToList()
+			};
+		}
 
 	private static HashTablesReport CreateHashTablesReport(ELFInspector.Parser.ElfFile elf)
 	{
@@ -609,16 +620,21 @@ public static class ElfReportMapper
 			0x6FFFFFF7 => "SHT_GNU_LIBLIST",
 			0x6FFFFFF8 => "SHT_CHECKSUM",
 			0x6FFFFFFA => "SHT_SUNW_MOVE",
-			0x6FFFFFFB => "SHT_SUNW_COMDAT",
-			0x6FFFFFFC => "SHT_SUNW_SYMINFO",
-			0x6FFFFFFD => "SHT_GNU_verdef",
-			0x6FFFFFFE => "SHT_GNU_verneed",
-			0x6FFFFFFF => "SHT_GNU_versym",
-			>= 0x60000000 and <= 0x6FFFFFFF => $"SHT_LOOS+0x{type - 0x60000000:X}",
-			>= 0x70000000 and <= 0x7FFFFFFF => $"SHT_LOPROC+0x{type - 0x70000000:X}",
-			>= 0x80000000 => $"SHT_LOUSER+0x{type - 0x80000000:X}",
-			_ => $"SHT_{type}"
-		};
+				0x6FFFFFFB => "SHT_SUNW_COMDAT",
+				0x6FFFFFFC => "SHT_SUNW_SYMINFO",
+				0x6FFFFFFD => "SHT_GNU_verdef",
+				0x6FFFFFFE => "SHT_GNU_verneed",
+				0x6FFFFFFF => "SHT_GNU_versym",
+				0x70000001 => "SHT_ARM_EXIDX",
+				0x70000003 => "SHT_ARM_ATTRIBUTES",
+				0x7000000D => "SHT_MIPS_OPTIONS",
+				0x7000002A => "SHT_MIPS_ABIFLAGS",
+				0x7000002B => "SHT_MIPS_XHASH",
+				>= 0x60000000 and <= 0x6FFFFFFF => $"SHT_LOOS+0x{type - 0x60000000:X}",
+				>= 0x70000000 and <= 0x7FFFFFFF => $"SHT_LOPROC+0x{type - 0x70000000:X}",
+				>= 0x80000000 => $"SHT_LOUSER+0x{type - 0x80000000:X}",
+				_ => $"SHT_{type}"
+			};
 	}
 
 	private static string TranslateSegmentType(uint type)
@@ -637,13 +653,15 @@ public static class ElfReportMapper
 			PtGnuStack => "PT_GNU_STACK",
 			PtGnuRelro => "PT_GNU_RELRO",
 			PtGnuProperty => "PT_GNU_PROPERTY",
-			PtGnuSFrame => "PT_GNU_SFRAME",
-			PtSunwBss => "PT_SUNWBSS",
-			PtSunwStack => "PT_SUNWSTACK",
-			>= 0x60000000 and <= 0x6FFFFFFF => $"PT_LOOS+0x{type - 0x60000000:X}",
-			>= 0x70000000 and <= 0x7FFFFFFF => $"PT_LOPROC+0x{type - 0x70000000:X}",
-			_ => $"PT_{type}"
-		};
+				PtGnuSFrame => "PT_GNU_SFRAME",
+				PtSunwBss => "PT_SUNWBSS",
+				PtSunwStack => "PT_SUNWSTACK",
+				0x70000001 => "PT_ARM_EXIDX",
+				0x70000003 => "PT_MIPS_ABIFLAGS",
+				>= 0x60000000 and <= 0x6FFFFFFF => $"PT_LOOS+0x{type - 0x60000000:X}",
+				>= 0x70000000 and <= 0x7FFFFFFF => $"PT_LOPROC+0x{type - 0x70000000:X}",
+				_ => $"PT_{type}"
+			};
 	}
 
 	private static string FormatSectionFlags(ulong flags)
@@ -721,16 +739,22 @@ public static class ElfReportMapper
 			5 => "Motorola 88000",
 			7 => "Intel 80860",
 			8 => "MIPS",
+			9 => "IBM System/370",
+			10 => "MIPS RS3000 Little-endian",
 			14 => "HP PA-RISC",
+			17 => "Fujitsu VPP500",
 			18 => "SPARC32+",
+			19 => "Intel 80960",
 			20 => "PowerPC",
 			21 => "PowerPC64",
 			22 => "IBM S/390",
+			23 => "IBM SPU/SPC",
 			40 => "ARM",
 			42 => "SuperH",
 			43 => "SPARC V9",
 			50 => "IA-64",
 			62 => "AMD x86-64",
+			75 => "Digital VAX",
 			76 => "Axis CRIS",
 			87 => "Atmel AVR",
 			88 => "Mitsubishi FR30",
@@ -761,6 +785,7 @@ public static class ElfReportMapper
 			2 => "NetBSD",
 			3 => "Linux",
 			4 => "GNU Hurd",
+			5 => "UNIX - GNU",
 			6 => "Solaris",
 			7 => "AIX",
 			8 => "IRIX",

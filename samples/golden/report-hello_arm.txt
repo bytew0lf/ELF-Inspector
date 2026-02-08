@@ -117,7 +117,7 @@ Sections
 - [12] .text: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x400, off=0x400, size=0x1A0
 - [13] .fini: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x5A0, off=0x5A0, size=0x8
 - [14] .rodata: SHT_PROGBITS (1), flags=ALLOC, addr=0x5A8, off=0x5A8, size=0x13C
-- [15] .ARM.exidx: SHT_LOPROC+0x1 (1879048193), flags=ALLOC|LINK_ORDER, addr=0x6E4, off=0x6E4, size=0x8
+- [15] .ARM.exidx: SHT_ARM_EXIDX (1879048193), flags=ALLOC|LINK_ORDER, addr=0x6E4, off=0x6E4, size=0x8
 - [16] .eh_frame: SHT_PROGBITS (1), flags=ALLOC, addr=0x6EC, off=0x6EC, size=0x4
 - [17] .note.ABI-tag: SHT_NOTE (7), flags=ALLOC, addr=0x6F0, off=0x6F0, size=0x20
 - [18] .note.package: SHT_NOTE (7), flags=ALLOC, addr=0x710, off=0x710, size=0x78
@@ -128,14 +128,14 @@ Sections
 - [23] .data: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x20034, off=0x10034, size=0x8
 - [24] .bss: SHT_NOBITS (8), flags=WRITE|ALLOC, addr=0x2003C, off=0x1003C, size=0x4
 - [25] .comment: SHT_PROGBITS (1), flags=MERGE|STRINGS, addr=0x0, off=0x1003C, size=0x1F
-- [26] .ARM.attributes: SHT_LOPROC+0x3 (1879048195), flags=0, addr=0x0, off=0x1005B, size=0x2B
+- [26] .ARM.attributes: SHT_ARM_ATTRIBUTES (1879048195), flags=0, addr=0x0, off=0x1005B, size=0x2B
 - [27] .symtab: SHT_SYMTAB (2), flags=0, addr=0x0, off=0x10088, size=0x680
 - [28] .strtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0x10708, size=0x22B
 - [29] .shstrtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0x10933, size=0x113
 
 Segments
 --------
-- [0] PT_LOPROC+0x1 (1879048193), flags=R--, off=0x6E4, vaddr=0x6E4, filesz=0x8, memsz=0x8
+- [0] PT_ARM_EXIDX (1879048193), flags=R--, off=0x6E4, vaddr=0x6E4, filesz=0x8, memsz=0x8
 - [1] PT_PHDR (6), flags=R--, off=0x34, vaddr=0x34, filesz=0x140, memsz=0x140
 - [2] PT_INTERP (3), flags=R--, off=0x198, vaddr=0x198, filesz=0x13, memsz=0x13
 - [3] PT_LOAD (1), flags=R-X, off=0x0, vaddr=0x0, filesz=0x788, memsz=0x788

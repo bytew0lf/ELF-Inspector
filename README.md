@@ -51,6 +51,18 @@ Update coverage map:
 scripts/generate_coverage_map.sh --write-readme
 ```
 
+Generate fallback/GAP metrics from golden reports:
+
+```bash
+scripts/generate_gap_metrics.sh
+```
+
+Verify fallback/GAP thresholds used by CI:
+
+```bash
+scripts/verify_gap_metrics.sh
+```
+
 ### Architecture sample coverage (`samples/`)
 
 | Architecture | Samples |
@@ -190,7 +202,7 @@ scripts/run_unit_tests.sh
 
 ## CI Gate
 
-Run the full quality gate locally (unit tests + P3 + P4):
+Run the full quality gate locally (unit tests + P0/P3/P4 matrices + coverage/gap drift checks):
 
 ```bash
 scripts/run_ci_gate.sh

@@ -195,6 +195,14 @@ public enum ElfDwarfAttributeValueKind
 	Bytes = 7
 }
 
+public enum ElfDwarfDecodeStatus
+{
+	Exact = 0,
+	Partial = 1,
+	PreservedUnknown = 2,
+	DecodeError = 3
+}
+
 public class ElfDwarfAttributeValue
 {
 	public ulong Name { get; set; }
@@ -207,6 +215,10 @@ public class ElfDwarfAttributeValue
 	public bool BoolValue { get; set; }
 	public string StringValue { get; set; }
 	public byte[] BytesValue { get; set; }
+	public ulong UnitRelativeValueOffset { get; set; }
+	public ulong ConsumedByteCount { get; set; }
+	public ElfDwarfDecodeStatus DecodeStatus { get; set; }
+	public string DecodeNote { get; set; }
 }
 
 public class ElfDwarfDie
@@ -230,6 +242,15 @@ public class ElfDwarfSemanticCompilationUnit
 	public ulong AbbrevOffset { get; set; }
 	public byte AddressSize { get; set; }
 	public List<ElfDwarfDie> RootDies { get; } = new();
+	public List<ElfDwarfPreservedRegion> PreservedRegions { get; } = new();
+}
+
+public class ElfDwarfPreservedRegion
+{
+	public ulong UnitRelativeOffset { get; set; }
+	public ulong UnitRelativeLength { get; set; }
+	public string Reason { get; set; }
+	public string PreviewHex { get; set; }
 }
 
 public class ElfDwarfSymbolMapping

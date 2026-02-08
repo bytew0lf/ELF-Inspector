@@ -22,16 +22,16 @@ resolve_status() {
 	local test_pattern="$2"
 
 	if ! has_parser_pattern "$parser_pattern"; then
-		printf "offen"
+		printf "open"
 		return
 	fi
 
 	if [[ -n "$test_pattern" ]] && ! has_test_pattern "$test_pattern"; then
-		printf "teilweise"
+		printf "partial"
 		return
 	fi
 
-	printf "voll"
+	printf "full"
 }
 
 print_matrix() {
@@ -57,33 +57,33 @@ print_matrix() {
 	textreport_status="$(resolve_status "BuildTextReport|RunWithArgs" "ExampleUsage_ReturnsErrorCode_ForMalformedElf|ExampleUsage_CompatHeaderValidation_AllowsLegacyHeaderVariants")"
 
 	cat <<EOF
-## Aktuelle Coverage-Map (auto-generiert)
+## Current Coverage Map (auto-generated)
 
-Status-Legende:
-* \`voll\`: Implementiert und durch Unit-/Matrix-Tests abgedeckt
-* \`teilweise\`: Implementiert, aber nur teilweise testabgedeckt
-* \`offen\`: Noch nicht implementiert
+Status legend:
+* \`full\`: Implemented and covered by unit/matrix tests
+* \`partial\`: Implemented, but only partially covered by tests
+* \`open\`: Not implemented yet
 
-### Parser-/Report-Abdeckung
+### Parser/Report Coverage
 
-| Bereich | Status | Aktuelle Abdeckung |
+| Area | Status | Current coverage |
 |---|---|---|
-| ELF Header | $elf_header_status | ELF32/ELF64, Endianness, Typ, Machine, EntryPoint |
-| Section Headers | $section_headers_status | Normale + Extended Numbering, Section-Name-Auflösung |
-| Section-Spezialfälle | $section_special_status | \`SHF_COMPRESSED\` (ZLIB + ZSTD), GNU \`.zdebug*\` (ZLIB + ZSTD), \`SHT_GROUP\`/COMDAT |
-| Program Headers | $program_headers_status | PT_LOAD/PT_DYNAMIC/PT_INTERP/PT_NOTE inkl. Interpreter-Auflösung |
-| Dynamic | $dynamic_status | DT_NEEDED, SONAME, RPATH/RUNPATH, FLAGS/FLAGS_1, REL/RELA/RELR Tags, GNU Version-Tags |
-| Symbol Tables | $symbols_status | \`.symtab\`/\`.dynsym\`, Fallback ohne Section Header Table, Import/Export-Klassifikation |
-| Symbol-Versionierung | $symbol_version_status | \`DT_VERSYM\`, \`DT_VERNEED\`, \`DT_VERDEF\` inkl. Library-/Versionszuordnung |
-| Relocations | $relocations_status | REL/RELA/RELR aus Sections und Dynamic Tags, Symbol-/Section-Zuordnung im Report |
-| Relocation Typnamen je Architektur | $relocation_arch_status | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V mit erweiterten Typnamens-Maps |
-| Hash Tables | $hash_status | \`DT_HASH\` und \`DT_GNU_HASH\` (Buckets/Chains/Bloom), konfigurierbare Lookup-Pfad-Auswertung |
-| Notes | $notes_status | \`SHT_NOTE\`/\`PT_NOTE\`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux benannt + Basis-Decoding |
-| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE-Parsing, CFA-Regeln, Basis-Stackwalk für Core-Fälle |
-| DWARF/Debug | $dwarf_status | Index + Teil-Semantik für \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` inkl. robustem Partial-Decoding |
-| ET_CORE | $core_status | \`PT_NOTE\`-basierte Process/Thread/Register/Signal-Auswertung + Thread-Unwind-Branch im Report |
-| Security-/Loader-Features | $security_status | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, Canary-/FORTIFY-Hinweise |
-| Textreport | $textreport_status | Deterministische Ausgabe, strukturierte Sektionen inkl. Hash/Security |
+| ELF Header | $elf_header_status | ELF32/ELF64, endianness, type, machine, entry point |
+| Section Headers | $section_headers_status | Standard + extended numbering, section name resolution |
+| Section special cases | $section_special_status | \`SHF_COMPRESSED\` (ZLIB + ZSTD), GNU \`.zdebug*\` (ZLIB + ZSTD), \`SHT_GROUP\`/COMDAT |
+| Program Headers | $program_headers_status | PT_LOAD/PT_DYNAMIC/PT_INTERP/PT_NOTE including interpreter resolution |
+| Dynamic | $dynamic_status | DT_NEEDED, SONAME, RPATH/RUNPATH, FLAGS/FLAGS_1, REL/RELA/RELR tags, GNU version tags |
+| Symbol Tables | $symbols_status | \`.symtab\`/\`.dynsym\`, fallback without section header table, import/export classification |
+| Symbol versioning | $symbol_version_status | \`DT_VERSYM\`, \`DT_VERNEED\`, \`DT_VERDEF\` including library/version mapping |
+| Relocations | $relocations_status | REL/RELA/RELR from sections and dynamic tags, symbol/section mapping in report |
+| Relocation type names per architecture | $relocation_arch_status | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
+| Hash Tables | $hash_status | \`DT_HASH\` and \`DT_GNU_HASH\` (buckets/chains/bloom), configurable lookup-path evaluation |
+| Notes | $notes_status | \`SHT_NOTE\`/\`PT_NOTE\`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
+| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE parsing, CFA rules, basic stack walk for core cases |
+| DWARF/Debug | $dwarf_status | Index + partial semantics for \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` including robust partial decoding |
+| ET_CORE | $core_status | \`PT_NOTE\`-based process/thread/register/signal evaluation plus thread-unwind branch in report |
+| Security/Loader features | $security_status | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
+| Text report | $textreport_status | Deterministic output, structured sections including hash/security |
 EOF
 }
 

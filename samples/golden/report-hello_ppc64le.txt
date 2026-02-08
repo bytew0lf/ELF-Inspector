@@ -192,7 +192,7 @@ Dynamic Entries
 - DT_PLTREL (20) = 0x7 -> DT_RELA
 - DT_JMPREL (23) = 0x530 -> addr=0x530, file_off=0x530, section=.rela.plt
 - DT_PPC64_GLINK (1879048192) = 0x87C -> addr=0x87C, file_off=0x87C, section=.text
-- DT_PPC64_OPT (1879048195) = 0x0 -> proc_value=0x0
+- DT_PPC64_OPT (1879048195) = 0x0 -> 0
 - DT_RELA (7) = 0x470 -> addr=0x470, file_off=0x470, section=.rela.dyn
 - DT_RELASZ (8) = 0xC0 -> size=192 (0xC0), entries=8
 - DT_RELAENT (9) = 0x18 -> entry_size=24

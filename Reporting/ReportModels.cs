@@ -316,6 +316,10 @@ public class DwarfAttributeReport
 	public bool BoolValue { get; set; }
 	public string StringValue { get; set; }
 	public string BytesHex { get; set; }
+	public ulong UnitRelativeValueOffset { get; set; }
+	public ulong ConsumedByteCount { get; set; }
+	public string DecodeStatus { get; set; }
+	public string DecodeNote { get; set; }
 }
 
 public class DwarfDieReport
@@ -339,6 +343,15 @@ public class DwarfSemanticUnitReport
 	public ulong AbbrevOffset { get; set; }
 	public byte AddressSize { get; set; }
 	public List<DwarfDieReport> RootDies { get; set; }
+	public List<DwarfPreservedRegionReport> PreservedRegions { get; set; }
+}
+
+public class DwarfPreservedRegionReport
+{
+	public ulong UnitRelativeOffset { get; set; }
+	public ulong UnitRelativeLength { get; set; }
+	public string Reason { get; set; }
+	public string PreviewHex { get; set; }
 }
 
 public class DwarfSymbolMappingReport

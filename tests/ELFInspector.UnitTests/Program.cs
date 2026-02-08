@@ -685,8 +685,69 @@ public sealed class ElfReaderTests
 		Assert.Equal("DW_FORM_0x44", attribute.FormText);
 		Assert.Equal(ElfDwarfAttributeValueKind.Unsigned, attribute.Kind);
 		Assert.Equal(0x2AUL, attribute.UnsignedValue);
+		Assert.Equal((ulong)12, attribute.UnitRelativeValueOffset);
+		Assert.Equal((ulong)1, attribute.ConsumedByteCount);
+		Assert.Equal(ElfDwarfDecodeStatus.PreservedUnknown, attribute.DecodeStatus);
+		Assert.Contains("unknown form preserved", attribute.DecodeNote, StringComparison.Ordinal);
 		Assert.Contains("unknown-form-fallback", attribute.StringValue, StringComparison.Ordinal);
 		Assert.Contains("form=DW_FORM_0x44", attribute.StringValue, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void ParseDwarfIndex_SemanticModel_AttributeEnumValue_IsSemanticallyDecoded()
+	{
+		var data = new byte[0x200];
+		var infoOffset = 0x80;
+		var abbrevOffset = 0x120;
+
+		var debugAbbrev = new byte[]
+		{
+			0x01, 0x11, 0x00, // abbrev #1, DW_TAG_compile_unit, no children
+			0x13, 0x05,       // DW_AT_language, DW_FORM_data2
+			0x00, 0x00,
+			0x00
+		};
+		Array.Copy(debugAbbrev, 0, data, abbrevOffset, debugAbbrev.Length);
+
+		var debugInfoBody = new List<byte>
+		{
+			0x04, 0x00,             // DWARF v4
+			0x00, 0x00, 0x00, 0x00, // abbrev offset
+			0x08,                   // address size
+			0x01,                   // abbrev code
+			0x1C, 0x00              // DW_LANG_Rust
+		};
+
+		WriteUInt32(data.AsSpan(infoOffset, 4), (uint)debugInfoBody.Count, littleEndian: true);
+		Array.Copy(debugInfoBody.ToArray(), 0, data, infoOffset + 4, debugInfoBody.Count);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_info", Offset = (ulong)infoOffset, Size = (ulong)(4 + debugInfoBody.Count) });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_abbrev", Offset = (ulong)abbrevOffset, Size = (ulong)debugAbbrev.Length });
+
+		ElfReader.ParseDwarfIndex(data, elf);
+		var report = ElfReportMapper.Create(elf);
+
+		var unit = Assert.Single(elf.Dwarf.SemanticUnits);
+		var rootDie = Assert.Single(unit.RootDies);
+		var attribute = Assert.Single(rootDie.Attributes);
+
+		Assert.Equal(0x13UL, attribute.Name);
+		Assert.Equal(0x1CUL, attribute.UnsignedValue);
+		Assert.Equal(ElfDwarfDecodeStatus.Exact, attribute.DecodeStatus);
+		Assert.Equal("DW_LANG_Rust (0x1C)", attribute.StringValue);
+
+		var reportAttribute = Assert.Single(Assert.Single(Assert.Single(report.Dwarf.SemanticUnits).RootDies).Attributes);
+		Assert.Equal("Exact", reportAttribute.DecodeStatus);
+		Assert.Equal("DW_LANG_Rust (0x1C)", reportAttribute.StringValue);
 	}
 
 	[Fact]
@@ -1998,9 +2059,13 @@ public sealed class ElfReaderTests
 	public void ReportMapper_Mappings_AdditionalKnownValues_AreResolved()
 	{
 		Assert.Equal("LoongArch", InvokeReportMapperString("TranslateMachine", (ushort)258));
+		Assert.Equal("MIPS RS3000 Little-endian", InvokeReportMapperString("TranslateMachine", (ushort)10));
 		Assert.Equal("ARM EABI", InvokeReportMapperString("TranslateOsAbi", (byte)64));
+		Assert.Equal("UNIX - GNU", InvokeReportMapperString("TranslateOsAbi", (byte)5));
 		Assert.Equal("SHT_GNU_ATTRIBUTES", InvokeReportMapperString("TranslateSectionType", 0x6FFFFFF5U));
+		Assert.Equal("SHT_MIPS_ABIFLAGS", InvokeReportMapperString("TranslateSectionType", 0x7000002AU));
 		Assert.Equal("PT_SUNWSTACK", InvokeReportMapperString("TranslateSegmentType", 0x6FFFFFFBU));
+		Assert.Equal("PT_MIPS_ABIFLAGS", InvokeReportMapperString("TranslateSegmentType", 0x70000003U));
 	}
 
 	[Fact]
