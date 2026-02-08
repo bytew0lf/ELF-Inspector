@@ -16,6 +16,7 @@ public static partial class ElfReader
 
 	private const ulong DwAtName = 0x03;
 	private const ulong DwAtLocation = 0x02;
+	private const ulong DwAtOrdering = 0x09;
 	private const ulong DwAtLowPc = 0x11;
 	private const ulong DwAtHighPc = 0x12;
 	private const ulong DwAtLanguage = 0x13;
@@ -23,13 +24,16 @@ public static partial class ElfReader
 	private const ulong DwAtInline = 0x20;
 	private const ulong DwAtAccessibility = 0x32;
 	private const ulong DwAtCallingConvention = 0x36;
+	private const ulong DwAtIdentifierCase = 0x42;
 	private const ulong DwAtEncoding = 0x3E;
 	private const ulong DwAtVirtuality = 0x4C;
+	private const ulong DwAtDecimalSign = 0x5E;
 	private const ulong DwAtEndianity = 0x65;
 	private const ulong DwAtLinkageName = 0x6E;
 	private const ulong DwAtMipsLinkageName = 0x2007;
 	private const ulong DwAtRanges = 0x55;
 	private const ulong DwAtDeclaration = 0x3C;
+	private const ulong DwAtDefaulted = 0x8A;
 	private const ulong DwAtStrOffsetsBase = 0x72;
 	private const ulong DwAtAddrBase = 0x73;
 	private const ulong DwAtRnglistsBase = 0x74;
@@ -97,6 +101,8 @@ public static partial class ElfReader
 	private const ulong DwFormAddrx2 = 0x2A;
 	private const ulong DwFormAddrx3 = 0x2B;
 	private const ulong DwFormAddrx4 = 0x2C;
+	private const ulong DwFormGnuAddrIndex = 0x1F01;
+	private const ulong DwFormGnuStrIndex = 0x1F02;
 	private const ulong DwFormGnuRefAlt = 0x1F20;
 	private const ulong DwFormGnuStrpAlt = 0x1F21;
 	private const ulong DwTagLoUser = 0x4080;
@@ -578,6 +584,8 @@ public static partial class ElfReader
 					case DwFormUData:
 					case DwFormStrx:
 					case DwFormAddrx:
+			case DwFormGnuStrIndex:
+			case DwFormGnuAddrIndex:
 			case DwFormLoclistx:
 			case DwFormRnglistx:
 			{
@@ -893,6 +901,9 @@ public static partial class ElfReader
 		text = string.Empty;
 		switch (attributeName)
 		{
+			case DwAtOrdering:
+				text = GetDwarfOrderingName(value);
+				return true;
 			case DwAtLanguage:
 				text = GetDwarfLanguageName(value);
 				return true;
@@ -911,15 +922,34 @@ public static partial class ElfReader
 			case DwAtCallingConvention:
 				text = GetDwarfCallingConventionName(value);
 				return true;
+			case DwAtIdentifierCase:
+				text = GetDwarfIdentifierCaseName(value);
+				return true;
 			case DwAtVirtuality:
 				text = GetDwarfVirtualityName(value);
+				return true;
+			case DwAtDecimalSign:
+				text = GetDwarfDecimalSignName(value);
 				return true;
 			case DwAtEndianity:
 				text = GetDwarfEndianityName(value);
 				return true;
+			case DwAtDefaulted:
+				text = GetDwarfDefaultedName(value);
+				return true;
 			default:
 				return false;
 		}
+	}
+
+	private static string GetDwarfOrderingName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_ORD_row_major",
+			1 => "DW_ORD_col_major",
+			_ => $"DW_ORD_0x{value:X}"
+		};
 	}
 
 	private static string GetDwarfLanguageName(ulong value)
@@ -1045,6 +1075,18 @@ public static partial class ElfReader
 		};
 	}
 
+	private static string GetDwarfIdentifierCaseName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_ID_case_sensitive",
+			1 => "DW_ID_up_case",
+			2 => "DW_ID_down_case",
+			3 => "DW_ID_case_insensitive",
+			_ => $"DW_ID_0x{value:X}"
+		};
+	}
+
 	private static string GetDwarfVirtualityName(ulong value)
 	{
 		return value switch
@@ -1064,6 +1106,30 @@ public static partial class ElfReader
 			1 => "DW_END_big",
 			2 => "DW_END_little",
 			_ => FormatUnknownDwarfCode("DW_END", value, 0x40, 0xFF)
+		};
+	}
+
+	private static string GetDwarfDecimalSignName(ulong value)
+	{
+		return value switch
+		{
+			1 => "DW_DS_unsigned",
+			2 => "DW_DS_leading_overpunch",
+			3 => "DW_DS_trailing_overpunch",
+			4 => "DW_DS_leading_separate",
+			5 => "DW_DS_trailing_separate",
+			_ => $"DW_DS_0x{value:X}"
+		};
+	}
+
+	private static string GetDwarfDefaultedName(ulong value)
+	{
+		return value switch
+		{
+			0 => "DW_DEFAULTED_no",
+			1 => "DW_DEFAULTED_in_class",
+			2 => "DW_DEFAULTED_out_of_class",
+			_ => $"DW_DEFAULTED_0x{value:X}"
 		};
 	}
 
@@ -1486,14 +1552,15 @@ public static partial class ElfReader
 			return false;
 		if (context.DebugStrPayload == null || context.DebugStrPayload.Length == 0)
 			return false;
-		if (!context.StrOffsetsBase.HasValue)
+		if (!context.StrOffsetsBase.HasValue && attribute.Form != DwFormGnuStrIndex)
 			return false;
+		var strOffsetsBase = context.StrOffsetsBase ?? 0UL;
 
 		if (!TryResolveOffsetTableIndex(
 			context.DebugStrOffsetsPayload,
 			context.IsLittleEndian,
 			context.IsDwarf64,
-			context.StrOffsetsBase.Value,
+			strOffsetsBase,
 			attribute.UnsignedValue,
 			out var stringOffset))
 		{
@@ -1511,12 +1578,12 @@ public static partial class ElfReader
 
 	private static bool IsDwarfAddrIndexForm(ulong form)
 	{
-		return form is DwFormAddrx or DwFormAddrx1 or DwFormAddrx2 or DwFormAddrx3 or DwFormAddrx4;
+		return form is DwFormAddrx or DwFormAddrx1 or DwFormAddrx2 or DwFormAddrx3 or DwFormAddrx4 or DwFormGnuAddrIndex;
 	}
 
 	private static bool IsDwarfStrIndexForm(ulong form)
 	{
-		return form is DwFormStrx or DwFormStrx1 or DwFormStrx2 or DwFormStrx3 or DwFormStrx4;
+		return form is DwFormStrx or DwFormStrx1 or DwFormStrx2 or DwFormStrx3 or DwFormStrx4 or DwFormGnuStrIndex;
 	}
 
 	private static int GetDwarfAddressByteSize(DwarfUnitMappingContext context)
@@ -2216,6 +2283,11 @@ public static partial class ElfReader
 			0x49 => "DW_TAG_call_site_parameter",
 			0x4A => "DW_TAG_skeleton_unit",
 			0x4B => "DW_TAG_immutable_type",
+			0x4106 => "DW_TAG_GNU_call_site",
+			0x4107 => "DW_TAG_GNU_call_site_parameter",
+			0x4108 => "DW_TAG_GNU_template_template_param",
+			0x4109 => "DW_TAG_GNU_template_parameter_pack",
+			0x410A => "DW_TAG_GNU_formal_parameter_pack",
 			_ => FormatUnknownDwarfCode("DW_TAG", tag, DwTagLoUser, DwTagHiUser)
 		};
 	}
@@ -2345,6 +2417,25 @@ public static partial class ElfReader
 			0x89 => "DW_AT_deleted",
 			0x8A => "DW_AT_defaulted",
 			0x8B => "DW_AT_loclists_base",
+			0x2101 => "DW_AT_GNU_vector",
+			0x2102 => "DW_AT_GNU_guarded_by",
+			0x2103 => "DW_AT_GNU_pt_guarded_by",
+			0x2104 => "DW_AT_GNU_guarded",
+			0x2105 => "DW_AT_GNU_pt_guarded",
+			0x2106 => "DW_AT_GNU_locks_excluded",
+			0x2107 => "DW_AT_GNU_exclusive_locks_required",
+			0x2108 => "DW_AT_GNU_shared_locks_required",
+			0x2109 => "DW_AT_GNU_odr_signature",
+			0x210A => "DW_AT_GNU_template_name",
+			0x210B => "DW_AT_GNU_call_site_value",
+			0x210C => "DW_AT_GNU_call_site_data_value",
+			0x210D => "DW_AT_GNU_call_site_target",
+			0x210E => "DW_AT_GNU_call_site_target_clobbered",
+			0x210F => "DW_AT_GNU_tail_call",
+			0x2110 => "DW_AT_GNU_all_tail_call_sites",
+			0x2111 => "DW_AT_GNU_all_call_sites",
+			0x2112 => "DW_AT_GNU_all_source_call_sites",
+			0x2119 => "DW_AT_GNU_macros",
 			0x2007 => "DW_AT_MIPS_linkage_name",
 			_ => FormatUnknownDwarfCode("DW_AT", attribute, DwAtLoUser, DwAtHiUser)
 		};
@@ -2394,14 +2485,16 @@ public static partial class ElfReader
 			DwFormStrx3 => "DW_FORM_strx3",
 			DwFormStrx4 => "DW_FORM_strx4",
 			DwFormAddrx1 => "DW_FORM_addrx1",
-				DwFormAddrx2 => "DW_FORM_addrx2",
-				DwFormAddrx3 => "DW_FORM_addrx3",
-				DwFormAddrx4 => "DW_FORM_addrx4",
-				DwFormGnuRefAlt => "DW_FORM_GNU_ref_alt",
-				DwFormGnuStrpAlt => "DW_FORM_GNU_strp_alt",
-				_ => FormatUnknownDwarfCode("DW_FORM", form, DwFormLoUser, DwFormHiUser)
-			};
-		}
+			DwFormAddrx2 => "DW_FORM_addrx2",
+			DwFormAddrx3 => "DW_FORM_addrx3",
+			DwFormAddrx4 => "DW_FORM_addrx4",
+			DwFormGnuAddrIndex => "DW_FORM_GNU_addr_index",
+			DwFormGnuStrIndex => "DW_FORM_GNU_str_index",
+			DwFormGnuRefAlt => "DW_FORM_GNU_ref_alt",
+			DwFormGnuStrpAlt => "DW_FORM_GNU_strp_alt",
+			_ => FormatUnknownDwarfCode("DW_FORM", form, DwFormLoUser, DwFormHiUser)
+		};
+	}
 
 	private static string FormatUnknownDwarfCode(string prefix, ulong value, ulong loUser, ulong hiUser)
 	{

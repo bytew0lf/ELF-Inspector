@@ -41,7 +41,7 @@ public static partial class ElfReader
 			unwind.Strategy = strategy;
 			unwind.Frames.Add(CreateCoreUnwindFrame(elf, 0, ip, sp, fp, strategy));
 
-			var framePointerWalkWorked = TryUnwindByFramePointer(
+			var cfiWalkWorked = TryUnwindByEhFrameCfi(
 				data,
 				elf,
 				segments,
@@ -50,12 +50,12 @@ public static partial class ElfReader
 				fp,
 				wordSize,
 				unwind.Frames,
-				strategy);
+				"eh-frame-cfi");
 
-			var cfiWalkWorked = false;
-			if (!framePointerWalkWorked)
+			var framePointerWalkWorked = false;
+			if (!cfiWalkWorked)
 			{
-				cfiWalkWorked = TryUnwindByEhFrameCfi(
+				framePointerWalkWorked = TryUnwindByFramePointer(
 					data,
 					elf,
 					segments,
@@ -64,10 +64,11 @@ public static partial class ElfReader
 					fp,
 					wordSize,
 					unwind.Frames,
-					"eh-frame-cfi");
+					strategy);
 			}
 
 			var linkRegisterWalkWorked = false;
+			var linkRegisterStrategy = $"{strategy}-link-register";
 			if (!framePointerWalkWorked && !cfiWalkWorked && linkRegister.HasValue)
 			{
 				linkRegisterWalkWorked = TryUnwindByLinkRegister(
@@ -77,12 +78,13 @@ public static partial class ElfReader
 					fp,
 					linkRegister.Value,
 					unwind.Frames,
-					$"{strategy}-link-register");
+					linkRegisterStrategy);
 			}
 
+			var stackScanWalkWorked = false;
 			if (!framePointerWalkWorked && !cfiWalkWorked && !linkRegisterWalkWorked)
 			{
-				TryUnwindByStackScan(
+				stackScanWalkWorked = TryUnwindByStackScan(
 					data,
 					elf,
 					segments,
@@ -92,6 +94,15 @@ public static partial class ElfReader
 					"stack-scan");
 			}
 
+			unwind.Strategy = cfiWalkWorked
+				? "eh-frame-cfi"
+				: framePointerWalkWorked
+					? strategy
+					: linkRegisterWalkWorked
+						? linkRegisterStrategy
+						: stackScanWalkWorked
+							? "stack-scan"
+							: strategy;
 			unwind.Complete = unwind.Frames.Count > 1;
 			core.UnwindThreads.Add(unwind);
 		}
@@ -609,7 +620,7 @@ public static partial class ElfReader
 		};
 	}
 
-	private static void TryUnwindByStackScan(
+	private static bool TryUnwindByStackScan(
 		IEndianDataSource data,
 		ElfFile elf,
 		List<CoreMemorySegment> segments,
@@ -618,12 +629,13 @@ public static partial class ElfReader
 		List<ElfCoreUnwindFrameInfo> frames,
 		string strategy)
 	{
+		var initialFrameCount = frames.Count;
 		if (wordSize is not (4 or 8))
-			return;
+			return false;
 		if (initialSp == 0)
-			return;
+			return false;
 		if (segments.Count == 0)
-			return;
+			return false;
 
 		var maxWords = 1024;
 		var depth = frames.Count;
@@ -645,6 +657,8 @@ public static partial class ElfReader
 
 			cursor = checked(cursor + (ulong)wordSize);
 		}
+
+		return frames.Count > initialFrameCount;
 	}
 
 	private static bool TryReadCoreMemoryWord(

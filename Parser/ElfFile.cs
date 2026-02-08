@@ -266,6 +266,9 @@ public class ElfCoreThreadInfo
 {
 	public int Index { get; set; }
 	public int? ThreadId { get; set; }
+	public int? ParentProcessId { get; set; }
+	public int? ProcessGroupId { get; set; }
+	public int? SessionId { get; set; }
 	public int? Signal { get; set; }
 	public int? CurrentSignal { get; set; }
 	public List<ulong> RegisterPreview { get; } = new();

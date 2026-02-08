@@ -759,11 +759,137 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void ParseDwarfIndex_SemanticModel_AdditionalEnumAttributes_AreSemanticallyDecoded()
+	{
+		var data = new byte[0x200];
+		var infoOffset = 0x80;
+		var abbrevOffset = 0x120;
+
+		var debugAbbrev = new byte[]
+		{
+			0x01, 0x11, 0x00, // abbrev #1, DW_TAG_compile_unit, no children
+			0x42, 0x0B,       // DW_AT_identifier_case, DW_FORM_data1
+			0x8A, 0x01, 0x0B, // DW_AT_defaulted, DW_FORM_data1
+			0x09, 0x0B,       // DW_AT_ordering, DW_FORM_data1
+			0x00, 0x00,
+			0x00
+		};
+		Array.Copy(debugAbbrev, 0, data, abbrevOffset, debugAbbrev.Length);
+
+		var debugInfoBody = new List<byte>
+		{
+			0x04, 0x00,             // DWARF v4
+			0x00, 0x00, 0x00, 0x00, // abbrev offset
+			0x08,                   // address size
+			0x01,                   // abbrev code
+			0x03,                   // DW_ID_case_insensitive
+			0x02,                   // DW_DEFAULTED_out_of_class
+			0x01                    // DW_ORD_col_major
+		};
+
+		WriteUInt32(data.AsSpan(infoOffset, 4), (uint)debugInfoBody.Count, littleEndian: true);
+		Array.Copy(debugInfoBody.ToArray(), 0, data, infoOffset + 4, debugInfoBody.Count);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_info", Offset = (ulong)infoOffset, Size = (ulong)(4 + debugInfoBody.Count) });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_abbrev", Offset = (ulong)abbrevOffset, Size = (ulong)debugAbbrev.Length });
+
+		ElfReader.ParseDwarfIndex(data, elf);
+
+		var unit = Assert.Single(elf.Dwarf.SemanticUnits);
+		var rootDie = Assert.Single(unit.RootDies);
+		Assert.Equal("DW_ID_case_insensitive (0x3)", rootDie.Attributes[0].StringValue);
+		Assert.Equal("DW_DEFAULTED_out_of_class (0x2)", rootDie.Attributes[1].StringValue);
+		Assert.Equal("DW_ORD_col_major (0x1)", rootDie.Attributes[2].StringValue);
+	}
+
+	[Fact]
+	public void ParseDwarfIndex_SemanticModel_GnuStringIndexForm_ResolvesNameForSymbolMapping()
+	{
+		var data = new byte[0x400];
+		var infoOffset = 0x80;
+		var abbrevOffset = 0x180;
+		var strOffset = 0x220;
+		var strOffsetsOffset = 0x260;
+
+		var debugAbbrev = new byte[]
+		{
+			0x01, 0x11, 0x01,             // CU, has children
+			0x00, 0x00,
+			0x02, 0x2E, 0x00,             // subprogram, no children
+			0x03, 0x82, 0x3E,             // DW_AT_name, DW_FORM_GNU_str_index
+			0x11, 0x01,                   // DW_AT_low_pc, DW_FORM_addr
+			0x12, 0x06,                   // DW_AT_high_pc, DW_FORM_data4
+			0x00, 0x00,
+			0x00
+		};
+		Array.Copy(debugAbbrev, 0, data, abbrevOffset, debugAbbrev.Length);
+
+		var debugStr = Encoding.ASCII.GetBytes("gnu_func\0");
+		Array.Copy(debugStr, 0, data, strOffset, debugStr.Length);
+
+		var debugStrOffsets = new byte[4];
+		WriteUInt32(debugStrOffsets.AsSpan(0, 4), 0, littleEndian: true);
+		Array.Copy(debugStrOffsets, 0, data, strOffsetsOffset, debugStrOffsets.Length);
+
+		var body = new List<byte>
+		{
+			0x04, 0x00,             // version
+			0x00, 0x00, 0x00, 0x00, // abbrev offset
+			0x08,                   // address size
+			0x01,                   // CU abbrev
+			0x02,                   // subprogram abbrev
+			0x00                    // GNU str index = 0
+		};
+		body.AddRange(BitConverter.GetBytes(0x401000UL)); // low_pc
+		body.AddRange(BitConverter.GetBytes((uint)0x20)); // high_pc as offset
+		body.Add(0x00); // end children
+
+		WriteUInt32(data.AsSpan(infoOffset, 4), (uint)body.Count, littleEndian: true);
+		Array.Copy(body.ToArray(), 0, data, infoOffset + 4, body.Count);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_info", Offset = (ulong)infoOffset, Size = (ulong)(4 + body.Count) });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_abbrev", Offset = (ulong)abbrevOffset, Size = (ulong)debugAbbrev.Length });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_str", Offset = (ulong)strOffset, Size = (ulong)debugStr.Length });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_str_offsets", Offset = (ulong)strOffsetsOffset, Size = (ulong)debugStrOffsets.Length });
+		elf.Symbols.Add(new ElfSymbol { Name = "gnu_func", Value = 0x401010, Size = 4 });
+
+		ElfReader.ParseDwarfIndex(data, elf);
+		var report = ElfReportMapper.Create(elf);
+
+		var unit = Assert.Single(elf.Dwarf.SemanticUnits);
+		var child = Assert.Single(Assert.Single(unit.RootDies).Children);
+		Assert.Equal("DW_FORM_GNU_str_index", child.Attributes[0].FormText);
+		Assert.Contains(report.Dwarf.SymbolMappings, mapping =>
+			mapping.SymbolName == "gnu_func"
+			&& mapping.MatchType.Contains("name", StringComparison.Ordinal));
+	}
+
+	[Fact]
 	public void ParseDwarfIndex_SemanticModel_UnknownUserRangeIdentifiers_ArePreservedWithLoUserNames()
 	{
 		Assert.Equal("DW_TAG_lo_user+0x1", InvokeReaderString("GetDwarfTagName", 0x4081UL));
 		Assert.Equal("DW_AT_lo_user+0x1", InvokeReaderString("GetDwarfAttributeName", 0x2001UL));
-		Assert.Equal("DW_FORM_lo_user+0x1", InvokeReaderString("GetDwarfFormName", 0x1F01UL));
+		Assert.Equal("DW_FORM_lo_user+0x3", InvokeReaderString("GetDwarfFormName", 0x1F03UL));
+		Assert.Equal("DW_TAG_GNU_call_site", InvokeReaderString("GetDwarfTagName", 0x4106UL));
+		Assert.Equal("DW_AT_GNU_call_site_value", InvokeReaderString("GetDwarfAttributeName", 0x210BUL));
+		Assert.Equal("DW_FORM_GNU_addr_index", InvokeReaderString("GetDwarfFormName", 0x1F01UL));
+		Assert.Equal("DW_FORM_GNU_str_index", InvokeReaderString("GetDwarfFormName", 0x1F02UL));
 	}
 
 	[Fact]
@@ -1527,6 +1653,9 @@ public sealed class ElfReaderTests
 		WriteUInt32(prStatus.AsSpan(0, 4), 11, littleEndian: true); // si_signo
 		WriteUInt16(prStatus.AsSpan(12, 2), 5, littleEndian: true); // pr_cursig
 		WriteUInt32(prStatus.AsSpan(32, 4), 1234, littleEndian: true); // pr_pid
+		WriteUInt32(prStatus.AsSpan(36, 4), 4321, littleEndian: true); // pr_ppid
+		WriteUInt32(prStatus.AsSpan(40, 4), 33, littleEndian: true); // pr_pgrp
+		WriteUInt32(prStatus.AsSpan(44, 4), 44, littleEndian: true); // pr_sid
 		for (var i = 0; i < 27; i++)
 			WriteUInt64(prStatus.AsSpan(112 + (i * 8), 8), (ulong)(0x1000 + i), littleEndian: true);
 
@@ -1550,17 +1679,24 @@ public sealed class ElfReaderTests
 		});
 
 		ElfReader.ParseCoreDumpInfo(elf);
+		var report = ElfReportMapper.Create(elf);
 
 		Assert.True(elf.CoreDump.IsCoreDump);
 		Assert.Equal(1234, elf.CoreDump.ProcessId);
 		Assert.Equal(11, elf.CoreDump.Signal);
 		Assert.Single(elf.CoreDump.Threads);
 		Assert.Equal(1234, elf.CoreDump.Threads[0].ThreadId);
+		Assert.Equal(4321, elf.CoreDump.Threads[0].ParentProcessId);
+		Assert.Equal(33, elf.CoreDump.Threads[0].ProcessGroupId);
+		Assert.Equal(44, elf.CoreDump.Threads[0].SessionId);
 		Assert.Equal(11, elf.CoreDump.Threads[0].Signal);
 		Assert.Equal(5, elf.CoreDump.Threads[0].CurrentSignal);
 		Assert.Equal(27, elf.CoreDump.Threads[0].RegisterPreview.Count);
 		Assert.Equal(0x1000UL, elf.CoreDump.Threads[0].RegisterPreview[0]);
 		Assert.Equal(0x101AUL, elf.CoreDump.Threads[0].RegisterPreview[^1]);
+		Assert.Equal(4321, report.CoreDump.Threads[0].ParentProcessId);
+		Assert.Equal(33, report.CoreDump.Threads[0].ProcessGroupId);
+		Assert.Equal(44, report.CoreDump.Threads[0].SessionId);
 	}
 
 	[Fact]
@@ -1751,6 +1887,83 @@ public sealed class ElfReaderTests
 		Assert.True(unwind.Complete);
 		Assert.True(unwind.Frames.Count >= 2);
 		Assert.Contains(unwind.Frames, frame => frame.InstructionPointer == execVaddr + 0x20 && frame.Strategy == "eh-frame-cfi");
+	}
+
+	[Fact]
+	public void ParseCoreDumpInfo_X86_64_WhenCfiAndFramePointerAvailable_PrefersCfi()
+	{
+		var coreBytes = new byte[0x500];
+		var execSegmentOffset = 0x100UL;
+		var stackSegmentOffset = 0x280UL;
+		var execVaddr = 0x401000UL;
+		var stackVaddr = 0x500000UL;
+
+		var fp = stackVaddr + 0x40;
+		var cfiReturnAddress = execVaddr + 0x30;
+		var framePointerReturnAddress = execVaddr + 0x50;
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x10), 8), cfiReturnAddress, littleEndian: true); // cfi RA @ rsp
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x40), 8), 0, littleEndian: true); // next fp
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x48), 8), framePointerReturnAddress, littleEndian: true); // fp RA
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Type = 4,
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 62
+			},
+			Unwind = new ElfUnwindInfo
+			{
+				EhFrame = new ElfEhFrameInfo()
+			}
+		};
+
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = execSegmentOffset,
+			VirtualAddress = execVaddr,
+			FileSize = 0x200,
+			MemorySize = 0x200,
+			Flags = 0x5
+		});
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = stackSegmentOffset,
+			VirtualAddress = stackVaddr,
+			FileSize = 0x180,
+			MemorySize = 0x180,
+			Flags = 0x6
+		});
+		elf.Unwind.EhFrame.FdeEntries.Add(new ElfEhFrameFdeInfo
+		{
+			InitialLocation = execVaddr,
+			EndLocation = execVaddr + 0x100,
+			CfaRuleAvailable = true,
+			CfaRegister = 7,
+			CfaOffset = 8,
+			ReturnAddressOffsetAvailable = true,
+			ReturnAddressOffset = -8
+		});
+
+		var prStatus = new byte[112 + (27 * 8)];
+		WriteUInt32(prStatus.AsSpan(0, 4), 6, littleEndian: true);
+		WriteUInt16(prStatus.AsSpan(12, 2), 6, littleEndian: true);
+		WriteUInt32(prStatus.AsSpan(32, 4), 2001, littleEndian: true);
+		WriteUInt64(prStatus.AsSpan(112 + (4 * 8), 8), fp, littleEndian: true); // rbp
+		WriteUInt64(prStatus.AsSpan(112 + (16 * 8), 8), execVaddr + 0x10, littleEndian: true); // rip
+		WriteUInt64(prStatus.AsSpan(112 + (19 * 8), 8), stackVaddr + 0x10, littleEndian: true); // rsp
+		elf.Notes.Add(new ElfNote { Name = "CORE", Type = 1, Descriptor = prStatus, TypeName = "NT_PRSTATUS", DecodedDescription = string.Empty });
+
+		ElfReader.ParseCoreDumpInfo(coreBytes, elf);
+
+		var unwind = Assert.Single(elf.CoreDump.UnwindThreads);
+		Assert.Equal("eh-frame-cfi", unwind.Strategy);
+		Assert.Contains(unwind.Frames, frame => frame.InstructionPointer == cfiReturnAddress && frame.Strategy == "eh-frame-cfi");
+		Assert.DoesNotContain(unwind.Frames, frame => frame.InstructionPointer == framePointerReturnAddress && frame.Strategy == "x86_64-frame-pointer");
 	}
 
 	[Fact]
@@ -2038,6 +2251,49 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void Parse_CoreNotes_S390_Elf32_PrStatus_UsesStructuredLayout()
+	{
+		var prStatus = new byte[72 + (18 * 4)];
+		WriteUInt32(prStatus.AsSpan(0, 4), 12, littleEndian: true);
+		WriteUInt16(prStatus.AsSpan(12, 2), 12, littleEndian: true);
+		WriteUInt32(prStatus.AsSpan(24, 4), 1111, littleEndian: true); // pid
+		WriteUInt32(prStatus.AsSpan(28, 4), 2222, littleEndian: true); // ppid
+		WriteUInt32(prStatus.AsSpan(32, 4), 3333, littleEndian: true); // pgrp
+		WriteUInt32(prStatus.AsSpan(36, 4), 4444, littleEndian: true); // sid
+		for (var i = 0; i < 18; i++)
+			WriteUInt32(prStatus.AsSpan(72 + (i * 4), 4), 0x5000U + (uint)i, littleEndian: true);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Type = 4,
+				Class = ElfClass.Elf32,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 22
+			}
+		};
+		elf.Notes.Add(new ElfNote
+		{
+			Name = "CORE",
+			Type = 1,
+			Descriptor = prStatus,
+			TypeName = "NT_PRSTATUS",
+			DecodedDescription = string.Empty
+		});
+
+		ElfReader.ParseCoreDumpInfo(elf);
+
+		Assert.True(elf.CoreDump.IsCoreDump);
+		Assert.Single(elf.CoreDump.Threads);
+		Assert.Equal(1111, elf.CoreDump.Threads[0].ThreadId);
+		Assert.Equal(2222, elf.CoreDump.Threads[0].ParentProcessId);
+		Assert.Equal(3333, elf.CoreDump.Threads[0].ProcessGroupId);
+		Assert.Equal(4444, elf.CoreDump.Threads[0].SessionId);
+		Assert.Equal(18, elf.CoreDump.Threads[0].RegisterPreview.Count);
+	}
+
+	[Fact]
 	public void Report_Nano_ParsesGnuHashTablesAndLookupPaths()
 	{
 		var nanoFile = GetRequiredSample("nano");
@@ -2102,12 +2358,17 @@ public sealed class ElfReaderTests
 	{
 		Assert.Equal("LoongArch", InvokeReportMapperString("TranslateMachine", (ushort)258));
 		Assert.Equal("MIPS RS3000 Little-endian", InvokeReportMapperString("TranslateMachine", (ushort)10));
+		Assert.Equal("Xilinx MicroBlaze", InvokeReportMapperString("TranslateMachine", (ushort)189));
+		Assert.Equal("QUALCOMM Hexagon", InvokeReportMapperString("TranslateMachine", (ushort)164));
 		Assert.Equal("ARM EABI", InvokeReportMapperString("TranslateOsAbi", (byte)64));
 		Assert.Equal("UNIX - GNU", InvokeReportMapperString("TranslateOsAbi", (byte)5));
+		Assert.Equal("Sortix", InvokeReportMapperString("TranslateOsAbi", (byte)53));
 		Assert.Equal("SHT_GNU_ATTRIBUTES", InvokeReportMapperString("TranslateSectionType", 0x6FFFFFF5U));
 		Assert.Equal("SHT_MIPS_ABIFLAGS", InvokeReportMapperString("TranslateSectionType", 0x7000002AU));
+		Assert.Equal("SHT_LLVM_ADDRSIG", InvokeReportMapperString("TranslateSectionType", 0x6FFF4C03U));
 		Assert.Equal("PT_SUNWSTACK", InvokeReportMapperString("TranslateSegmentType", 0x6FFFFFFBU));
 		Assert.Equal("PT_MIPS_ABIFLAGS", InvokeReportMapperString("TranslateSegmentType", 0x70000003U));
+		Assert.Equal("PT_OPENBSD_RANDOMIZE", InvokeReportMapperString("TranslateSegmentType", 0x65A3DBE6U));
 	}
 
 	[Fact]

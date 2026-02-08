@@ -24,13 +24,24 @@ public static partial class ElfReader
 
 	private readonly struct CorePrStatusLayout
 	{
-		public CorePrStatusLayout(int signalOffset, int currentSignalOffset, int threadIdOffset, int registersOffset, int registerCount)
+		public CorePrStatusLayout(
+			int signalOffset,
+			int currentSignalOffset,
+			int threadIdOffset,
+			int registersOffset,
+			int registerCount,
+			int? parentProcessIdOffset = null,
+			int? processGroupIdOffset = null,
+			int? sessionIdOffset = null)
 		{
 			SignalOffset = signalOffset;
 			CurrentSignalOffset = currentSignalOffset;
 			ThreadIdOffset = threadIdOffset;
 			RegistersOffset = registersOffset;
 			RegisterCount = registerCount;
+			ParentProcessIdOffset = parentProcessIdOffset;
+			ProcessGroupIdOffset = processGroupIdOffset;
+			SessionIdOffset = sessionIdOffset;
 		}
 
 		public int SignalOffset { get; }
@@ -38,6 +49,9 @@ public static partial class ElfReader
 		public int ThreadIdOffset { get; }
 		public int RegistersOffset { get; }
 		public int RegisterCount { get; }
+		public int? ParentProcessIdOffset { get; }
+		public int? ProcessGroupIdOffset { get; }
+		public int? SessionIdOffset { get; }
 	}
 
 	public static void ParseCoreDumpInfo(ElfFile elf)
@@ -169,11 +183,23 @@ public static partial class ElfReader
 		var threadId = hasKnownLayout
 			? TryReadCoreInt32At(span, layout.ThreadIdOffset, isLittleEndian)
 			: TryReadFirstPlausibleCoreInt32(span, isLittleEndian, 24, 28, 32, 48, 72, 80);
+		var parentProcessId = hasKnownLayout && layout.ParentProcessIdOffset.HasValue
+			? TryReadCoreInt32At(span, layout.ParentProcessIdOffset.Value, isLittleEndian)
+			: null;
+		var processGroupId = hasKnownLayout && layout.ProcessGroupIdOffset.HasValue
+			? TryReadCoreInt32At(span, layout.ProcessGroupIdOffset.Value, isLittleEndian)
+			: null;
+		var sessionId = hasKnownLayout && layout.SessionIdOffset.HasValue
+			? TryReadCoreInt32At(span, layout.SessionIdOffset.Value, isLittleEndian)
+			: null;
 
 		var thread = new ElfCoreThreadInfo
 		{
 			Index = core.Threads.Count,
 			ThreadId = threadId,
+			ParentProcessId = parentProcessId,
+			ProcessGroupId = processGroupId,
+			SessionId = sessionId,
 			Signal = signal,
 			CurrentSignal = currentSignal
 		};
@@ -430,81 +456,227 @@ public static partial class ElfReader
 		{
 			if (header.Machine == EmX86_64)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 27);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 27,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmAArch64)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 34);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 34,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmPpc64)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 48);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 48,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmS390)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 18);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 18,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmRiscV)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 33);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 33,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmMips)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 45);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 45,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
-				if (header.Machine == EmSparc64)
-				{
-					layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 36);
-					return IsLayoutReadable(layout, descriptorLength, wordSize);
-				}
-
-				if (header.Machine == EmLoongArch)
-				{
-					layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 32, registersOffset: 112, registerCount: 34);
-					return IsLayoutReadable(layout, descriptorLength, wordSize);
-				}
+			if (header.Machine == EmSparc64)
+			{
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 36,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
+				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
+
+			if (header.Machine == EmLoongArch)
+			{
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 32,
+					registersOffset: 112,
+					registerCount: 34,
+					parentProcessIdOffset: 36,
+					processGroupIdOffset: 40,
+					sessionIdOffset: 44);
+				return IsLayoutReadable(layout, descriptorLength, wordSize);
+			}
+		}
 		else if (wordSize == 4)
 		{
 			if (header.Machine == Em386)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 24, registersOffset: 72, registerCount: 17);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 17,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmArm)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 24, registersOffset: 72, registerCount: 18);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 18,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmPpc)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 24, registersOffset: 72, registerCount: 48);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 48,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmMips)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 24, registersOffset: 72, registerCount: 45);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 45,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 
 			if (header.Machine == EmSparc)
 			{
-				layout = new CorePrStatusLayout(signalOffset: 0, currentSignalOffset: 12, threadIdOffset: 24, registersOffset: 72, registerCount: 38);
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 38,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
+				return IsLayoutReadable(layout, descriptorLength, wordSize);
+			}
+
+			if (header.Machine == EmS390)
+			{
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 18,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
+				return IsLayoutReadable(layout, descriptorLength, wordSize);
+			}
+
+			if (header.Machine == EmRiscV)
+			{
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 33,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
+				return IsLayoutReadable(layout, descriptorLength, wordSize);
+			}
+
+			if (header.Machine == EmLoongArch)
+			{
+				layout = new CorePrStatusLayout(
+					signalOffset: 0,
+					currentSignalOffset: 12,
+					threadIdOffset: 24,
+					registersOffset: 72,
+					registerCount: 34,
+					parentProcessIdOffset: 28,
+					processGroupIdOffset: 32,
+					sessionIdOffset: 36);
 				return IsLayoutReadable(layout, descriptorLength, wordSize);
 			}
 		}

@@ -268,6 +268,9 @@ public static class ElfReportMapper
 			{
 				Index = thread.Index,
 				ThreadId = thread.ThreadId,
+				ParentProcessId = thread.ParentProcessId,
+				ProcessGroupId = thread.ProcessGroupId,
+				SessionId = thread.SessionId,
 				Signal = thread.Signal,
 				CurrentSignal = thread.CurrentSignal,
 				RegisterPreview = thread.RegisterPreview.ToList()
@@ -620,21 +623,26 @@ public static class ElfReportMapper
 			0x6FFFFFF7 => "SHT_GNU_LIBLIST",
 			0x6FFFFFF8 => "SHT_CHECKSUM",
 			0x6FFFFFFA => "SHT_SUNW_MOVE",
-				0x6FFFFFFB => "SHT_SUNW_COMDAT",
-				0x6FFFFFFC => "SHT_SUNW_SYMINFO",
-				0x6FFFFFFD => "SHT_GNU_verdef",
-				0x6FFFFFFE => "SHT_GNU_verneed",
-				0x6FFFFFFF => "SHT_GNU_versym",
-				0x70000001 => "SHT_ARM_EXIDX",
-				0x70000003 => "SHT_ARM_ATTRIBUTES",
-				0x7000000D => "SHT_MIPS_OPTIONS",
-				0x7000002A => "SHT_MIPS_ABIFLAGS",
-				0x7000002B => "SHT_MIPS_XHASH",
-				>= 0x60000000 and <= 0x6FFFFFFF => $"SHT_LOOS+0x{type - 0x60000000:X}",
-				>= 0x70000000 and <= 0x7FFFFFFF => $"SHT_LOPROC+0x{type - 0x70000000:X}",
-				>= 0x80000000 => $"SHT_LOUSER+0x{type - 0x80000000:X}",
-				_ => $"SHT_{type}"
-			};
+			0x6FFFFFFB => "SHT_SUNW_COMDAT",
+			0x6FFFFFFC => "SHT_SUNW_SYMINFO",
+			0x6FFFFFFD => "SHT_GNU_verdef",
+			0x6FFFFFFE => "SHT_GNU_verneed",
+			0x6FFFFFFF => "SHT_GNU_versym",
+			0x6FFF4C00 => "SHT_LLVM_DEPENDENT_LIBRARIES",
+			0x6FFF4C01 => "SHT_LLVM_SYMPART",
+			0x6FFF4C02 => "SHT_LLVM_PART_EHDR",
+			0x6FFF4C03 => "SHT_LLVM_ADDRSIG",
+			0x6FFF4C04 => "SHT_LLVM_OFFLOADING",
+			0x70000001 => "SHT_ARM_EXIDX",
+			0x70000003 => "SHT_ARM_ATTRIBUTES",
+			0x7000000D => "SHT_MIPS_OPTIONS",
+			0x7000002A => "SHT_MIPS_ABIFLAGS",
+			0x7000002B => "SHT_MIPS_XHASH",
+			>= 0x60000000 and <= 0x6FFFFFFF => $"SHT_LOOS+0x{type - 0x60000000:X}",
+			>= 0x70000000 and <= 0x7FFFFFFF => $"SHT_LOPROC+0x{type - 0x70000000:X}",
+			>= 0x80000000 => $"SHT_LOUSER+0x{type - 0x80000000:X}",
+			_ => $"SHT_{type}"
+		};
 	}
 
 	private static string TranslateSegmentType(uint type)
@@ -653,15 +661,18 @@ public static class ElfReportMapper
 			PtGnuStack => "PT_GNU_STACK",
 			PtGnuRelro => "PT_GNU_RELRO",
 			PtGnuProperty => "PT_GNU_PROPERTY",
-				PtGnuSFrame => "PT_GNU_SFRAME",
-				PtSunwBss => "PT_SUNWBSS",
-				PtSunwStack => "PT_SUNWSTACK",
-				0x70000001 => "PT_ARM_EXIDX",
-				0x70000003 => "PT_MIPS_ABIFLAGS",
-				>= 0x60000000 and <= 0x6FFFFFFF => $"PT_LOOS+0x{type - 0x60000000:X}",
-				>= 0x70000000 and <= 0x7FFFFFFF => $"PT_LOPROC+0x{type - 0x70000000:X}",
-				_ => $"PT_{type}"
-			};
+			PtGnuSFrame => "PT_GNU_SFRAME",
+			PtSunwBss => "PT_SUNWBSS",
+			PtSunwStack => "PT_SUNWSTACK",
+			0x65A3DBE6 => "PT_OPENBSD_RANDOMIZE",
+			0x65A3DBE7 => "PT_OPENBSD_WXNEEDED",
+			0x65A41BE6 => "PT_OPENBSD_BOOTDATA",
+			0x70000001 => "PT_ARM_EXIDX",
+			0x70000003 => "PT_MIPS_ABIFLAGS",
+			>= 0x60000000 and <= 0x6FFFFFFF => $"PT_LOOS+0x{type - 0x60000000:X}",
+			>= 0x70000000 and <= 0x7FFFFFFF => $"PT_LOPROC+0x{type - 0x70000000:X}",
+			_ => $"PT_{type}"
+		};
 	}
 
 	private static string FormatSectionFlags(ulong flags)
@@ -764,8 +775,17 @@ public static class ElfReportMapper
 			93 => "ARC",
 			94 => "Xtensa",
 			106 => "Blackfin",
+			113 => "Altera Nios II",
+			135 => "TI PRU",
+			164 => "QUALCOMM Hexagon",
+			167 => "Andes Technology NDS32",
+			174 => "Imagination Technologies META",
+			175 => "MCST Elbrus",
 			183 => "AArch64",
+			187 => "Tilera TILE64",
 			188 => "Tilera TILEPro",
+			189 => "Xilinx MicroBlaze",
+			190 => "NVIDIA CUDA",
 			191 => "Tilera TILE-Gx",
 			224 => "AMDGPU",
 			243 => "RISC-V",
@@ -799,6 +819,7 @@ public static class ElfReportMapper
 			16 => "FenixOS",
 			17 => "Nuxi CloudABI",
 			18 => "OpenVOS",
+			53 => "Sortix",
 			64 => "ARM EABI",
 			97 => "ARM",
 			255 => "Standalone Application",

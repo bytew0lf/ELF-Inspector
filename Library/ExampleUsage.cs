@@ -433,9 +433,12 @@ public static class ExampleUsage
 				foreach (var thread in threads.Take(MaxDetailedItems))
 				{
 					var tid = thread.ThreadId.HasValue ? thread.ThreadId.Value.ToString() : "(unknown)";
+					var ppid = thread.ParentProcessId.HasValue ? thread.ParentProcessId.Value.ToString() : "(unknown)";
+					var pgrp = thread.ProcessGroupId.HasValue ? thread.ProcessGroupId.Value.ToString() : "(unknown)";
+					var sid = thread.SessionId.HasValue ? thread.SessionId.Value.ToString() : "(unknown)";
 					var signal = thread.Signal.HasValue ? thread.Signal.Value.ToString() : "(unknown)";
 					var currentSignal = thread.CurrentSignal.HasValue ? thread.CurrentSignal.Value.ToString() : "(unknown)";
-					sb.AppendLine($"- Thread#{thread.Index}: tid={tid}, signal={signal}, current_signal={currentSignal}, register_preview={FormatRegisterPreview(thread.RegisterPreview)}");
+					sb.AppendLine($"- Thread#{thread.Index}: tid={tid}, ppid={ppid}, pgrp={pgrp}, sid={sid}, signal={signal}, current_signal={currentSignal}, register_preview={FormatRegisterPreview(thread.RegisterPreview)}");
 				}
 				if (threads.Count > MaxDetailedItems)
 					sb.AppendLine($"... {threads.Count - MaxDetailedItems} more");
