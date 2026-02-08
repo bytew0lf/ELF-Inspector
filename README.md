@@ -204,10 +204,16 @@ scripts/run_p4_test_matrix.sh
 
 ## Differential Checks
 
-Run parser output comparisons against available reference tooling (`readelf`, `eu-readelf`, or `llvm-readelf`) for selected deterministic fields:
+Run parser output comparisons against available reference tooling (`readelf`, `eu-readelf`, `llvm-readelf`, or `greadelf`) for selected deterministic fields:
 
 ```bash
 scripts/run_differential_checks.sh
+```
+
+Optional on macOS/Homebrew:
+
+```bash
+READELF_TOOL=/opt/homebrew/opt/binutils/bin/greadelf scripts/run_differential_checks.sh
 ```
 
 ## P0 Conformance Matrix
@@ -238,3 +244,13 @@ Run the full quality gate locally (unit tests + P0/P2/P3/P4 matrices + different
 ```bash
 scripts/run_ci_gate.sh
 ```
+
+## Manual Release Workflow
+
+A manual GitHub workflow publishes a release after successful build and tests:
+
+* Workflow file: `.github/workflows/release-manual.yml`
+* Trigger: `Actions` -> `Manual Release` -> `Run workflow`
+* Required input: `tag` (for example `v1.5.0`)
+* Optional inputs: `release_name`, `draft`, `prerelease`
+* Published artifacts: `linux-x64`, `osx-arm64`, `win-x64` archives attached to the GitHub release
