@@ -36,6 +36,7 @@ public static partial class ElfReader
 	private const uint NtCore386Tls = 0x200;
 	private const uint NtCore386Ioperm = 0x201;
 	private const uint NtCoreX86Xstate = 0x202;
+	private const uint NtCoreX86Cet = 0x203;
 	private const uint NtCoreS390HighGprs = 0x300;
 	private const uint NtCoreS390Timer = 0x301;
 	private const uint NtCoreS390TodCmp = 0x302;
@@ -65,6 +66,17 @@ public static partial class ElfReader
 	private const uint NtCoreArmZa = 0x40C;
 	private const uint NtCoreArmZt = 0x40D;
 	private const uint NtCoreArmFpmr = 0x40E;
+	private const uint NtCorePpcTmCgpr = 0x108;
+	private const uint NtCorePpcTmCfpr = 0x109;
+	private const uint NtCorePpcTmCvmx = 0x10A;
+	private const uint NtCorePpcTmCvsx = 0x10B;
+	private const uint NtCorePpcTmSpr = 0x10C;
+	private const uint NtCorePpcTmCtar = 0x10D;
+	private const uint NtCorePpcTmCppr = 0x10E;
+	private const uint NtCorePpcTmCdscr = 0x10F;
+	private const uint NtCorePpcPkey = 0x110;
+	private const uint NtCorePpcDexcr = 0x111;
+	private const uint NtCorePpcHashkeyr = 0x112;
 	private const uint GnuPropertyAArch64Feature1And = 0xC0000000;
 	private const uint GnuPropertyX86Feature1And = 0xC0000002;
 	private const uint GnuPropertyX86Isa1Needed = 0xC0008002;
@@ -72,6 +84,9 @@ public static partial class ElfReader
 	private const uint GnuPropertyStackSize = 0xA0000000;
 	private const uint GnuPropertyNoCopyOnProtected = 0xA0000001;
 	private const ulong AuxvAtNull = 0;
+	private const ulong MaxNoteNameBytes = 1UL * 1024UL * 1024UL;
+	private const ulong MaxNoteDescriptorBytes = 64UL * 1024UL * 1024UL;
+	private const ulong NotePreviewBytes = 64UL;
 
 	public static void ParseNotes(IEndianDataSource data, ElfFile elf)
 	{
@@ -144,14 +159,13 @@ public static partial class ElfReader
 			if (cursor + nameSize > end)
 				throw new InvalidDataException("Invalid NOTE name size.");
 
-			var rawName = Encoding.ASCII.GetString(ReadBytes(data, cursor, nameSize, "NOTE name"));
-			var name = NormalizeNoteNamespace(rawName.TrimEnd('\0'));
+			var name = ReadNoteName(data, cursor, nameSize);
 			cursor = AlignUp(cursor + nameSize, align);
 
 			if (cursor + descSize > end)
 				throw new InvalidDataException("Invalid NOTE descriptor size.");
 
-			var descriptor = ReadBytes(data, cursor, descSize, "NOTE descriptor");
+			var descriptor = ReadNoteDescriptor(data, cursor, descSize, out var descriptorDecodeOverride);
 			cursor = AlignUp(cursor + descSize, align);
 
 			var note = new ElfNote
@@ -160,10 +174,44 @@ public static partial class ElfReader
 				Type = type,
 				TypeName = GetNoteTypeName(name, type),
 				Descriptor = descriptor,
-				DecodedDescription = DecodeNoteDescriptor(elf.Header, name, type, descriptor)
+				DecodedDescription = string.IsNullOrEmpty(descriptorDecodeOverride)
+					? DecodeNoteDescriptor(elf.Header, name, type, descriptor)
+					: descriptorDecodeOverride
 			};
 			AddNoteDeduplicated(elf, note, dedupeKeys);
 		}
+	}
+
+	private static string ReadNoteName(IEndianDataSource data, ulong offset, ulong nameSize)
+	{
+		if (nameSize == 0)
+			return string.Empty;
+
+		var nameBytesToRead = Math.Min(nameSize, MaxNoteNameBytes);
+		var rawName = Encoding.ASCII.GetString(ReadBytes(data, offset, nameBytesToRead, "NOTE name"));
+		var normalizedName = NormalizeNoteNamespace(rawName.TrimEnd('\0'));
+
+		if (!string.IsNullOrEmpty(normalizedName))
+			return normalizedName;
+		if (nameSize > MaxNoteNameBytes)
+			return $"NOTE_NAME_OVERSIZE_{nameSize}";
+
+		return string.Empty;
+	}
+
+	private static byte[] ReadNoteDescriptor(IEndianDataSource data, ulong offset, ulong descSize, out string decodeOverride)
+	{
+		decodeOverride = string.Empty;
+		if (descSize == 0)
+			return Array.Empty<byte>();
+
+		if (descSize <= MaxNoteDescriptorBytes)
+			return ReadBytes(data, offset, descSize, "NOTE descriptor");
+
+		var previewLength = Math.Min(NotePreviewBytes, descSize);
+		var preview = ReadBytes(data, offset, previewLength, "NOTE descriptor preview");
+		decodeOverride = $"descriptor truncated: bytes={descSize}, preview=0x{Convert.ToHexString(preview)}";
+		return preview;
 	}
 
 	private static void AddNoteDeduplicated(ElfFile elf, ElfNote note, HashSet<string> dedupeKeys)
@@ -185,12 +233,24 @@ public static partial class ElfReader
 			NtCoreFile => "NT_FILE",
 			NtCoreSigInfo => "NT_SIGINFO",
 			NtCorePrXfpReg => "NT_PRXFPREG",
-			NtCorePpcVmx => "NT_PPC_VMX",
-			NtCorePpcSpe => "NT_PPC_SPE",
-			NtCorePpcVsx => "NT_PPC_VSX",
-			NtCore386Tls => "NT_386_TLS",
-			NtCore386Ioperm => "NT_386_IOPERM",
-			NtCoreX86Xstate => "NT_X86_XSTATE",
+				NtCorePpcVmx => "NT_PPC_VMX",
+				NtCorePpcSpe => "NT_PPC_SPE",
+				NtCorePpcVsx => "NT_PPC_VSX",
+				NtCorePpcTmCgpr => "NT_PPC_TM_CGPR",
+				NtCorePpcTmCfpr => "NT_PPC_TM_CFPR",
+				NtCorePpcTmCvmx => "NT_PPC_TM_CVMX",
+				NtCorePpcTmCvsx => "NT_PPC_TM_CVSX",
+				NtCorePpcTmSpr => "NT_PPC_TM_SPR",
+				NtCorePpcTmCtar => "NT_PPC_TM_CTAR",
+				NtCorePpcTmCppr => "NT_PPC_TM_CPPR",
+				NtCorePpcTmCdscr => "NT_PPC_TM_CDSCR",
+				NtCorePpcPkey => "NT_PPC_PKEY",
+				NtCorePpcDexcr => "NT_PPC_DEXCR",
+				NtCorePpcHashkeyr => "NT_PPC_HASHKEYR",
+				NtCore386Tls => "NT_386_TLS",
+				NtCore386Ioperm => "NT_386_IOPERM",
+				NtCoreX86Xstate => "NT_X86_XSTATE",
+				NtCoreX86Cet => "NT_X86_CET",
 			NtCoreS390HighGprs => "NT_S390_HIGH_GPRS",
 			NtCoreS390Timer => "NT_S390_TIMER",
 			NtCoreS390TodCmp => "NT_S390_TODCMP",
@@ -519,12 +579,24 @@ public static partial class ElfReader
 		{
 			NtCoreFpRegSet => DecodeCoreRegisterSetDescriptor("fpregset", descriptor),
 			NtCorePrXfpReg => DecodeCoreRegisterSetDescriptor("x86_prxfpreg", descriptor),
-			NtCorePpcVmx => DecodeCoreRegisterSetDescriptor("ppc_vmx", descriptor),
-			NtCorePpcSpe => DecodeCoreRegisterSetDescriptor("ppc_spe", descriptor),
-			NtCorePpcVsx => DecodeCoreRegisterSetDescriptor("ppc_vsx", descriptor),
-			NtCore386Tls => DecodeCoreRegisterSetDescriptor("x86_tls", descriptor),
-			NtCore386Ioperm => DecodeCoreRegisterSetDescriptor("x86_ioperm", descriptor),
-			NtCoreX86Xstate => DecodeX86XstateDescriptor(header, descriptor),
+				NtCorePpcVmx => DecodeCoreRegisterSetDescriptor("ppc_vmx", descriptor),
+				NtCorePpcSpe => DecodeCoreRegisterSetDescriptor("ppc_spe", descriptor),
+				NtCorePpcVsx => DecodeCoreRegisterSetDescriptor("ppc_vsx", descriptor),
+				NtCorePpcTmCgpr => DecodeCoreRegisterSetDescriptor("ppc_tm_cgpr", descriptor),
+				NtCorePpcTmCfpr => DecodeCoreRegisterSetDescriptor("ppc_tm_cfpr", descriptor),
+				NtCorePpcTmCvmx => DecodeCoreRegisterSetDescriptor("ppc_tm_cvmx", descriptor),
+				NtCorePpcTmCvsx => DecodeCoreRegisterSetDescriptor("ppc_tm_cvsx", descriptor),
+				NtCorePpcTmSpr => DecodeCoreRegisterSetDescriptor("ppc_tm_spr", descriptor),
+				NtCorePpcTmCtar => DecodeCoreRegisterSetDescriptor("ppc_tm_ctar", descriptor),
+				NtCorePpcTmCppr => DecodeCoreRegisterSetDescriptor("ppc_tm_cppr", descriptor),
+				NtCorePpcTmCdscr => DecodeCoreRegisterSetDescriptor("ppc_tm_cdscr", descriptor),
+				NtCorePpcPkey => DecodeCoreRegisterSetDescriptor("ppc_pkey", descriptor),
+				NtCorePpcDexcr => DecodeCoreRegisterSetDescriptor("ppc_dexcr", descriptor),
+				NtCorePpcHashkeyr => DecodeCoreRegisterSetDescriptor("ppc_hashkeyr", descriptor),
+				NtCore386Tls => DecodeCoreRegisterSetDescriptor("x86_tls", descriptor),
+				NtCore386Ioperm => DecodeCoreRegisterSetDescriptor("x86_ioperm", descriptor),
+				NtCoreX86Xstate => DecodeX86XstateDescriptor(header, descriptor),
+				NtCoreX86Cet => DecodeCoreRegisterSetDescriptor("x86_cet", descriptor),
 			NtCoreS390HighGprs => DecodeCoreRegisterSetDescriptor("s390_high_gprs", descriptor),
 			NtCoreS390Timer => DecodeCoreRegisterSetDescriptor("s390_timer", descriptor),
 			NtCoreS390TodCmp => DecodeCoreRegisterSetDescriptor("s390_todcmp", descriptor),
@@ -801,16 +873,27 @@ public static partial class ElfReader
 		return DecodeAsciiDescriptor(descriptor);
 	}
 
-	private static string DecodeLinuxNoteDescriptor(uint type, byte[] descriptor, bool isLittleEndian)
-	{
-		if (descriptor.Length >= 4)
+		private static string DecodeLinuxNoteDescriptor(uint type, byte[] descriptor, bool isLittleEndian)
 		{
-			var value = ReadUInt32(descriptor.AsSpan(0, 4), isLittleEndian);
-			return $"linux_note_0x{type:X}=0x{value:X}";
-		}
+			var ascii = DecodeAsciiDescriptor(descriptor);
+			if (!string.IsNullOrEmpty(ascii) && !ascii.StartsWith("bytes=", StringComparison.Ordinal))
+				return $"linux_note_0x{type:X}={ascii}";
 
-		return DecodeAsciiDescriptor(descriptor);
-	}
+			if (descriptor.Length >= 8)
+			{
+				var first = ReadUInt32(descriptor.AsSpan(0, 4), isLittleEndian);
+				var second = ReadUInt32(descriptor.AsSpan(4, 4), isLittleEndian);
+				return $"linux_note_0x{type:X}=[0x{first:X}, 0x{second:X}], bytes={descriptor.Length}";
+			}
+
+			if (descriptor.Length >= 4)
+			{
+				var value = ReadUInt32(descriptor.AsSpan(0, 4), isLittleEndian);
+				return $"linux_note_0x{type:X}=0x{value:X}";
+			}
+
+			return DecodeUnknownNoteDescriptor(descriptor);
+		}
 
 	private static string DecodeX86XstateDescriptor(ElfHeader header, byte[] descriptor)
 	{

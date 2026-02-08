@@ -632,11 +632,11 @@ public static partial class ElfReader
 		};
 	}
 
-	private static string GetRelocationTypeName(ushort machine, uint type)
-	{
-		return machine switch
+		private static string GetRelocationTypeName(ushort machine, uint type)
 		{
-			3 => type switch
+			return machine switch
+			{
+				3 => type switch
 			{
 				0 => "R_386_NONE",
 				1 => "R_386_32",
@@ -661,17 +661,17 @@ public static partial class ElfReader
 				22 => "R_386_PC16",
 				23 => "R_386_8",
 				24 => "R_386_PC8",
-				36 => "R_386_TLS_DTPMOD32",
-				37 => "R_386_TLS_DTPOFF32",
-				38 => "R_386_TLS_TPOFF32",
+					36 => "R_386_TLS_DTPMOD32",
+					37 => "R_386_TLS_DTPOFF32",
+					38 => "R_386_TLS_TPOFF32",
 					39 => "R_386_SIZE32",
 					42 => "R_386_IRELATIVE",
-					_ => $"R_386_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_386", type)
 				},
-			8 => GetMipsRelocationTypeName(type),
-			20 => type switch
-			{
-				0 => "R_PPC_NONE",
+				8 => GetMipsRelocationTypeName(type),
+				20 => type switch
+				{
+					0 => "R_PPC_NONE",
 				1 => "R_PPC_ADDR32",
 				2 => "R_PPC_ADDR24",
 				3 => "R_PPC_ADDR16",
@@ -701,34 +701,44 @@ public static partial class ElfReader
 				73 => "R_PPC_TLS_DTPREL16_LO",
 				74 => "R_PPC_TLS_DTPREL16_HI",
 				75 => "R_PPC_TLS_DTPREL16_HA",
-				76 => "R_PPC_TLS_TPREL16",
-				77 => "R_PPC_TLS_TPREL16_LO",
-				78 => "R_PPC_TLS_TPREL16_HI",
+					76 => "R_PPC_TLS_TPREL16",
+					77 => "R_PPC_TLS_TPREL16_LO",
+					78 => "R_PPC_TLS_TPREL16_HI",
 					79 => "R_PPC_TLS_TPREL16_HA",
 					248 => "R_PPC_IRELATIVE",
-					_ => $"R_PPC_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_PPC", type)
 				},
-			21 => type switch
-			{
-				0 => "R_PPC64_NONE",
-				1 => "R_PPC64_ADDR32",
-				2 => "R_PPC64_ADDR24",
-				10 => "R_PPC64_REL24",
-				20 => "R_PPC64_GLOB_DAT",
-				21 => "R_PPC64_JMP_SLOT",
-				22 => "R_PPC64_RELATIVE",
-				38 => "R_PPC64_ADDR64",
-				44 => "R_PPC64_TOC",
-				67 => "R_PPC64_TLS_DTPMOD64",
-				68 => "R_PPC64_TLS_DTPREL64",
+				21 => type switch
+				{
+					0 => "R_PPC64_NONE",
+					1 => "R_PPC64_ADDR32",
+					2 => "R_PPC64_ADDR24",
+					10 => "R_PPC64_REL24",
+					16 => "R_PPC64_ADDR16",
+					17 => "R_PPC64_ADDR16_LO",
+					18 => "R_PPC64_ADDR16_HI",
+					19 => "R_PPC64_ADDR16_HA",
+					20 => "R_PPC64_GLOB_DAT",
+					21 => "R_PPC64_JMP_SLOT",
+					22 => "R_PPC64_RELATIVE",
+					26 => "R_PPC64_REL32",
+					44 => "R_PPC64_TOC",
+					46 => "R_PPC64_PLTGOT16",
+					47 => "R_PPC64_PLTGOT16_LO",
+					48 => "R_PPC64_PLTGOT16_HI",
+					49 => "R_PPC64_PLTGOT16_HA",
+					67 => "R_PPC64_TLS_DTPMOD64",
+					68 => "R_PPC64_TLS_DTPREL64",
 					69 => "R_PPC64_TLS_TPREL64",
+					107 => "R_PPC64_TLSDESC",
 					248 => "R_PPC64_IRELATIVE",
-					_ => $"R_PPC64_UNKNOWN_{type}"
+					38 => "R_PPC64_ADDR64",
+					_ => FormatRelocationTypeFallback("R_PPC64", type)
 				},
-			22 => type switch
-			{
-				0 => "R_390_NONE",
-				1 => "R_390_8",
+				22 => type switch
+				{
+					0 => "R_390_NONE",
+					1 => "R_390_8",
 				2 => "R_390_12",
 				3 => "R_390_16",
 				4 => "R_390_32",
@@ -752,17 +762,21 @@ public static partial class ElfReader
 				24 => "R_390_GOT64",
 				25 => "R_390_PLT64",
 				26 => "R_390_GOTENT",
-				27 => "R_390_GOTPLT12",
-				28 => "R_390_GOTPLT16",
-				29 => "R_390_GOTPLT32",
+					27 => "R_390_GOTPLT12",
+					28 => "R_390_GOTPLT16",
+					29 => "R_390_GOTPLT32",
 					30 => "R_390_GOTPLT64",
 					56 => "R_390_GOTPLTENT",
+					57 => "R_390_GOTPLTOFF16",
+					58 => "R_390_GOTPLTOFF32",
+					59 => "R_390_GOTPLTOFF64",
+					60 => "R_390_TLS_LOAD",
 					61 => "R_390_IRELATIVE",
-					_ => $"R_390_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_390", type)
 				},
-			2 or 43 => type switch
-			{
-				0 => "R_SPARC_NONE",
+				2 or 43 => type switch
+				{
+					0 => "R_SPARC_NONE",
 				1 => "R_SPARC_8",
 				2 => "R_SPARC_16",
 				3 => "R_SPARC_32",
@@ -795,93 +809,139 @@ public static partial class ElfReader
 				31 => "R_SPARC_11",
 				32 => "R_SPARC_64",
 				33 => "R_SPARC_OLO10",
-				34 => "R_SPARC_HH22",
-				35 => "R_SPARC_HM10",
-				36 => "R_SPARC_LM22",
+					34 => "R_SPARC_HH22",
+					35 => "R_SPARC_HM10",
+					36 => "R_SPARC_LM22",
 					37 => "R_SPARC_PC_HH22",
 					38 => "R_SPARC_PC_HM10",
 					39 => "R_SPARC_PC_LM22",
+					48 => "R_SPARC_DISP64",
+					49 => "R_SPARC_PLT64",
+					50 => "R_SPARC_HIX22",
+					51 => "R_SPARC_LOX10",
 					249 => "R_SPARC_IRELATIVE",
-					_ => $"R_SPARC_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_SPARC", type)
 				},
-			40 => type switch
-			{
-				0 => "R_ARM_NONE",
-				1 => "R_ARM_PC24",
-				2 => "R_ARM_ABS32",
-				3 => "R_ARM_REL32",
-				5 => "R_ARM_ABS16",
-				6 => "R_ARM_ABS12",
-				8 => "R_ARM_ABS8",
-				10 => "R_ARM_THM_CALL",
-				11 => "R_ARM_THM_PC8",
+				40 => type switch
+				{
+					0 => "R_ARM_NONE",
+					1 => "R_ARM_PC24",
+					2 => "R_ARM_ABS32",
+					3 => "R_ARM_REL32",
+					4 => "R_ARM_LDR_PC_G0",
+					5 => "R_ARM_ABS16",
+					6 => "R_ARM_ABS12",
+					7 => "R_ARM_THM_ABS5",
+					8 => "R_ARM_ABS8",
+					9 => "R_ARM_SBREL32",
+					10 => "R_ARM_THM_CALL",
+					11 => "R_ARM_THM_PC8",
 					12 => "R_ARM_BREL_ADJ",
 					13 => "R_ARM_TLS_DESC",
 					14 => "R_ARM_THM_SWI8",
+					15 => "R_ARM_XPC25",
+					16 => "R_ARM_THM_XPC22",
 					17 => "R_ARM_TLS_DTPMOD32",
 					18 => "R_ARM_TLS_DTPOFF32",
 					19 => "R_ARM_TLS_TPOFF32",
 					20 => "R_ARM_COPY",
+					21 => "R_ARM_GLOB_DAT",
+					22 => "R_ARM_JUMP_SLOT",
+					23 => "R_ARM_RELATIVE",
 					24 => "R_ARM_GOTOFF32",
 					25 => "R_ARM_BASE_PREL",
 					26 => "R_ARM_GOT_BREL",
 					27 => "R_ARM_PLT32",
 					28 => "R_ARM_CALL",
-				29 => "R_ARM_JUMP24",
-				30 => "R_ARM_THM_JUMP24",
-				42 => "R_ARM_PREL31",
-				43 => "R_ARM_MOVW_ABS_NC",
-				44 => "R_ARM_MOVT_ABS",
+					29 => "R_ARM_JUMP24",
+					30 => "R_ARM_THM_JUMP24",
+					31 => "R_ARM_BASE_ABS",
+					32 => "R_ARM_ALU_PCREL_7_0",
+					33 => "R_ARM_ALU_PCREL_15_8",
+					34 => "R_ARM_ALU_PCREL_23_15",
+					35 => "R_ARM_LDR_SBREL_11_0_NC",
+					36 => "R_ARM_ALU_SBREL_19_12_NC",
+					37 => "R_ARM_ALU_SBREL_27_20_CK",
+					38 => "R_ARM_TARGET1",
+					39 => "R_ARM_SBREL31",
+					40 => "R_ARM_V4BX",
+					41 => "R_ARM_TARGET2",
+					42 => "R_ARM_PREL31",
+					43 => "R_ARM_MOVW_ABS_NC",
+					44 => "R_ARM_MOVT_ABS",
 				45 => "R_ARM_MOVW_PREL_NC",
 				46 => "R_ARM_MOVT_PREL",
 				47 => "R_ARM_THM_MOVW_ABS_NC",
 				48 => "R_ARM_THM_MOVT_ABS",
 				49 => "R_ARM_THM_MOVW_PREL_NC",
 				50 => "R_ARM_THM_MOVT_PREL",
-				51 => "R_ARM_THM_JUMP19",
-				53 => "R_ARM_THM_ALU_PREL_11_0",
-				54 => "R_ARM_THM_PC12",
-				21 => "R_ARM_GLOB_DAT",
-				22 => "R_ARM_JUMP_SLOT",
-				23 => "R_ARM_RELATIVE",
-				55 => "R_ARM_ABS32_NOI",
-				56 => "R_ARM_REL32_NOI",
+					51 => "R_ARM_THM_JUMP19",
+					53 => "R_ARM_THM_ALU_PREL_11_0",
+					54 => "R_ARM_THM_PC12",
+					55 => "R_ARM_ABS32_NOI",
+					56 => "R_ARM_REL32_NOI",
 					57 => "R_ARM_ALU_PC_G0_NC",
 					58 => "R_ARM_ALU_PC_G0",
 					160 => "R_ARM_IRELATIVE",
-					_ => $"R_ARM_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_ARM", type)
 				},
-			62 => type switch
-			{
-				0 => "R_X86_64_NONE",
-				1 => "R_X86_64_64",
-				2 => "R_X86_64_PC32",
-				5 => "R_X86_64_COPY",
-				6 => "R_X86_64_GLOB_DAT",
-				7 => "R_X86_64_JUMP_SLOT",
-				8 => "R_X86_64_RELATIVE",
+				62 => type switch
+				{
+					0 => "R_X86_64_NONE",
+					1 => "R_X86_64_64",
+					2 => "R_X86_64_PC32",
+					3 => "R_X86_64_GOT32",
+					4 => "R_X86_64_PLT32",
+					5 => "R_X86_64_COPY",
+					6 => "R_X86_64_GLOB_DAT",
+					7 => "R_X86_64_JUMP_SLOT",
+					8 => "R_X86_64_RELATIVE",
+					9 => "R_X86_64_GOTPCREL",
 					10 => "R_X86_64_32",
 					11 => "R_X86_64_32S",
+					12 => "R_X86_64_16",
+					13 => "R_X86_64_PC16",
+					14 => "R_X86_64_8",
+					15 => "R_X86_64_PC8",
+					16 => "R_X86_64_DTPMOD64",
+					17 => "R_X86_64_DTPOFF64",
+					18 => "R_X86_64_TPOFF64",
+					19 => "R_X86_64_TLSGD",
+					20 => "R_X86_64_TLSLD",
+					21 => "R_X86_64_DTPOFF32",
+					22 => "R_X86_64_GOTTPOFF",
+					23 => "R_X86_64_TPOFF32",
+					24 => "R_X86_64_PC64",
+					25 => "R_X86_64_GOTOFF64",
+					26 => "R_X86_64_GOTPC32",
+					32 => "R_X86_64_SIZE32",
+					33 => "R_X86_64_SIZE64",
 					37 => "R_X86_64_IRELATIVE",
-					_ => $"R_X86_64_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_X86_64", type)
 				},
-			183 => type switch
-			{
-				0 => "R_AARCH64_NONE",
-				257 => "R_AARCH64_ABS64",
-				258 => "R_AARCH64_ABS32",
-				259 => "R_AARCH64_ABS16",
-				1024 => "R_AARCH64_COPY",
-				1025 => "R_AARCH64_GLOB_DAT",
+				183 => type switch
+				{
+					0 => "R_AARCH64_NONE",
+					257 => "R_AARCH64_ABS64",
+					258 => "R_AARCH64_ABS32",
+					259 => "R_AARCH64_ABS16",
+					260 => "R_AARCH64_PREL64",
+					261 => "R_AARCH64_PREL32",
+					262 => "R_AARCH64_PREL16",
+					1024 => "R_AARCH64_COPY",
+					1025 => "R_AARCH64_GLOB_DAT",
 					1026 => "R_AARCH64_JUMP_SLOT",
 					1027 => "R_AARCH64_RELATIVE",
+					1028 => "R_AARCH64_TLS_DTPMOD64",
+					1029 => "R_AARCH64_TLS_DTPREL64",
+					1030 => "R_AARCH64_TLS_TPREL64",
 					1031 => "R_AARCH64_TLSDESC",
 					1032 => "R_AARCH64_IRELATIVE",
-					_ => $"R_AARCH64_UNKNOWN_{type}"
+					_ => FormatRelocationTypeFallback("R_AARCH64", type)
 				},
-			243 => type switch
-			{
-				0 => "R_RISCV_NONE",
+				243 => type switch
+				{
+					0 => "R_RISCV_NONE",
 				1 => "R_RISCV_32",
 				2 => "R_RISCV_64",
 				3 => "R_RISCV_RELATIVE",
@@ -919,7 +979,7 @@ public static partial class ElfReader
 				38 => "R_RISCV_SUB16",
 				39 => "R_RISCV_SUB32",
 				40 => "R_RISCV_SUB64",
-				43 => "R_RISCV_ALIGN",
+					43 => "R_RISCV_ALIGN",
 					44 => "R_RISCV_RVC_BRANCH",
 					45 => "R_RISCV_RVC_JUMP",
 					46 => "R_RISCV_RELAX",
@@ -930,10 +990,20 @@ public static partial class ElfReader
 					51 => "R_RISCV_SET32",
 					52 => "R_RISCV_32_PCREL",
 					58 => "R_RISCV_IRELATIVE",
-					_ => $"R_RISCV_UNKNOWN_{type}"
-					},
-				_ => $"R_MACHINE_{machine}_{type}"
-			};
+					_ => FormatRelocationTypeFallback("R_RISCV", type)
+				},
+				_ => FormatMachineRelocationTypeFallback(machine, type)
+				};
+			}
+
+		private static string FormatRelocationTypeFallback(string architecturePrefix, uint type)
+		{
+			return $"{architecturePrefix}_{type}";
+		}
+
+		private static string FormatMachineRelocationTypeFallback(ushort machine, uint type)
+		{
+			return $"R_{machine}_{type}";
 		}
 
 	private static string GetMipsRelocationTypeName(uint type)
@@ -947,10 +1017,10 @@ public static partial class ElfReader
 		return $"{GetMipsRelocationTypeComponent(type1)}/{GetMipsRelocationTypeComponent(type2)}/{GetMipsRelocationTypeComponent(type3)}";
 	}
 
-	private static string GetMipsRelocationTypeComponent(byte type)
-	{
-		return type switch
+		private static string GetMipsRelocationTypeComponent(byte type)
 		{
+			return type switch
+			{
 			0 => "R_MIPS_NONE",
 			1 => "R_MIPS_16",
 			2 => "R_MIPS_32",
@@ -1001,11 +1071,19 @@ public static partial class ElfReader
 			50 => "R_MIPS_TLS_TPREL_LO16",
 			51 => "R_MIPS_PC21_S2",
 			52 => "R_MIPS_PC26_S2",
-			53 => "R_MIPS_PC18_S3",
-			54 => "R_MIPS_PC19_S2",
+				53 => "R_MIPS_PC18_S3",
+				54 => "R_MIPS_PC19_S2",
 				55 => "R_MIPS_PCHI16",
 				56 => "R_MIPS_PCLO16",
-				_ => $"R_MIPS_UNKNOWN_{type}"
+				57 => "R_MIPS_COPY",
+				58 => "R_MIPS_JUMP_SLOT",
+				59 => "R_MIPS_PC32",
+				60 => "R_MIPS_GLOB_DAT",
+				61 => "R_MIPS_TLS_DTPREL_HI16",
+				62 => "R_MIPS_TLS_DTPREL_LO16",
+				63 => "R_MIPS_TLS_TPREL_HI16",
+				64 => "R_MIPS_TLS_TPREL_LO16",
+				_ => FormatRelocationTypeFallback("R_MIPS", type)
 			};
 		}
-}
+	}

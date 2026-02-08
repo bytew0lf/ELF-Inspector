@@ -128,7 +128,7 @@ public static partial class ElfReader
 			var entryCount = section.Size / entrySize;
 			EnsureReasonableEntryCount(entryCount, "SHT_SYMTAB_SHNDX");
 
-			var values = new uint[ToInt32(entryCount)];
+			var values = new uint[GetManagedArrayLength(entryCount, "SHT_SYMTAB_SHNDX")];
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 			for (ulong i = 0; i < entryCount; i++)
 			{
@@ -498,7 +498,7 @@ public static partial class ElfReader
 			var count = section.Size / entrySize;
 			EnsureReasonableEntryCount(count, "GNU version symbols");
 
-			var versions = new ushort[ToInt32(count)];
+			var versions = new ushort[GetManagedArrayLength(count, "GNU version symbols")];
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
 			for (ulong i = 0; i < count; i++)
@@ -536,7 +536,7 @@ public static partial class ElfReader
 		EnsureReasonableEntryCount(entryCount, "DT_VERSYM entries");
 		EnsureReadableRange(data, versionTableFileOffset, checked(entryCount * 2UL), "DT_VERSYM");
 
-		var versions = new ushort[ToInt32(entryCount)];
+		var versions = new ushort[GetManagedArrayLength(entryCount, "DT_VERSYM entries")];
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
 		{
@@ -896,5 +896,13 @@ public static partial class ElfReader
 		}
 
 		return Encoding.UTF8.GetString(buffer.ToArray());
+	}
+
+	private static int GetManagedArrayLength(ulong count, string blockName)
+	{
+		if (count > int.MaxValue)
+			throw new InvalidDataException($"ELF {blockName} exceeds managed array limits.");
+
+		return (int)count;
 	}
 }

@@ -107,6 +107,54 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void Parse_FilePath_StreamMode_SparseInterpSegmentOverIntMax_Succeeds()
+	{
+		var tempFile = Path.Combine(Path.GetTempPath(), $"elf-large-interp-{Guid.NewGuid():N}.bin");
+		try
+		{
+			const string expectedInterpreter = "/lib/ld-musl-x86_64.so.1";
+			const ulong interpreterOffset = 0x200;
+			var interpreterBytes = Encoding.ASCII.GetBytes(expectedInterpreter + "\0");
+			var interpreterSegmentSize = (ulong)int.MaxValue + 8192UL;
+
+			var header = BuildMinimalElf64Header();
+			WriteUInt64(header.AsSpan(32, 8), 64, littleEndian: true); // e_phoff
+			WriteUInt16(header.AsSpan(54, 2), 56, littleEndian: true); // e_phentsize
+			WriteUInt16(header.AsSpan(56, 2), 1, littleEndian: true);  // e_phnum
+
+			var programHeader = new byte[56];
+			WriteUInt32(programHeader.AsSpan(0, 4), 3U, littleEndian: true); // PT_INTERP
+			WriteUInt32(programHeader.AsSpan(4, 4), 0U, littleEndian: true); // p_flags
+			WriteUInt64(programHeader.AsSpan(8, 8), interpreterOffset, littleEndian: true); // p_offset
+			WriteUInt64(programHeader.AsSpan(32, 8), interpreterSegmentSize, littleEndian: true); // p_filesz
+			WriteUInt64(programHeader.AsSpan(40, 8), interpreterSegmentSize, littleEndian: true); // p_memsz
+			WriteUInt64(programHeader.AsSpan(48, 8), 1UL, littleEndian: true); // p_align
+
+			using (var stream = new FileStream(tempFile, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.Read))
+			{
+				stream.Write(header);
+				stream.Position = 64;
+				stream.Write(programHeader);
+				stream.Position = (long)interpreterOffset;
+				stream.Write(interpreterBytes);
+				stream.SetLength((long)(interpreterOffset + interpreterSegmentSize));
+			}
+
+			var elf = ElfReader.Parse(tempFile, new ElfParseOptions
+			{
+				DataSourceMode = ElfDataSourceMode.Stream
+			});
+
+			Assert.Equal(expectedInterpreter, elf.InterpreterPath);
+		}
+		finally
+		{
+			if (File.Exists(tempFile))
+				File.Delete(tempFile);
+		}
+	}
+
+	[Fact]
 	public void Parse_Busybox_ContainsRelrRelocations()
 	{
 		var busyboxFile = GetRequiredSample("busybox");
@@ -139,9 +187,9 @@ public sealed class ElfReaderTests
 		Assert.Equal("R_MIPS_REL16", InvokeRelocationTypeName(8, 33));
 		Assert.Equal("R_ARM_TLS_DTPMOD32", InvokeRelocationTypeName(40, 17));
 		Assert.Equal("R_ARM_GOT_BREL", InvokeRelocationTypeName(40, 26));
-		Assert.Equal("R_ARM_UNKNOWN_4095", InvokeRelocationTypeName(40, 4095));
-		Assert.Equal("R_RISCV_UNKNOWN_4095", InvokeRelocationTypeName(243, 4095));
-		Assert.Equal("R_MACHINE_9999_7", InvokeRelocationTypeName(9999, 7));
+		Assert.Equal("R_ARM_4095", InvokeRelocationTypeName(40, 4095));
+		Assert.Equal("R_RISCV_4095", InvokeRelocationTypeName(243, 4095));
+		Assert.Equal("R_9999_7", InvokeRelocationTypeName(9999, 7));
 	}
 
 	[Fact]
@@ -229,6 +277,20 @@ public sealed class ElfReaderTests
 		var helloPpc64 = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample("hello_ppc64le")));
 		var ppc64Glink = helloPpc64.DynamicEntries.First(entry => entry.TagName == "DT_PPC64_GLINK");
 		Assert.Contains("addr=0x", ppc64Glink.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void Parse_DynamicTags_ProcessorSpecificSemantics_AvoidGenericProcValueFallback()
+	{
+		var helloMips = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample("hello_mips")));
+		var mipsLocalGotNo = helloMips.DynamicEntries.First(entry => entry.TagName == "DT_MIPS_LOCAL_GOTNO");
+		Assert.Contains("local_got_entries=", mipsLocalGotNo.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.DoesNotContain("proc_value", mipsLocalGotNo.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+
+		var helloPpc64 = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample("hello_ppc64le")));
+		var ppc64Opt = helloPpc64.DynamicEntries.First(entry => entry.TagName == "DT_PPC64_OPT");
+		Assert.DoesNotContain("proc_value", ppc64Opt.DecodedValue ?? string.Empty, StringComparison.Ordinal);
+		Assert.Equal("0", ppc64Opt.DecodedValue);
 	}
 
 	[Fact]
@@ -814,6 +876,44 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void ParseNotes_SyntheticCoreExtendedTypes_AreNamedAndDecoded()
+	{
+		var noteSectionData = BuildNoteSection(
+			CreateNote("CORE", 0x203, new byte[24]),
+			CreateNote("CORE", 0x10D, new byte[16]));
+
+		var elfData = new byte[0x200];
+		var offset = 0x80;
+		Array.Copy(noteSectionData, 0, elfData, offset, noteSectionData.Length);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".note.core.ext",
+			Type = 7,
+			Offset = (ulong)offset,
+			Size = (ulong)noteSectionData.Length,
+			AddressAlign = 4
+		});
+
+		ElfReader.ParseNotes(elfData, elf);
+
+		Assert.Contains(elf.Notes, note =>
+			note.TypeName == "NT_X86_CET"
+			&& note.DecodedDescription.Contains("x86_cet_bytes=24", StringComparison.Ordinal));
+		Assert.Contains(elf.Notes, note =>
+			note.TypeName == "NT_PPC_TM_CTAR"
+			&& note.DecodedDescription.Contains("ppc_tm_ctar_bytes=16", StringComparison.Ordinal));
+	}
+
+	[Fact]
 	public void ParseNotes_SyntheticVendorTypes_AreNamedAndDecoded()
 	{
 		var freeBsdAbi = new byte[4];
@@ -1026,6 +1126,49 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void ParseNotes_OversizedDescriptor_IsTruncatedWithoutParserAbort()
+	{
+		const uint noteType = 0x1234;
+		const ulong descSize = 80UL * 1024UL * 1024UL;
+
+		var prefix = new byte[128];
+		WriteUInt32(prefix.AsSpan(0, 4), 4U, littleEndian: true); // namesz
+		WriteUInt32(prefix.AsSpan(4, 4), checked((uint)descSize), littleEndian: true); // descsz
+		WriteUInt32(prefix.AsSpan(8, 4), noteType, littleEndian: true); // type
+		Encoding.ASCII.GetBytes("GNU\0").CopyTo(prefix.AsSpan(12, 4));
+		prefix[16] = 0xAA;
+		prefix[17] = 0x55;
+
+		var noteSectionSize = 16UL + descSize;
+		var source = new SparseEndianDataSource(noteSectionSize, prefix);
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".note.large",
+			Type = 7,
+			Offset = 0,
+			Size = noteSectionSize,
+			AddressAlign = 4
+		});
+
+		ElfReader.ParseNotes(source, elf);
+
+		var note = Assert.Single(elf.Notes);
+		Assert.Equal("GNU", note.Name);
+		Assert.Equal(noteType, note.Type);
+		Assert.Equal(64, note.Descriptor.Length);
+		Assert.Contains("descriptor truncated", note.DecodedDescription, StringComparison.Ordinal);
+		Assert.Contains("bytes=", note.DecodedDescription, StringComparison.Ordinal);
+	}
+
+	[Fact]
 	public void Parse_HelloX64_Notes_AreDeduplicatedAndPropertyIsDecoded()
 	{
 		var helloFile = GetRequiredSample("hello_x86_64");
@@ -1123,6 +1266,41 @@ public sealed class ElfReaderTests
 		ElfReader.ParseDwarfIndex(data, elf);
 		Assert.Single(elf.Dwarf.CompileUnits);
 		Assert.Equal((ushort)4, elf.Dwarf.CompileUnits[0].Version);
+	}
+
+	[Fact]
+	public void ParseSectionSpecialCases_ShfCompressedHugePayload_IsRejectedGracefully()
+	{
+		var sectionSize = 24UL + (ulong)int.MaxValue + 1024UL;
+		var prefix = new byte[64];
+		WriteUInt32(prefix.AsSpan(0, 4), 1U, littleEndian: true); // ELFCOMPRESS_ZLIB
+		WriteUInt32(prefix.AsSpan(4, 4), 0U, littleEndian: true); // ch_reserved
+		WriteUInt64(prefix.AsSpan(8, 8), 128UL, littleEndian: true); // ch_size
+		WriteUInt64(prefix.AsSpan(16, 8), 1UL, littleEndian: true); // ch_addralign
+
+		var source = new SparseEndianDataSource(sectionSize, prefix);
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".debug_info",
+			Flags = 0x800, // SHF_COMPRESSED
+			Offset = 0,
+			Size = sectionSize,
+			AddressAlign = 1
+		});
+
+		ElfReader.ParseSectionSpecialCases(source, elf);
+
+		var compressed = Assert.Single(elf.CompressedSections);
+		Assert.False(compressed.DecompressionSucceeded);
+		Assert.Contains("contiguous managed buffer window", compressed.Error, StringComparison.Ordinal);
 	}
 
 	[Fact]
@@ -1654,6 +1832,73 @@ public sealed class ElfReaderTests
 		Assert.Contains(unwind.Frames, frame =>
 			frame.InstructionPointer == execVaddr + 0x30
 			&& frame.Strategy == "aarch64-frame-pointer-link-register");
+	}
+
+	[Fact]
+	public void ParseCoreDumpInfo_S390_LinkRegisterFallback_ProducesSecondaryFrame()
+	{
+		var coreBytes = new byte[0x300];
+		var execSegmentOffset = 0x100UL;
+		var stackSegmentOffset = 0x180UL;
+		var execVaddr = 0x600000UL;
+		var stackVaddr = 0x700000UL;
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Type = 4,
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 22
+			}
+		};
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = execSegmentOffset,
+			VirtualAddress = execVaddr,
+			FileSize = 0x80,
+			MemorySize = 0x80,
+			Flags = 0x5
+		});
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = stackSegmentOffset,
+			VirtualAddress = stackVaddr,
+			FileSize = 0x80,
+			MemorySize = 0x80,
+			Flags = 0x6
+		});
+
+		var prStatus = new byte[112 + (18 * 8)];
+		WriteUInt32(prStatus.AsSpan(0, 4), 11, littleEndian: true);
+		WriteUInt16(prStatus.AsSpan(12, 2), 11, littleEndian: true);
+		WriteUInt32(prStatus.AsSpan(32, 4), 8080, littleEndian: true);
+		for (var i = 0; i < 18; i++)
+			WriteUInt64(prStatus.AsSpan(112 + (i * 8), 8), 0, littleEndian: true);
+		WriteUInt64(prStatus.AsSpan(112 + (1 * 8), 8), execVaddr + 0x10, littleEndian: true); // psw_addr => ip
+		WriteUInt64(prStatus.AsSpan(112 + (16 * 8), 8), execVaddr + 0x30, littleEndian: true); // gpr14 => lr
+		WriteUInt64(prStatus.AsSpan(112 + (17 * 8), 8), stackVaddr + 0x20, littleEndian: true); // gpr15 => sp
+
+		elf.Notes.Add(new ElfNote
+		{
+			Name = "CORE",
+			Type = 1,
+			Descriptor = prStatus,
+			TypeName = "NT_PRSTATUS",
+			DecodedDescription = string.Empty
+		});
+
+		ElfReader.ParseCoreDumpInfo(coreBytes, elf);
+
+		Assert.Single(elf.CoreDump.UnwindThreads);
+		var unwind = elf.CoreDump.UnwindThreads[0];
+		Assert.True(unwind.Frames.Count >= 2);
+		Assert.Contains(unwind.Frames, frame =>
+			frame.InstructionPointer == execVaddr + 0x30
+			&& frame.Strategy == "s390-stack-link-register");
 	}
 
 	[Fact]

@@ -223,6 +223,9 @@ public static partial class ElfReader
 		var isGnuCompressed = !string.IsNullOrEmpty(section.Name) && section.Name.StartsWith(".zdebug", StringComparison.Ordinal);
 		if (!isFlagCompressed && !isGnuCompressed)
 		{
+			if (!TryGetManagedBufferLength(section.Size, "section payload", out _, out error))
+				return false;
+
 			payload = ReadBytes(data, section.Offset, section.Size, "section payload");
 			return true;
 		}
@@ -258,14 +261,16 @@ public static partial class ElfReader
 				compressionAlignment = reader.ReadUInt64();
 			}
 
-			var compressedPayloadOffset = checked(section.Offset + compressionHeaderSize);
-			var compressedPayloadSize = section.Size - compressionHeaderSize;
-			EnsureReadableRange(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
+				var compressedPayloadOffset = checked(section.Offset + compressionHeaderSize);
+				var compressedPayloadSize = section.Size - compressionHeaderSize;
+				EnsureReadableRange(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
+				if (!TryGetManagedBufferLength(compressedPayloadSize, "compressed section payload", out _, out error))
+					return false;
 
-			if (compressionType == ElfCompressZlib)
-			{
-				var compressedPayload = ReadBytes(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
-				return TryDecompressZlibPayload(compressedPayload, declaredUncompressedSize, out payload, out error);
+				if (compressionType == ElfCompressZlib)
+				{
+					var compressedPayload = ReadBytes(data, compressedPayloadOffset, compressedPayloadSize, "compressed section payload");
+					return TryDecompressZlibPayload(compressedPayload, declaredUncompressedSize, out payload, out error);
 			}
 
 			if (compressionType == ElfCompressZstd)
@@ -298,13 +303,15 @@ public static partial class ElfReader
 			return false;
 		}
 
-		compressionType = isZstdHeader ? ElfCompressZstd : ElfCompressZlib;
-		declaredUncompressedSize = BinaryPrimitives.ReadUInt64BigEndian(zdebugHeader.AsSpan(4, 8));
-		var gnuPayloadOffset = checked(section.Offset + 12UL);
-		var gnuPayloadSize = section.Size - 12UL;
-		EnsureReadableRange(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
+			compressionType = isZstdHeader ? ElfCompressZstd : ElfCompressZlib;
+			declaredUncompressedSize = BinaryPrimitives.ReadUInt64BigEndian(zdebugHeader.AsSpan(4, 8));
+			var gnuPayloadOffset = checked(section.Offset + 12UL);
+			var gnuPayloadSize = section.Size - 12UL;
+			EnsureReadableRange(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
+			if (!TryGetManagedBufferLength(gnuPayloadSize, "GNU .zdebug payload", out _, out error))
+				return false;
 
-		var gnuPayload = ReadBytes(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
+			var gnuPayload = ReadBytes(data, gnuPayloadOffset, gnuPayloadSize, "GNU .zdebug payload");
 		if (compressionType == ElfCompressZstd)
 		{
 			return TryDecompressZstdPayload(

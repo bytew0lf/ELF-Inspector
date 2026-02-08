@@ -205,14 +205,6 @@ public static partial class ElfReader
 		header.SectionHeaderStringIndex = r.ReadUInt16();
 	}
 
-	private static int ToInt32(ulong value)
-	{
-		if (value > int.MaxValue)
-			throw new InvalidDataException("ELF value exceeds the addressable in-memory buffer range.");
-
-		return (int)value;
-	}
-
 	private static void EnsureReadableRange(IEndianDataSource data, ulong offset, ulong size, string blockName)
 	{
 		var dataLength = data.Length;
@@ -371,12 +363,27 @@ public static partial class ElfReader
 	private static byte[] ReadBytes(IEndianDataSource data, ulong offset, ulong size, string blockName)
 	{
 		EnsureReadableRange(data, offset, size, blockName);
-		if (size > int.MaxValue)
-			throw new InvalidDataException($"ELF {blockName} exceeds the maximum contiguous read window.");
+		if (!TryGetManagedBufferLength(size, blockName, out var bufferLength, out var error))
+			throw new InvalidDataException(error);
 
-		var bytes = new byte[(int)size];
+		var bytes = new byte[bufferLength];
 		data.ReadAt(offset, bytes);
 		return bytes;
+	}
+
+	private static bool TryGetManagedBufferLength(ulong size, string blockName, out int bufferLength, out string error)
+	{
+		bufferLength = 0;
+		error = string.Empty;
+
+		if (size > int.MaxValue)
+		{
+			error = $"ELF {blockName} exceeds the maximum contiguous managed buffer window.";
+			return false;
+		}
+
+		bufferLength = (int)size;
+		return true;
 	}
 
 	private static byte[] ReadAllBytes(Stream stream)

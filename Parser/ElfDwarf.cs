@@ -345,26 +345,26 @@ public static partial class ElfReader
 		{
 			case 0x01: // DW_FORM_addr
 				return TryAdvance(ref cursor, unitEnd, addressSize == 0 ? offsetSize : addressSize);
-			case 0x03: // DW_FORM_block2
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 2, out var block2Len))
-					return false;
-				return TryAdvance(ref cursor, unitEnd, (int)block2Len);
-			case 0x04: // DW_FORM_block4
-				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 4, out var block4Len))
-					return false;
-				return TryAdvance(ref cursor, unitEnd, ToInt32(block4Len));
+				case 0x03: // DW_FORM_block2
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 2, out var block2Len))
+						return false;
+					return TryAdvance(ref cursor, unitEnd, (int)block2Len);
+				case 0x04: // DW_FORM_block4
+					if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 4, out var block4Len))
+						return false;
+					return TryAdvance(ref cursor, unitEnd, block4Len);
 			case 0x05: // DW_FORM_data2
 				return TryAdvance(ref cursor, unitEnd, 2);
 			case 0x06: // DW_FORM_data4
 				return TryAdvance(ref cursor, unitEnd, 4);
 			case 0x07: // DW_FORM_data8
 				return TryAdvance(ref cursor, unitEnd, 8);
-			case 0x08: // DW_FORM_string
-				return TryReadNullTerminatedAscii(payload, ref cursor, unitEnd, out _);
-			case 0x09: // DW_FORM_block
-				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var blockLen))
-					return false;
-				return TryAdvance(ref cursor, unitEnd, ToInt32(blockLen));
+				case 0x08: // DW_FORM_string
+					return TryReadNullTerminatedAscii(payload, ref cursor, unitEnd, out _);
+				case 0x09: // DW_FORM_block
+					if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var blockLen))
+						return false;
+					return TryAdvance(ref cursor, unitEnd, blockLen);
 			case 0x0A: // DW_FORM_block1
 				if (!TryReadUnsigned(payload, isLittleEndian, ref cursor, unitEnd, 1, out var block1Len))
 					return false;
@@ -400,14 +400,14 @@ public static partial class ElfReader
 			case 0x14: // DW_FORM_ref8
 			case 0x20: // DW_FORM_ref_sig8
 				return TryAdvance(ref cursor, unitEnd, 8);
-			case 0x16: // DW_FORM_indirect
-				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var actualForm))
-					return false;
-				return TrySkipDwarfFormValue(payload, isLittleEndian, isDwarf64, ref cursor, unitEnd, addressSize, actualForm);
-			case 0x18: // DW_FORM_exprloc
-				if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var exprLen))
-					return false;
-				return TryAdvance(ref cursor, unitEnd, ToInt32(exprLen));
+				case 0x16: // DW_FORM_indirect
+					if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var actualForm))
+						return false;
+					return TrySkipDwarfFormValue(payload, isLittleEndian, isDwarf64, ref cursor, unitEnd, addressSize, actualForm);
+				case 0x18: // DW_FORM_exprloc
+					if (!TryReadUleb128Bounded(payload, ref cursor, unitEnd, out var exprLen))
+						return false;
+					return TryAdvance(ref cursor, unitEnd, exprLen);
 			case 0x19: // DW_FORM_flag_present
 			case 0x21: // DW_FORM_implicit_const
 				return true;
@@ -598,10 +598,22 @@ public static partial class ElfReader
 
 	private static bool TryAdvance(ref int cursor, int unitEnd, int count)
 	{
-		if (count < 0 || cursor + count > unitEnd)
+		if (count < 0)
 			return false;
 
-		cursor += count;
+		return TryAdvance(ref cursor, unitEnd, (ulong)count);
+	}
+
+	private static bool TryAdvance(ref int cursor, int unitEnd, ulong count)
+	{
+		if (cursor < 0 || unitEnd < cursor)
+			return false;
+
+		var remaining = (ulong)(unitEnd - cursor);
+		if (count > remaining)
+			return false;
+
+		cursor += (int)count;
 		return true;
 	}
 }

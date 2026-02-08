@@ -78,11 +78,11 @@ run_expect_success "$strict_invalid_4" "compat-ph-meta.txt" "--compat-header-val
 run_expect_success "$strict_invalid_5" "compat-sh-meta.txt" "--compat-header-validation"
 
 echo "[4/5] Deterministic mutation smoke matrix"
-for i in $(seq 0 31); do
+for i in $(seq 0 63); do
   mutated="$TEMP_DIR/mut-$i.bin"
   cp "$SAMPLES_DIR/busybox" "$mutated"
-  # Mutate deterministic offsets in ELF ident/header region.
-  offset=$(( (i * 7) % 96 ))
+  # Mutate deterministic offsets in ELF ident/header and nearby metadata region.
+  offset=$(( (i * 173) % 4096 ))
   value=$(( (i * 13 + 17) % 256 ))
   printf "\\$(printf '%03o' "$value")" | dd of="$mutated" bs=1 seek="$offset" conv=notrunc >/dev/null 2>&1
 

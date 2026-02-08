@@ -194,38 +194,41 @@ public static partial class ElfReader
 					return ip != 0;
 				}
 				case EmPpc:
-			{
-				if (registers.Count < 33)
-					return false;
-				// Linux powerpc: gpr0..gpr31, nip, ...
-				sp = registers[1];
-				fp = registers.Count > 31 ? registers[31] : 0;
-				ip = registers[32];
-					strategy = "ppc-stack";
+				{
+					if (registers.Count < 33)
+						return false;
+					// Linux powerpc: gpr0..gpr31, nip, ...
+					sp = registers[1];
+					fp = registers.Count > 31 ? registers[31] : 0;
+					ip = registers[32];
+					linkRegister = registers.Count > 36 ? registers[36] : null;
+						strategy = "ppc-stack";
+						return ip != 0;
+					}
+					case EmPpc64:
+				{
+					if (registers.Count < 33)
+						return false;
+					// Linux ppc64: gpr0..gpr31, nip, ...
+					sp = registers[1];
+					fp = registers.Count > 31 ? registers[31] : 0;
+					ip = registers[32];
+					linkRegister = registers.Count > 36 ? registers[36] : null;
+						strategy = "ppc64-stack";
+						return ip != 0;
+					}
+				case EmS390:
+				{
+					if (registers.Count < 18)
+						return false;
+					// Linux s390/s390x preview: psw_mask, psw_addr, gpr0..gpr15
+					ip = registers[1];
+					sp = registers[17];
+					fp = registers.Count > 13 ? registers[13] : null;
+					linkRegister = registers.Count > 16 ? registers[16] : null;
+					strategy = "s390-stack";
 					return ip != 0;
 				}
-				case EmPpc64:
-			{
-				if (registers.Count < 33)
-					return false;
-				// Linux ppc64: gpr0..gpr31, nip, ...
-				sp = registers[1];
-				fp = registers.Count > 31 ? registers[31] : 0;
-				ip = registers[32];
-					strategy = "ppc64-stack";
-					return ip != 0;
-				}
-			case EmS390:
-			{
-				if (registers.Count < 18)
-					return false;
-				// Linux s390/s390x preview: psw_mask, psw_addr, gpr0..gpr15
-				ip = registers[1];
-				sp = registers[17];
-				fp = null;
-				strategy = "s390-stack";
-				return ip != 0;
-			}
 				case EmRiscV:
 				{
 					if (registers.Count < 9)
@@ -446,21 +449,31 @@ public static partial class ElfReader
 					return true;
 				}
 				return false;
-			case EmPpc:
-			case EmPpc64:
-				if (cfaRegister == 1)
-				{
-					value = sp;
-					return true;
-				}
-				return false;
-			case EmS390:
-				if (cfaRegister == 15)
-				{
-					value = sp;
-					return true;
-				}
-				return false;
+				case EmPpc:
+				case EmPpc64:
+					if (cfaRegister == 1)
+					{
+						value = sp;
+						return true;
+					}
+					if (cfaRegister == 31 && fp.HasValue)
+					{
+						value = fp.Value;
+						return true;
+					}
+					return false;
+				case EmS390:
+					if (cfaRegister == 15)
+					{
+						value = sp;
+						return true;
+					}
+					if (cfaRegister == 11 && fp.HasValue)
+					{
+						value = fp.Value;
+						return true;
+					}
+					return false;
 			case EmRiscV:
 				if (cfaRegister == 2)
 				{

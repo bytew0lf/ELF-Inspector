@@ -93,12 +93,23 @@ public static partial class ElfReader
 				case NtCoreFpRegSet:
 				case NtCorePrXfpReg:
 				case NtCoreX86Xstate:
-				case NtCorePpcVmx:
-				case NtCorePpcSpe:
-				case NtCorePpcVsx:
-				case NtCore386Tls:
-				case NtCore386Ioperm:
-				case NtCoreS390HighGprs:
+					case NtCorePpcVmx:
+					case NtCorePpcSpe:
+					case NtCorePpcVsx:
+					case NtCorePpcTmCgpr:
+					case NtCorePpcTmCfpr:
+					case NtCorePpcTmCvmx:
+					case NtCorePpcTmCvsx:
+					case NtCorePpcTmSpr:
+					case NtCorePpcTmCtar:
+					case NtCorePpcTmCppr:
+					case NtCorePpcTmCdscr:
+					case NtCorePpcPkey:
+					case NtCorePpcDexcr:
+					case NtCorePpcHashkeyr:
+					case NtCore386Tls:
+					case NtCore386Ioperm:
+					case NtCoreS390HighGprs:
 				case NtCoreS390Timer:
 				case NtCoreS390TodCmp:
 				case NtCoreS390TodPreg:
@@ -126,10 +137,11 @@ public static partial class ElfReader
 				case NtCoreArmSsve:
 				case NtCoreArmZa:
 				case NtCoreArmZt:
-				case NtCoreArmFpmr:
-					ParseCoreSupplementalRegisterNote(core, note.Descriptor, isLittleEndian, wordSize);
-					break;
-			}
+					case NtCoreArmFpmr:
+					case NtCoreX86Cet:
+						ParseCoreSupplementalRegisterNote(core, note.Descriptor, isLittleEndian, wordSize);
+						break;
+				}
 		}
 
 		core.Signals.Sort();

@@ -21,6 +21,7 @@ public static partial class ElfReader
 	private const uint PtDynamic = 2;
 	private const uint PtInterp = 3;
 	private const uint PtNote = 4;
+	private const ulong MaxInterpreterPathProbeBytes = 16UL * 1024UL;
 
 	private static void ParseSectionHeaders(IEndianDataSource data, ElfFile elf)
 	{
@@ -176,12 +177,17 @@ public static partial class ElfReader
 			return;
 
 		EnsureReadableRange(data, interp.Offset, interp.FileSize, "PT_INTERP");
-		var bytes = ReadBytes(data, interp.Offset, interp.FileSize, "PT_INTERP");
+		var bytesToRead = Math.Min(interp.FileSize, MaxInterpreterPathProbeBytes);
+		if (!TryGetManagedBufferLength(bytesToRead, "PT_INTERP", out var probeLength, out _))
+			return;
 
-		var end = Array.IndexOf(bytes, (byte)0);
+		var probe = new byte[probeLength];
+		data.ReadAt(interp.Offset, probe);
+
+		var end = Array.IndexOf(probe, (byte)0);
 		if (end < 0)
-			end = bytes.Length;
+			end = probe.Length;
 
-		elf.InterpreterPath = Encoding.ASCII.GetString(bytes.AsSpan(0, end));
+		elf.InterpreterPath = Encoding.ASCII.GetString(probe.AsSpan(0, end));
 	}
 }

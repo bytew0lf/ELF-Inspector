@@ -519,30 +519,38 @@ public static partial class ElfReader
 		return string.Empty;
 	}
 
-	private static string DecodeDynamicValue(long tag, ulong value, ushort machine)
-	{
-		return tag switch
+		private static string DecodeDynamicValue(long tag, ulong value, ushort machine)
 		{
-			DtPltRel => DecodePltRelValue(value),
-			DtFlags => DecodeFlags(value, DynamicFlagBits),
-			DtFeature1 => DecodeFlags(value, DynamicFeature1Bits),
-			DtPosFlag1 => DecodeFlags(value, DynamicPosFlag1Bits),
-			DtRelaCount or DtRelCount => value.ToString(),
-			DtFlags1 => DecodeFlags(value, DynamicFlag1Bits),
-			DtMipsFlags when machine == EmMips => DecodeFlags(value, DynamicMipsFlagBits),
-			DtAArch64BtiPlt when machine == EmAArch64 => DecodeBooleanState(value),
-			DtAArch64PacPlt when machine == EmAArch64 => DecodeBooleanState(value),
-			DtAArch64VariantPcs when machine == EmAArch64 => DecodeBooleanState(value),
-			DtRiscVVariantCc when machine == EmRiscV => DecodeBooleanState(value),
-			DtSparcRegister when machine is EmSparc or EmSparc64 => $"register={value}",
+			return tag switch
+			{
+				DtPltRel => DecodePltRelValue(value),
+				DtSymbolic or DtTextRel or DtBindNow => DecodePresenceFlag(value),
+				DtFlags => DecodeFlags(value, DynamicFlagBits),
+				DtFeature1 => DecodeFlags(value, DynamicFeature1Bits),
+				DtPosFlag1 => DecodeFlags(value, DynamicPosFlag1Bits),
+				DtRelaCount or DtRelCount => value.ToString(),
+				DtFlags1 => DecodeFlags(value, DynamicFlag1Bits),
+				DtMipsFlags when machine == EmMips => DecodeFlags(value, DynamicMipsFlagBits),
+				DtPpcOpt when machine == EmPpc => DecodeFlags(value, DynamicPpcOptBits),
+				DtPpc64Opt when machine == EmPpc64 => DecodeFlags(value, DynamicPpc64OptBits),
+				DtAArch64BtiPlt when machine == EmAArch64 => DecodeBooleanState(value),
+				DtAArch64PacPlt when machine == EmAArch64 => DecodeBooleanState(value),
+				DtAArch64VariantPcs when machine == EmAArch64 => DecodeBooleanState(value),
+				DtRiscVVariantCc when machine == EmRiscV => DecodeBooleanState(value),
+				DtSparcRegister when machine is EmSparc or EmSparc64 => $"register={value}",
 			_ => string.Empty
 		};
 	}
 
-	private static string DecodeBooleanState(ulong value)
-	{
-		return value == 0 ? "disabled" : "enabled";
-	}
+		private static string DecodeBooleanState(ulong value)
+		{
+			return value == 0 ? "disabled" : "enabled";
+		}
+
+		private static string DecodePresenceFlag(ulong value)
+		{
+			return value == 0 ? "present" : DecodeBooleanState(value);
+		}
 
 	private static string DecodePltRelValue(ulong value)
 	{
@@ -631,8 +639,8 @@ public static partial class ElfReader
 		(0x2, "DF_P1_GROUPPERM"),
 	};
 
-	private static readonly (ulong Bit, string Name)[] DynamicMipsFlagBits =
-	{
+		private static readonly (ulong Bit, string Name)[] DynamicMipsFlagBits =
+		{
 		(0x1, "RHF_QUICKSTART"),
 		(0x2, "RHF_NOTPOT"),
 		(0x4, "RHF_NO_LIBRARY_REPLACEMENT"),
@@ -647,11 +655,23 @@ public static partial class ElfReader
 		(0x800, "RHF_REQUICKSTARTED"),
 		(0x1000, "RHF_CORD"),
 		(0x2000, "RHF_NO_UNRES_UNDEF"),
-		(0x4000, "RHF_RLD_ORDER_SAFE"),
-	};
+			(0x4000, "RHF_RLD_ORDER_SAFE"),
+		};
 
-	private static void EnrichDynamicEntrySemantics(ElfFile elf)
-	{
+		private static readonly (ulong Bit, string Name)[] DynamicPpcOptBits =
+		{
+			(0x1, "PPC_OPT_TLS"),
+			(0x2, "PPC_OPT_MULTI_TOC"),
+		};
+
+		private static readonly (ulong Bit, string Name)[] DynamicPpc64OptBits =
+		{
+			(0x1, "PPC64_OPT_TLS"),
+			(0x2, "PPC64_OPT_MULTI_TOC"),
+		};
+
+		private static void EnrichDynamicEntrySemantics(ElfFile elf)
+		{
 		var wordSize = elf.Header.Class == ElfClass.Elf32 ? 4UL : 8UL;
 		var moveEnt = TryGetDynamicValue(elf, DtMoveEnt, out var moveEntValue) ? moveEntValue : 0UL;
 		var symInEnt = TryGetDynamicValue(elf, DtSymInEnt, out var symInEntValue) ? symInEntValue : 0UL;
@@ -686,12 +706,14 @@ public static partial class ElfReader
 			{
 				entry.DecodedValue = extra;
 			}
-			else if (!entry.DecodedValue.Contains(extra, StringComparison.Ordinal))
-			{
-				entry.DecodedValue = $"{entry.DecodedValue}; {extra}";
+				else if (!entry.DecodedValue.Contains(extra, StringComparison.Ordinal))
+				{
+					entry.DecodedValue = $"{entry.DecodedValue}; {extra}";
+				}
 			}
+
+			AppendMachineSpecificDynamicCorrelations(elf);
 		}
-	}
 
 	private static string GetStructuredDynamicValue(ElfFile elf, long tag, ulong value, ulong wordSize, ushort machine)
 	{
@@ -706,11 +728,14 @@ public static partial class ElfReader
 		if (IsSizeDynamicTag(machine, tag))
 			return $"size={value} (0x{value:X})";
 
-		if (IsEntrySizeDynamicTag(machine, tag))
-			return $"entry_size={value}";
+			if (IsEntrySizeDynamicTag(machine, tag))
+				return $"entry_size={value}";
 
-		if (IsCountDynamicTag(machine, tag))
-			return $"count={value}";
+			if (TryGetProcessorSpecificDynamicValue(machine, tag, value, out var machineSpecific))
+				return machineSpecific;
+
+			if (IsCountDynamicTag(machine, tag))
+				return $"count={value}";
 
 		if (tag == DtChecksum)
 			return $"checksum=0x{value:X}";
@@ -720,10 +745,7 @@ public static partial class ElfReader
 			return $"timestamp={FormatUnixTimestamp(value)}";
 		}
 
-		if (TryGetProcessorSpecificDynamicValue(machine, tag, value, out var machineSpecific))
-			return machineSpecific;
-
-		if (tag >= DtAddrRangeLo && tag <= DtAddrRangeHi)
+			if (tag >= DtAddrRangeLo && tag <= DtAddrRangeHi)
 		{
 			if (TryDescribeVirtualAddress(elf, value, out var description))
 				return description;
@@ -734,11 +756,11 @@ public static partial class ElfReader
 		if (tag >= DtValRangeLo && tag <= DtValRangeHi)
 			return $"value=0x{value:X}";
 
-		if (tag >= DtProcRangeLo && tag <= DtProcRangeHi)
-			return $"proc_value=0x{value:X}";
+			if (tag >= DtProcRangeLo && tag <= DtProcRangeHi)
+				return $"proc_tag=0x{tag:X}, value=0x{value:X}";
 
-		return string.Empty;
-	}
+			return string.Empty;
+		}
 
 	private static string FormatUnixTimestamp(ulong value)
 	{
@@ -758,38 +780,78 @@ public static partial class ElfReader
 		return value.ToString();
 	}
 
-	private static bool TryGetProcessorSpecificDynamicValue(ushort machine, long tag, ulong value, out string decoded)
-	{
-		decoded = string.Empty;
-		if (machine == EmMips)
+		private static bool TryGetProcessorSpecificDynamicValue(ushort machine, long tag, ulong value, out string decoded)
 		{
-			switch (tag)
+			decoded = string.Empty;
+			if (machine == EmMips)
 			{
-				case DtMipsIchecksum:
-					decoded = $"checksum=0x{value:X}";
-					return true;
-				case DtMipsTimeStamp:
-					decoded = $"timestamp={FormatUnixTimestamp(value)}";
-					return true;
-				case DtMipsRldVersion:
-				case DtMipsIVersion:
-					decoded = $"version={value}";
-					return true;
-				case DtMipsMsym:
-					decoded = $"symbol_index={value}";
-					return true;
+				switch (tag)
+				{
+					case DtMipsIchecksum:
+						decoded = $"checksum=0x{value:X}";
+						return true;
+					case DtMipsTimeStamp:
+						decoded = $"timestamp={FormatUnixTimestamp(value)}";
+						return true;
+					case DtMipsRldVersion:
+					case DtMipsIVersion:
+						decoded = $"version={value}";
+						return true;
+					case DtMipsMsym:
+						decoded = $"symbol_index={value}";
+						return true;
+					case DtMipsLocalGotNo:
+						decoded = $"local_got_entries={value}";
+						return true;
+					case DtMipsGotSym:
+						decoded = $"first_global_got_symbol={value}";
+						return true;
+					case DtMipsSymTabNo:
+						decoded = $"dynamic_symbol_count={value}";
+						return true;
+					case DtMipsConflictNo:
+						decoded = $"conflict_count={value}";
+						return true;
+					case DtMipsLibListNo:
+						decoded = $"liblist_count={value}";
+						return true;
+					case DtMipsUnrefExtNo:
+						decoded = $"unresolved_external_count={value}";
+						return true;
+					case DtMipsHiPageNo:
+						decoded = $"got_hi_page_count={value}";
+						return true;
+					case DtMipsRldMapRel:
+						decoded = $"relative_offset=0x{value:X}";
+						return true;
+				}
 			}
-		}
-		else if (machine is EmSparc or EmSparc64)
-		{
+			else if (machine is EmSparc or EmSparc64)
+			{
 			if (tag == DtSparcRegister)
 			{
 				decoded = $"register={value}";
 				return true;
 			}
-		}
-		else if (machine == EmAArch64)
-		{
+			}
+			else if (machine == EmPpc)
+			{
+				if (tag == DtPpcOpt)
+				{
+					decoded = DecodeFlags(value, DynamicPpcOptBits);
+					return true;
+				}
+			}
+			else if (machine == EmPpc64)
+			{
+				if (tag == DtPpc64Opt)
+				{
+					decoded = DecodeFlags(value, DynamicPpc64OptBits);
+					return true;
+				}
+			}
+			else if (machine == EmAArch64)
+			{
 			if (tag is DtAArch64BtiPlt or DtAArch64PacPlt or DtAArch64VariantPcs)
 			{
 				decoded = DecodeBooleanState(value);
@@ -810,8 +872,42 @@ public static partial class ElfReader
 			}
 		}
 
-		return false;
-	}
+			return false;
+		}
+
+		private static void AppendMachineSpecificDynamicCorrelations(ElfFile elf)
+		{
+			if (elf.Header.Machine != EmMips)
+				return;
+
+			if (!TryGetDynamicValue(elf, DtMipsLocalGotNo, out var localGotEntries))
+				return;
+			if (!TryGetDynamicValue(elf, DtMipsGotSym, out var firstGlobalGotSymbol))
+				return;
+			if (!TryGetDynamicValue(elf, DtMipsSymTabNo, out var dynamicSymbolCount))
+				return;
+			if (dynamicSymbolCount < firstGlobalGotSymbol)
+				return;
+
+			var globalGotEntries = dynamicSymbolCount - firstGlobalGotSymbol;
+			AppendDynamicDetailByTag(elf, DtMipsLocalGotNo, $"global_got_entries={globalGotEntries}");
+			AppendDynamicDetailByTag(elf, DtMipsSymTabNo, $"got_coverage={localGotEntries + globalGotEntries}");
+		}
+
+		private static void AppendDynamicDetailByTag(ElfFile elf, long tag, string detail)
+		{
+			if (string.IsNullOrEmpty(detail))
+				return;
+
+			for (var i = 0; i < elf.DynamicEntries.Count; i++)
+			{
+				var entry = elf.DynamicEntries[i];
+				if (entry.Tag != tag)
+					continue;
+
+				entry.DecodedValue = AppendDetail(entry.DecodedValue, detail);
+			}
+		}
 
 	private static bool TryDescribeVirtualAddress(ElfFile elf, ulong address, out string description)
 	{
