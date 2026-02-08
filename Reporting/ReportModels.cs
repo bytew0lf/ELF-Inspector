@@ -315,6 +315,16 @@ public class DwarfFunctionParameterQueryReport
 {
 	public string Name { get; set; }
 	public ulong? TypeDieOffset { get; set; }
+	public DwarfTypeReferenceQueryReport Type { get; set; }
+}
+
+public class DwarfTypeReferenceQueryReport
+{
+	public ulong? DirectDieOffset { get; set; }
+	public ulong? CanonicalDieOffset { get; set; }
+	public string DisplayName { get; set; }
+	public bool IsResolved { get; set; }
+	public List<ulong> TraversedDieOffsets { get; set; }
 }
 
 public class DwarfTypeQueryReport
@@ -335,6 +345,7 @@ public class DwarfFunctionQueryReport
 	public string Name { get; set; }
 	public string LinkageName { get; set; }
 	public ulong? ReturnTypeDieOffset { get; set; }
+	public DwarfTypeReferenceQueryReport ReturnType { get; set; }
 	public bool IsDeclaration { get; set; }
 	public List<DwarfAddressRangeReport> AddressRanges { get; set; }
 	public List<DwarfFunctionParameterQueryReport> Parameters { get; set; }
@@ -345,9 +356,21 @@ public class DwarfVariableQueryReport
 	public ulong DieOffset { get; set; }
 	public string Name { get; set; }
 	public ulong? TypeDieOffset { get; set; }
+	public DwarfTypeReferenceQueryReport Type { get; set; }
 	public bool IsExternal { get; set; }
 	public bool IsDeclaration { get; set; }
 	public List<DwarfAddressRangeReport> AddressRanges { get; set; }
+}
+
+public class DwarfQueryLinkReport
+{
+	public ulong SourceDieOffset { get; set; }
+	public string Relation { get; set; }
+	public string Label { get; set; }
+	public ulong? TargetDieOffset { get; set; }
+	public bool IsResolved { get; set; }
+	public ulong? RangeStart { get; set; }
+	public ulong? RangeEnd { get; set; }
 }
 
 public class DwarfQueryReport
@@ -355,6 +378,7 @@ public class DwarfQueryReport
 	public List<DwarfTypeQueryReport> Types { get; set; }
 	public List<DwarfFunctionQueryReport> Functions { get; set; }
 	public List<DwarfVariableQueryReport> Variables { get; set; }
+	public List<DwarfQueryLinkReport> Links { get; set; }
 }
 
 public class DwarfAttributeReport
@@ -439,6 +463,20 @@ public class CoreDumpReport
 	public List<int> Signals { get; set; }
 	public List<CoreThreadReport> Threads { get; set; }
 	public List<CoreThreadUnwindReport> UnwindThreads { get; set; }
+	public CoreUnwindMetricsReport UnwindMetrics { get; set; }
+}
+
+public class CoreUnwindMetricsReport
+{
+	public int ThreadCount { get; set; }
+	public int CfiThreads { get; set; }
+	public int FramePointerThreads { get; set; }
+	public int LinkRegisterThreads { get; set; }
+	public int StackScanThreads { get; set; }
+	public int NoUnwindThreads { get; set; }
+	public double CfiRatio { get; set; }
+	public double StackScanRatio { get; set; }
+	public bool CfiDominatesStackScan { get; set; }
 }
 
 public class CoreUnwindFrameReport

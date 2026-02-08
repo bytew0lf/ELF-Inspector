@@ -16,9 +16,11 @@ public static partial class ElfReader
 	private static void ParseCoreThreadUnwind(IEndianDataSource data, ElfFile elf, ElfCoreDumpInfo core)
 	{
 		core.UnwindThreads.Clear();
+		ResetCoreUnwindMetrics(core.UnwindMetrics);
 		if (!core.IsCoreDump || core.Threads.Count == 0)
 			return;
 
+		core.UnwindMetrics.ThreadCount = core.Threads.Count;
 		var wordSize = GetCoreWordSize(elf.Header);
 		var segments = BuildCoreMemorySegments(data, elf);
 		for (var i = 0; i < core.Threads.Count; i++)
@@ -35,6 +37,7 @@ public static partial class ElfReader
 			if (!TryGetThreadRegisterState(elf.Header, thread.RegisterPreview, out var ip, out var sp, out var fp, out var linkRegister, out var strategy))
 			{
 				core.UnwindThreads.Add(unwind);
+				RegisterCoreUnwindStrategy(core.UnwindMetrics, unwind.Strategy, unwind.Complete);
 				continue;
 			}
 
@@ -105,7 +108,10 @@ public static partial class ElfReader
 							: strategy;
 			unwind.Complete = unwind.Frames.Count > 1;
 			core.UnwindThreads.Add(unwind);
+			RegisterCoreUnwindStrategy(core.UnwindMetrics, unwind.Strategy, unwind.Complete);
 		}
+
+		FinalizeCoreUnwindMetrics(core.UnwindMetrics);
 	}
 
 	private static List<CoreMemorySegment> BuildCoreMemorySegments(IEndianDataSource data, ElfFile elf)
@@ -774,5 +780,71 @@ public static partial class ElfReader
 		}
 
 		return best?.QualifiedName ?? best?.Name ?? string.Empty;
+	}
+
+	private static void ResetCoreUnwindMetrics(ElfCoreUnwindMetrics metrics)
+	{
+		if (metrics == null)
+			return;
+
+		metrics.ThreadCount = 0;
+		metrics.CfiThreads = 0;
+		metrics.FramePointerThreads = 0;
+		metrics.LinkRegisterThreads = 0;
+		metrics.StackScanThreads = 0;
+		metrics.NoUnwindThreads = 0;
+		metrics.CfiRatio = 0;
+		metrics.StackScanRatio = 0;
+		metrics.CfiDominatesStackScan = true;
+	}
+
+	private static void RegisterCoreUnwindStrategy(ElfCoreUnwindMetrics metrics, string strategy, bool complete)
+	{
+		if (metrics == null)
+			return;
+
+		if (!complete || string.IsNullOrEmpty(strategy) || strategy == "none")
+		{
+			metrics.NoUnwindThreads++;
+			return;
+		}
+
+		if (string.Equals(strategy, "eh-frame-cfi", StringComparison.Ordinal))
+		{
+			metrics.CfiThreads++;
+			return;
+		}
+
+		if (string.Equals(strategy, "stack-scan", StringComparison.Ordinal))
+		{
+			metrics.StackScanThreads++;
+			return;
+		}
+
+		if (strategy.EndsWith("link-register", StringComparison.Ordinal))
+		{
+			metrics.LinkRegisterThreads++;
+			return;
+		}
+
+		metrics.FramePointerThreads++;
+	}
+
+	private static void FinalizeCoreUnwindMetrics(ElfCoreUnwindMetrics metrics)
+	{
+		if (metrics == null)
+			return;
+
+		var finished = metrics.CfiThreads
+			+ metrics.FramePointerThreads
+			+ metrics.LinkRegisterThreads
+			+ metrics.StackScanThreads
+			+ metrics.NoUnwindThreads;
+		if (finished <= 0)
+			return;
+
+		metrics.CfiRatio = (double)metrics.CfiThreads / finished;
+		metrics.StackScanRatio = (double)metrics.StackScanThreads / finished;
+		metrics.CfiDominatesStackScan = metrics.CfiThreads >= metrics.StackScanThreads;
 	}
 }

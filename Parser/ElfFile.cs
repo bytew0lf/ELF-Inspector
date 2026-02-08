@@ -273,6 +273,16 @@ public class ElfDwarfFunctionParameterQuery
 {
 	public string Name { get; set; }
 	public ulong? TypeDieOffset { get; set; }
+	public ElfDwarfTypeReferenceQuery Type { get; set; } = new();
+}
+
+public class ElfDwarfTypeReferenceQuery
+{
+	public ulong? DirectDieOffset { get; set; }
+	public ulong? CanonicalDieOffset { get; set; }
+	public string DisplayName { get; set; }
+	public bool IsResolved { get; set; }
+	public List<ulong> TraversedDieOffsets { get; } = new();
 }
 
 public class ElfDwarfTypeQuery
@@ -293,6 +303,7 @@ public class ElfDwarfFunctionQuery
 	public string Name { get; set; }
 	public string LinkageName { get; set; }
 	public ulong? ReturnTypeDieOffset { get; set; }
+	public ElfDwarfTypeReferenceQuery ReturnType { get; set; } = new();
 	public bool IsDeclaration { get; set; }
 	public List<ElfDwarfAddressRange> AddressRanges { get; } = new();
 	public List<ElfDwarfFunctionParameterQuery> Parameters { get; } = new();
@@ -303,9 +314,21 @@ public class ElfDwarfVariableQuery
 	public ulong DieOffset { get; set; }
 	public string Name { get; set; }
 	public ulong? TypeDieOffset { get; set; }
+	public ElfDwarfTypeReferenceQuery Type { get; set; } = new();
 	public bool IsExternal { get; set; }
 	public bool IsDeclaration { get; set; }
 	public List<ElfDwarfAddressRange> AddressRanges { get; } = new();
+}
+
+public class ElfDwarfQueryLink
+{
+	public ulong SourceDieOffset { get; set; }
+	public string Relation { get; set; }
+	public string Label { get; set; }
+	public ulong? TargetDieOffset { get; set; }
+	public bool IsResolved { get; set; }
+	public ulong? RangeStart { get; set; }
+	public ulong? RangeEnd { get; set; }
 }
 
 public class ElfDwarfQueryModel
@@ -313,6 +336,7 @@ public class ElfDwarfQueryModel
 	public List<ElfDwarfTypeQuery> Types { get; } = new();
 	public List<ElfDwarfFunctionQuery> Functions { get; } = new();
 	public List<ElfDwarfVariableQuery> Variables { get; } = new();
+	public List<ElfDwarfQueryLink> Links { get; } = new();
 }
 
 public class ElfCoreThreadInfo
@@ -357,6 +381,20 @@ public class ElfCoreDumpInfo
 	public List<int> Signals { get; } = new();
 	public List<ElfCoreThreadInfo> Threads { get; } = new();
 	public List<ElfCoreThreadUnwindInfo> UnwindThreads { get; } = new();
+	public ElfCoreUnwindMetrics UnwindMetrics { get; } = new();
+}
+
+public class ElfCoreUnwindMetrics
+{
+	public int ThreadCount { get; set; }
+	public int CfiThreads { get; set; }
+	public int FramePointerThreads { get; set; }
+	public int LinkRegisterThreads { get; set; }
+	public int StackScanThreads { get; set; }
+	public int NoUnwindThreads { get; set; }
+	public double CfiRatio { get; set; }
+	public double StackScanRatio { get; set; }
+	public bool CfiDominatesStackScan { get; set; }
 }
 
 public class ElfFile

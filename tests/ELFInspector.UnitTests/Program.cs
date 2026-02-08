@@ -671,14 +671,94 @@ public sealed class ElfReaderTests
 
 		var function = Assert.Single(elf.Dwarf.Query.Functions, entry => entry.Name == "foo");
 		Assert.Equal("_Z3foov", function.LinkageName);
+		Assert.NotNull(function.ReturnType);
+		Assert.Equal((ulong?)0x20, function.ReturnType.DirectDieOffset);
+		Assert.Equal(baseType.DieOffset, function.ReturnType.CanonicalDieOffset);
+		Assert.Equal("int", function.ReturnType.DisplayName);
+		Assert.True(function.ReturnType.IsResolved);
+		Assert.Contains((ulong)0x20, function.ReturnType.TraversedDieOffsets);
+		Assert.Contains(baseType.DieOffset, function.ReturnType.TraversedDieOffsets);
 		var parameter = Assert.Single(function.Parameters);
 		Assert.Equal("p", parameter.Name);
 		Assert.Equal(baseType.DieOffset, parameter.TypeDieOffset);
+		Assert.NotNull(parameter.Type);
+		Assert.Equal("int", parameter.Type.DisplayName);
+		Assert.Equal(baseType.DieOffset, parameter.Type.CanonicalDieOffset);
+		Assert.True(parameter.Type.IsResolved);
 		Assert.Contains(function.AddressRanges, range => range.Start == 0x401000UL && range.End == 0x401020UL);
+		Assert.Contains(elf.Dwarf.Query.Links, link => link.SourceDieOffset == function.DieOffset && link.Relation == "returns" && link.TargetDieOffset == baseType.DieOffset && link.IsResolved);
+		Assert.Contains(elf.Dwarf.Query.Links, link => link.SourceDieOffset == function.DieOffset && link.Relation == "parameter-type" && link.TargetDieOffset == baseType.DieOffset && link.IsResolved);
+		Assert.Contains(elf.Dwarf.Query.Links, link => link.SourceDieOffset == function.DieOffset && link.Relation == "range" && link.RangeStart == 0x401000UL && link.RangeEnd == 0x401020UL);
 
 		Assert.NotNull(report.Dwarf.Query);
 		Assert.Contains(report.Dwarf.Query.Functions, entry => entry.Name == "foo" && entry.Parameters.Count == 1);
 		Assert.Contains(report.Dwarf.Query.Types, entry => entry.Name == "int" && entry.ByteSize == 4);
+		Assert.Contains(report.Dwarf.Query.Links, link => link.Relation == "returns" && link.IsResolved);
+	}
+
+	[Fact]
+	public void ParseDwarfIndex_QueryModel_UnresolvedTypeReference_IsPreservedAsQueryableLink()
+	{
+		var data = new byte[0x300];
+		var infoOffset = 0x80;
+		var abbrevOffset = 0x140;
+
+		var debugAbbrev = new byte[]
+		{
+			0x01, 0x11, 0x01, 0x03, 0x08, 0x00, 0x00, // CU
+			0x02, 0x2E, 0x00, 0x03, 0x08, 0x49, 0x13, 0x11, 0x01, 0x12, 0x06, 0x00, 0x00, // subprogram
+			0x00
+		};
+		Array.Copy(debugAbbrev, 0, data, abbrevOffset, debugAbbrev.Length);
+
+		var body = new List<byte>
+		{
+			0x04, 0x00,             // version
+			0x00, 0x00, 0x00, 0x00, // abbrev offset
+			0x08,                   // address size
+			0x01                    // CU DIE
+		};
+		body.AddRange(Encoding.ASCII.GetBytes("synthetic-cu\0"));
+		body.Add(0x02); // subprogram
+		body.AddRange(Encoding.ASCII.GetBytes("broken\0"));
+		body.AddRange(new byte[] { 0x88, 0x00, 0x00, 0x00 }); // unresolved type ref
+		body.AddRange(BitConverter.GetBytes(0x401000UL));
+		body.AddRange(BitConverter.GetBytes(0x10U));
+		body.Add(0x00); // end CU children
+
+		WriteUInt32(data.AsSpan(infoOffset, 4), (uint)body.Count, littleEndian: true);
+		Array.Copy(body.ToArray(), 0, data, infoOffset + 4, body.Count);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 62
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_info", Offset = (ulong)infoOffset, Size = (ulong)(4 + body.Count) });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_abbrev", Offset = (ulong)abbrevOffset, Size = (ulong)debugAbbrev.Length });
+
+		ElfReader.ParseDwarfIndex(data, elf);
+		var report = ElfReportMapper.Create(elf);
+
+		var function = Assert.Single(elf.Dwarf.Query.Functions);
+		Assert.Equal("broken", function.Name);
+		Assert.Equal((ulong?)0x88, function.ReturnTypeDieOffset);
+		Assert.NotNull(function.ReturnType);
+		Assert.False(function.ReturnType.IsResolved);
+		Assert.Equal((ulong?)0x88, function.ReturnType.DirectDieOffset);
+		Assert.Equal((ulong?)0x88, function.ReturnType.CanonicalDieOffset);
+		Assert.Contains("unresolved@0x88", function.ReturnType.DisplayName, StringComparison.Ordinal);
+
+		var returnLink = Assert.Single(elf.Dwarf.Query.Links, link => link.Relation == "returns");
+		Assert.Equal(function.DieOffset, returnLink.SourceDieOffset);
+		Assert.Equal((ulong?)0x88, returnLink.TargetDieOffset);
+		Assert.False(returnLink.IsResolved);
+
+		Assert.Contains(report.Dwarf.Query.Links, link => link.Relation == "returns" && !link.IsResolved && link.TargetDieOffset == 0x88);
 	}
 
 	[Fact]
@@ -2335,6 +2415,103 @@ public sealed class ElfReaderTests
 		Assert.Equal("eh-frame-cfi", unwind.Strategy);
 		Assert.Contains(unwind.Frames, frame => frame.InstructionPointer == cfiReturnAddress && frame.Strategy == "eh-frame-cfi");
 		Assert.DoesNotContain(unwind.Frames, frame => frame.InstructionPointer == framePointerReturnAddress && frame.Strategy == "x86_64-frame-pointer");
+	}
+
+	[Fact]
+	public void ParseCoreDumpInfo_UnwindMetrics_ExposeCfiDominanceAndStackScanRatio()
+	{
+		var coreBytes = new byte[0x700];
+		var execSegmentOffset = 0x100UL;
+		var stackSegmentOffset = 0x300UL;
+		var execVaddr = 0x401000UL;
+		var stackVaddr = 0x500000UL;
+
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x10), 8), execVaddr + 0x40, littleEndian: true); // thread1 CFI RA
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x80), 8), execVaddr + 0x70, littleEndian: true); // thread2 stack-scan candidate
+		WriteUInt64(coreBytes.AsSpan((int)(stackSegmentOffset + 0x30), 8), execVaddr + 0x50, littleEndian: true); // thread3 CFI RA
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Type = 4,
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 62
+			},
+			Unwind = new ElfUnwindInfo
+			{
+				EhFrame = new ElfEhFrameInfo()
+			}
+		};
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = execSegmentOffset,
+			VirtualAddress = execVaddr,
+			FileSize = 0x180,
+			MemorySize = 0x180,
+			Flags = 0x5
+		});
+		elf.ProgramHeaders.Add(new ElfProgramHeader
+		{
+			Type = 1,
+			Offset = stackSegmentOffset,
+			VirtualAddress = stackVaddr,
+			FileSize = 0x180,
+			MemorySize = 0x180,
+			Flags = 0x6
+		});
+		elf.Unwind.EhFrame.FdeEntries.Add(new ElfEhFrameFdeInfo
+		{
+			InitialLocation = execVaddr,
+			EndLocation = execVaddr + 0x40,
+			CfaRuleAvailable = true,
+			CfaRegister = 7,
+			CfaOffset = 8,
+			ReturnAddressOffsetAvailable = true,
+			ReturnAddressOffset = -8
+		});
+
+		byte[] BuildX64PrStatus(int tid, ulong rip, ulong rsp, ulong rbp)
+		{
+			var descriptor = new byte[112 + (27 * 8)];
+			WriteUInt32(descriptor.AsSpan(0, 4), 6, littleEndian: true);
+			WriteUInt16(descriptor.AsSpan(12, 2), 6, littleEndian: true);
+			WriteUInt32(descriptor.AsSpan(32, 4), tid, littleEndian: true);
+			WriteUInt64(descriptor.AsSpan(112 + (4 * 8), 8), rbp, littleEndian: true); // rbp
+			WriteUInt64(descriptor.AsSpan(112 + (16 * 8), 8), rip, littleEndian: true); // rip
+			WriteUInt64(descriptor.AsSpan(112 + (19 * 8), 8), rsp, littleEndian: true); // rsp
+			return descriptor;
+		}
+
+		elf.Notes.Add(new ElfNote { Name = "CORE", Type = 1, Descriptor = BuildX64PrStatus(1001, execVaddr + 0x10, stackVaddr + 0x10, 0), TypeName = "NT_PRSTATUS", DecodedDescription = string.Empty });
+		elf.Notes.Add(new ElfNote { Name = "CORE", Type = 1, Descriptor = BuildX64PrStatus(1002, execVaddr - 0x80, stackVaddr + 0x80, 0), TypeName = "NT_PRSTATUS", DecodedDescription = string.Empty });
+		elf.Notes.Add(new ElfNote { Name = "CORE", Type = 1, Descriptor = BuildX64PrStatus(1003, execVaddr + 0x20, stackVaddr + 0x30, 0), TypeName = "NT_PRSTATUS", DecodedDescription = string.Empty });
+
+		ElfReader.ParseCoreDumpInfo(coreBytes, elf);
+		var report = ElfReportMapper.Create(elf);
+
+		var metrics = elf.CoreDump.UnwindMetrics;
+		Assert.Equal(3, metrics.ThreadCount);
+		Assert.Equal(2, metrics.CfiThreads);
+		Assert.Equal(1, metrics.StackScanThreads);
+		Assert.Equal(0, metrics.LinkRegisterThreads);
+		Assert.Equal(0, metrics.FramePointerThreads);
+		Assert.Equal(0, metrics.NoUnwindThreads);
+		Assert.True(metrics.CfiRatio > metrics.StackScanRatio);
+		Assert.True(metrics.CfiDominatesStackScan);
+
+		var total = metrics.CfiThreads
+			+ metrics.FramePointerThreads
+			+ metrics.LinkRegisterThreads
+			+ metrics.StackScanThreads
+			+ metrics.NoUnwindThreads;
+		Assert.Equal(metrics.ThreadCount, total);
+
+		Assert.Equal(metrics.CfiThreads, report.CoreDump.UnwindMetrics.CfiThreads);
+		Assert.Equal(metrics.StackScanThreads, report.CoreDump.UnwindMetrics.StackScanThreads);
+		Assert.True(report.CoreDump.UnwindMetrics.CfiDominatesStackScan);
 	}
 
 	[Fact]

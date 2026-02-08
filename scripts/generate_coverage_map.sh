@@ -50,9 +50,9 @@ print_matrix() {
 	relocation_arch_status="$(resolve_status "GetRelocationTypeName|R_ARM_|R_MIPS_|R_PPC_|R_390_|R_SPARC_|R_RISCV_" "Parse_MultiArchSamples_UseArchitectureSpecificRelocationNames|Parse_MultiArchSamples_Relocations_AvoidRawFallbackTypeNames")"
 	hash_status="$(resolve_status "ParseHashTables|DT_GNU_HASH|DT_HASH|BuildHashLookupPaths" "Report_Nano_ParsesGnuHashTablesAndLookupPaths|Report_HelloX64_GnuHashLookupPaths_CanResolveMatches|Parse_HashLookupPaths_SymbolLimit_IsConfigurable")"
 	notes_status="$(resolve_status "ParseNotes|ElfNote|NT_" "ParseNotes_SyntheticGnuExtendedTypes_AreNamedAndDecoded|ParseNotes_SyntheticVendorTypes_AreNamedAndDecoded")"
-	unwind_status="$(resolve_status "ParseUnwindData|EhFrame|CFA|ParseEhFrame" "Parse_HelloX64_ParsesUnwindSections|ParseUnwindData_SyntheticEhFrame_ParsesCieFdeRules")"
-	dwarf_status="$(resolve_status "ParseDwarfIndex|ParseDwarfSemantics|debug_rnglists|debug_loclists|ElfDwarf" "ParseDwarfIndex_SemanticModel_ParsesDieTreeAndSymbolMappings|ParseDwarfIndex_DwarfV5Tables_EnableRnglistsAndLoclistsSymbolMappings|ParseDwarfIndex_SemanticModel_UnknownAttributeForm_IsPreservedWithFallbackValue")"
-	core_status="$(resolve_status "ParseCoreDumpInfo|ElfCoreDump|NT_PRSTATUS" "Parse_CoreTypedSample_InitializesCoreReportBranch|Parse_CoreNotes_X86_64_PrStatus_UsesStructuredLayout")"
+	unwind_status="$(resolve_status "ParseUnwindData|EhFrame|CFA|ParseEhFrame|UnwindMetrics" "Parse_HelloX64_ParsesUnwindSections|ParseUnwindData_SyntheticEhFrame_ParsesCieFdeRules|ParseCoreDumpInfo_UnwindMetrics_ExposeCfiDominanceAndStackScanRatio")"
+	dwarf_status="$(resolve_status "ParseDwarfIndex|ParseDwarfSemantics|debug_rnglists|debug_loclists|ElfDwarf|PopulateDwarfQueryRelationships" "ParseDwarfIndex_SemanticModel_ParsesDieTreeAndSymbolMappings|ParseDwarfIndex_DwarfV5Tables_EnableRnglistsAndLoclistsSymbolMappings|ParseDwarfIndex_SemanticModel_UnknownAttributeForm_IsPreservedWithFallbackValue|ParseDwarfIndex_QueryModel_BuildsFunctionTypeAndRangeRelationships|ParseDwarfIndex_QueryModel_UnresolvedTypeReference_IsPreservedAsQueryableLink")"
+	core_status="$(resolve_status "ParseCoreDumpInfo|ElfCoreDump|NT_PRSTATUS|UnwindMetrics" "Parse_CoreTypedSample_InitializesCoreReportBranch|Parse_CoreNotes_X86_64_PrStatus_UsesStructuredLayout|ParseCoreDumpInfo_UnwindMetrics_ExposeCfiDominanceAndStackScanRatio")"
 	security_status="$(resolve_status "CreateSecurityFeatures|PT_GNU_STACK|PT_GNU_RELRO|DF_BIND_NOW|FORTIFY" "Report_Nano_ContainsExpectedSecurityFeatures|Report_HelloX64_ContainsExpectedSecurityFeatures")"
 	textreport_status="$(resolve_status "BuildTextReport|RunWithArgs" "ExampleUsage_ReturnsErrorCode_ForMalformedElf|ExampleUsage_CompatHeaderValidation_AllowsLegacyHeaderVariants")"
 
@@ -79,9 +79,9 @@ Status legend:
 | Relocation type names per architecture | $relocation_arch_status | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
 | Hash Tables | $hash_status | \`DT_HASH\` and \`DT_GNU_HASH\` (buckets/chains/bloom), configurable lookup-path evaluation |
 | Notes | $notes_status | \`SHT_NOTE\`/\`PT_NOTE\`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
-| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, core stack-walk strategies |
-| DWARF/Debug | $dwarf_status | Index + partial semantics for \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` incl. enum/bool semantic hints and robust partial decoding |
-| ET_CORE | $core_status | \`PT_NOTE\`-based process/thread/register/signal evaluation with scored \`NT_PRSTATUS\` layout selection and thread-unwind branch |
+| Unwind | $unwind_status | \`.eh_frame\`/\`.eh_frame_hdr\`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, CFI-first core stack-walk + strategy metrics |
+| DWARF/Debug | $dwarf_status | Index + partial semantics for \`.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists\` incl. enum/bool hints, queryable function→type→range links, and robust unknown preservation |
+| ET_CORE | $core_status | \`PT_NOTE\`-based process/thread/register/signal evaluation with scored \`NT_PRSTATUS\` layout selection, thread-unwind branch, and unwind ratio metrics |
 | Security/Loader features | $security_status | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
 | Text report | $textreport_status | Deterministic output, structured sections including hash/security |
 EOF

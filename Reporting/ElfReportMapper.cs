@@ -290,7 +290,19 @@ public static class ElfReportMapper
 					SymbolName = frame.SymbolName,
 					Strategy = frame.Strategy
 				}).ToList()
-			}).ToList()
+			}).ToList(),
+			UnwindMetrics = new CoreUnwindMetricsReport
+			{
+				ThreadCount = coreDump.UnwindMetrics.ThreadCount,
+				CfiThreads = coreDump.UnwindMetrics.CfiThreads,
+				FramePointerThreads = coreDump.UnwindMetrics.FramePointerThreads,
+				LinkRegisterThreads = coreDump.UnwindMetrics.LinkRegisterThreads,
+				StackScanThreads = coreDump.UnwindMetrics.StackScanThreads,
+				NoUnwindThreads = coreDump.UnwindMetrics.NoUnwindThreads,
+				CfiRatio = coreDump.UnwindMetrics.CfiRatio,
+				StackScanRatio = coreDump.UnwindMetrics.StackScanRatio,
+				CfiDominatesStackScan = coreDump.UnwindMetrics.CfiDominatesStackScan
+			}
 		};
 	}
 
@@ -381,6 +393,7 @@ public static class ElfReportMapper
 					Name = function.Name,
 					LinkageName = function.LinkageName,
 					ReturnTypeDieOffset = function.ReturnTypeDieOffset,
+					ReturnType = MapDwarfTypeReference(function.ReturnType),
 					IsDeclaration = function.IsDeclaration,
 					AddressRanges = function.AddressRanges.Select(range => new DwarfAddressRangeReport
 					{
@@ -390,7 +403,8 @@ public static class ElfReportMapper
 					Parameters = function.Parameters.Select(parameter => new DwarfFunctionParameterQueryReport
 					{
 						Name = parameter.Name,
-						TypeDieOffset = parameter.TypeDieOffset
+						TypeDieOffset = parameter.TypeDieOffset,
+						Type = MapDwarfTypeReference(parameter.Type)
 					}).ToList()
 				}).ToList(),
 				Variables = dwarf.Query.Variables.Select(variable => new DwarfVariableQueryReport
@@ -398,6 +412,7 @@ public static class ElfReportMapper
 					DieOffset = variable.DieOffset,
 					Name = variable.Name,
 					TypeDieOffset = variable.TypeDieOffset,
+					Type = MapDwarfTypeReference(variable.Type),
 					IsExternal = variable.IsExternal,
 					IsDeclaration = variable.IsDeclaration,
 					AddressRanges = variable.AddressRanges.Select(range => new DwarfAddressRangeReport
@@ -405,8 +420,31 @@ public static class ElfReportMapper
 						Start = range.Start,
 						End = range.End
 					}).ToList()
+				}).ToList(),
+				Links = dwarf.Query.Links.Select(link => new DwarfQueryLinkReport
+				{
+					SourceDieOffset = link.SourceDieOffset,
+					Relation = link.Relation,
+					Label = link.Label,
+					TargetDieOffset = link.TargetDieOffset,
+					IsResolved = link.IsResolved,
+					RangeStart = link.RangeStart,
+					RangeEnd = link.RangeEnd
 				}).ToList()
 			}
+		};
+	}
+
+	private static DwarfTypeReferenceQueryReport MapDwarfTypeReference(ELFInspector.Parser.ElfDwarfTypeReferenceQuery reference)
+	{
+		reference ??= new ELFInspector.Parser.ElfDwarfTypeReferenceQuery();
+		return new DwarfTypeReferenceQueryReport
+		{
+			DirectDieOffset = reference.DirectDieOffset,
+			CanonicalDieOffset = reference.CanonicalDieOffset,
+			DisplayName = reference.DisplayName ?? string.Empty,
+			IsResolved = reference.IsResolved,
+			TraversedDieOffsets = reference.TraversedDieOffsets.ToList()
 		};
 	}
 

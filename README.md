@@ -16,6 +16,8 @@ ELF parser and reporter for ELF32 and ELF64 binaries (.so, executables, etc.).
 * Hardened CFI/unwind decoding (unknown/truncated CFA instructions are preserved without hard abort)
 * ET_CORE thread/register decoding with scored `NT_PRSTATUS` layout selection plus generic Linux fallback
 * Extended DWARF semantic hints (including boolean attributes) while preserving unknown forms
+* DWARF query model with function→type→range links and preserved unresolved type references
+* ET_CORE unwind strategy metrics (`CFI`, frame-pointer, link-register, stack-scan ratios)
 * Extended mapping coverage for architecture-specific values (including MIPS REGINFO section/segment names)
 * Security/loader features in the report (PIE, RELRO, NX, BIND_NOW, canary/FORTIFY hints)
 
@@ -42,9 +44,9 @@ Status legend:
 | Relocation type names per architecture | full | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
 | Hash Tables | full | `DT_HASH` and `DT_GNU_HASH` (buckets/chains/bloom), configurable lookup-path evaluation |
 | Notes | full | `SHT_NOTE`/`PT_NOTE`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
-| Unwind | full | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, core stack-walk strategies |
-| DWARF/Debug | full | Index + partial semantics for `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` incl. enum/bool semantic hints and robust partial decoding |
-| ET_CORE | full | `PT_NOTE`-based process/thread/register/signal evaluation with scored `NT_PRSTATUS` layout selection and thread-unwind branch |
+| Unwind | full | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE parsing, CFA rules, tolerant unknown/truncated opcode handling, CFI-first core stack-walk + strategy metrics |
+| DWARF/Debug | full | Index + partial semantics for `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` incl. enum/bool hints, queryable function→type→range links, and robust unknown preservation |
+| ET_CORE | full | `PT_NOTE`-based process/thread/register/signal evaluation with scored `NT_PRSTATUS` layout selection, thread-unwind branch, and unwind ratio metrics |
 | Security/Loader features | full | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
 | Text report | full | Deterministic output, structured sections including hash/security |
 <!-- COVERAGE_MAP_END -->
@@ -92,6 +94,7 @@ scripts/verify_gap_metrics.sh
 | Negative parser tests | full | in unit tests + `scripts/run_p3_test_matrix.sh` |
 | Golden report regression | full | `scripts/verify_golden_reports.sh` |
 | Feature matrix (RELR/flags/mapping) | full | `scripts/run_p4_test_matrix.sh` |
+| Differential checks vs reference tools | full | `scripts/run_differential_checks.sh` (skips if no `readelf`/`eu-readelf`/`llvm-readelf`) |
 | Local CI gate | full | `scripts/run_ci_gate.sh` |
 
 ### Intentionally out of current scope
@@ -190,6 +193,14 @@ Run advanced feature checks (RELR, relocation mapping, dynamic flag decoding):
 scripts/run_p4_test_matrix.sh
 ```
 
+## Differential Checks
+
+Run parser output comparisons against available reference tooling (`readelf`, `eu-readelf`, or `llvm-readelf`) for selected deterministic fields:
+
+```bash
+scripts/run_differential_checks.sh
+```
+
 ## P0 Conformance Matrix
 
 Run strict/compat header conformance and deterministic mutation smoke checks:
@@ -208,7 +219,7 @@ scripts/run_unit_tests.sh
 
 ## CI Gate
 
-Run the full quality gate locally (unit tests + P0/P3/P4 matrices + coverage/gap drift checks):
+Run the full quality gate locally (unit tests + P0/P2/P3/P4 matrices + differential checks + coverage/gap drift checks):
 
 ```bash
 scripts/run_ci_gate.sh

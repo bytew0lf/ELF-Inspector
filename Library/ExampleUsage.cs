@@ -359,14 +359,22 @@ public static class ExampleUsage
 			var queryTypes = query.Types ?? new List<ELFInspector.Reporting.DwarfTypeQueryReport>();
 			var queryFunctions = query.Functions ?? new List<ELFInspector.Reporting.DwarfFunctionQueryReport>();
 			var queryVariables = query.Variables ?? new List<ELFInspector.Reporting.DwarfVariableQueryReport>();
-			sb.AppendLine($"Query Model: types={queryTypes.Count}, functions={queryFunctions.Count}, variables={queryVariables.Count}");
+			var queryLinks = query.Links ?? new List<ELFInspector.Reporting.DwarfQueryLinkReport>();
+			if (queryLinks.Count == 0)
+				sb.AppendLine($"Query Model: types={queryTypes.Count}, functions={queryFunctions.Count}, variables={queryVariables.Count}");
+			else
+				sb.AppendLine($"Query Model: types={queryTypes.Count}, functions={queryFunctions.Count}, variables={queryVariables.Count}, links={queryLinks.Count}");
 			foreach (var function in queryFunctions.Take(Math.Min(MaxDetailedItems, 24)))
 			{
 				var displayName = !string.IsNullOrEmpty(function.LinkageName) ? function.LinkageName : function.Name;
 				var ranges = function.AddressRanges == null || function.AddressRanges.Count == 0
 					? "(none)"
 					: string.Join(", ", function.AddressRanges.Take(4).Select(range => $"0x{range.Start:X}-0x{range.End:X}"));
-				sb.AppendLine($"- fn DIE@0x{function.DieOffset:X}: {OrNone(displayName)}, return_type={(function.ReturnTypeDieOffset.HasValue ? $"0x{function.ReturnTypeDieOffset.Value:X}" : "(n/a)")}, params={(function.Parameters?.Count ?? 0)}, ranges={ranges}");
+				var returnTypeName = function.ReturnType == null || string.IsNullOrEmpty(function.ReturnType.DisplayName)
+					? "(n/a)"
+					: function.ReturnType.DisplayName;
+				var returnTypeOffset = function.ReturnTypeDieOffset.HasValue ? $"0x{function.ReturnTypeDieOffset.Value:X}" : "(n/a)";
+				sb.AppendLine($"- fn DIE@0x{function.DieOffset:X}: {OrNone(displayName)}, return_type={returnTypeOffset} ({returnTypeName}), params={(function.Parameters?.Count ?? 0)}, ranges={ranges}");
 			}
 			if (queryFunctions.Count > 24)
 				sb.AppendLine($"... {queryFunctions.Count - 24} more query functions");
@@ -461,6 +469,8 @@ public static class ExampleUsage
 			}
 
 			var unwindThreads = coreDump.UnwindThreads ?? new List<ELFInspector.Reporting.CoreThreadUnwindReport>();
+			var unwindMetrics = coreDump.UnwindMetrics ?? new ELFInspector.Reporting.CoreUnwindMetricsReport();
+			sb.AppendLine($"Unwind Metrics: threads={unwindMetrics.ThreadCount}, cfi={unwindMetrics.CfiThreads}, frame-pointer={unwindMetrics.FramePointerThreads}, link-register={unwindMetrics.LinkRegisterThreads}, stack-scan={unwindMetrics.StackScanThreads}, none={unwindMetrics.NoUnwindThreads}, cfi_ratio={unwindMetrics.CfiRatio:F3}, stack_scan_ratio={unwindMetrics.StackScanRatio:F3}, cfi_dominates_stack_scan={YesNo(unwindMetrics.CfiDominatesStackScan)}");
 			if (unwindThreads.Count == 0)
 			{
 				sb.AppendLine("Stack Walk: (none)");

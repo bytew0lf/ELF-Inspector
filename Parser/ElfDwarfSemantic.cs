@@ -1425,6 +1425,7 @@ public static partial class ElfReader
 		query.Types.Clear();
 		query.Functions.Clear();
 		query.Variables.Clear();
+		query.Links.Clear();
 		if (units.Count == 0)
 			return;
 
@@ -1444,6 +1445,9 @@ public static partial class ElfReader
 				seenVariables,
 				activeFunction: null);
 		}
+
+		var dieLookup = BuildDwarfDieLookup(units);
+		PopulateDwarfQueryRelationships(query, dieLookup);
 	}
 
 	private static void BuildDwarfQueryModelForDies(
@@ -1633,6 +1637,187 @@ public static partial class ElfReader
 			Name = name ?? string.Empty,
 			TypeDieOffset = typeDieOffset
 		});
+	}
+
+	private static Dictionary<ulong, ElfDwarfDie> BuildDwarfDieLookup(List<ElfDwarfSemanticCompilationUnit> units)
+	{
+		var lookup = new Dictionary<ulong, ElfDwarfDie>();
+		for (var unitIndex = 0; unitIndex < units.Count; unitIndex++)
+			AddDwarfDiesToLookup(units[unitIndex].RootDies, lookup);
+		return lookup;
+	}
+
+	private static void AddDwarfDiesToLookup(List<ElfDwarfDie> dies, Dictionary<ulong, ElfDwarfDie> lookup)
+	{
+		for (var i = 0; i < dies.Count; i++)
+		{
+			var die = dies[i];
+			if (!lookup.ContainsKey(die.Offset))
+				lookup.Add(die.Offset, die);
+
+			if (die.Children.Count > 0)
+				AddDwarfDiesToLookup(die.Children, lookup);
+		}
+	}
+
+	private static void PopulateDwarfQueryRelationships(ElfDwarfQueryModel query, Dictionary<ulong, ElfDwarfDie> dieLookup)
+	{
+		if (query == null)
+			return;
+
+		query.Links.Clear();
+
+		var typeByOffset = new Dictionary<ulong, ElfDwarfTypeQuery>();
+		for (var i = 0; i < query.Types.Count; i++)
+		{
+			var type = query.Types[i];
+			if (!typeByOffset.ContainsKey(type.DieOffset))
+				typeByOffset.Add(type.DieOffset, type);
+		}
+
+		for (var functionIndex = 0; functionIndex < query.Functions.Count; functionIndex++)
+		{
+			var function = query.Functions[functionIndex];
+			function.ReturnType = ResolveDwarfTypeReference(function.ReturnTypeDieOffset, typeByOffset, dieLookup);
+
+			if (function.ReturnTypeDieOffset.HasValue)
+			{
+				query.Links.Add(CreateDwarfTypeLink(
+					function.DieOffset,
+					"returns",
+					"return",
+					function.ReturnType));
+			}
+
+			for (var parameterIndex = 0; parameterIndex < function.Parameters.Count; parameterIndex++)
+			{
+				var parameter = function.Parameters[parameterIndex];
+				parameter.Type = ResolveDwarfTypeReference(parameter.TypeDieOffset, typeByOffset, dieLookup);
+				if (!parameter.TypeDieOffset.HasValue)
+					continue;
+
+				var label = string.IsNullOrEmpty(parameter.Name)
+					? $"param#{parameterIndex}"
+					: parameter.Name;
+				query.Links.Add(CreateDwarfTypeLink(
+					function.DieOffset,
+					"parameter-type",
+					label,
+					parameter.Type));
+			}
+
+			for (var rangeIndex = 0; rangeIndex < function.AddressRanges.Count; rangeIndex++)
+			{
+				var range = function.AddressRanges[rangeIndex];
+				query.Links.Add(new ElfDwarfQueryLink
+				{
+					SourceDieOffset = function.DieOffset,
+					Relation = "range",
+					Label = "function-range",
+					TargetDieOffset = null,
+					IsResolved = true,
+					RangeStart = range.Start,
+					RangeEnd = range.End
+				});
+			}
+		}
+
+		for (var variableIndex = 0; variableIndex < query.Variables.Count; variableIndex++)
+		{
+			var variable = query.Variables[variableIndex];
+			variable.Type = ResolveDwarfTypeReference(variable.TypeDieOffset, typeByOffset, dieLookup);
+			if (variable.TypeDieOffset.HasValue)
+			{
+				var variableLabel = string.IsNullOrEmpty(variable.Name) ? "variable" : variable.Name;
+				query.Links.Add(CreateDwarfTypeLink(
+					variable.DieOffset,
+					"variable-type",
+					variableLabel,
+					variable.Type));
+			}
+
+			for (var rangeIndex = 0; rangeIndex < variable.AddressRanges.Count; rangeIndex++)
+			{
+				var range = variable.AddressRanges[rangeIndex];
+				query.Links.Add(new ElfDwarfQueryLink
+				{
+					SourceDieOffset = variable.DieOffset,
+					Relation = "range",
+					Label = "variable-range",
+					TargetDieOffset = null,
+					IsResolved = true,
+					RangeStart = range.Start,
+					RangeEnd = range.End
+				});
+			}
+		}
+	}
+
+	private static ElfDwarfQueryLink CreateDwarfTypeLink(
+		ulong sourceDieOffset,
+		string relation,
+		string label,
+		ElfDwarfTypeReferenceQuery typeReference)
+	{
+		return new ElfDwarfQueryLink
+		{
+			SourceDieOffset = sourceDieOffset,
+			Relation = relation,
+			Label = label,
+			TargetDieOffset = typeReference.CanonicalDieOffset ?? typeReference.DirectDieOffset,
+			IsResolved = typeReference.IsResolved
+		};
+	}
+
+	private static ElfDwarfTypeReferenceQuery ResolveDwarfTypeReference(
+		ulong? directOffset,
+		Dictionary<ulong, ElfDwarfTypeQuery> typeByOffset,
+		Dictionary<ulong, ElfDwarfDie> dieLookup)
+	{
+		var result = new ElfDwarfTypeReferenceQuery
+		{
+			DirectDieOffset = directOffset,
+			DisplayName = string.Empty,
+			IsResolved = false
+		};
+
+		if (!directOffset.HasValue)
+			return result;
+
+		var seen = new HashSet<ulong>();
+		ulong? cursor = directOffset.Value;
+		ulong? canonical = null;
+		while (cursor.HasValue && result.TraversedDieOffsets.Count < 64)
+		{
+			var current = cursor.Value;
+			if (!seen.Add(current))
+				break;
+
+			result.TraversedDieOffsets.Add(current);
+			canonical = current;
+
+			if (typeByOffset.TryGetValue(current, out var typeQuery))
+			{
+				if (string.IsNullOrEmpty(result.DisplayName) && !string.IsNullOrEmpty(typeQuery.Name))
+					result.DisplayName = typeQuery.Name;
+
+				cursor = typeQuery.TypeDieOffset;
+				continue;
+			}
+
+			cursor = null;
+		}
+
+		result.CanonicalDieOffset = canonical;
+		result.IsResolved = canonical.HasValue && typeByOffset.ContainsKey(canonical.Value);
+
+		if (string.IsNullOrEmpty(result.DisplayName) && canonical.HasValue && dieLookup.TryGetValue(canonical.Value, out var die))
+			result.DisplayName = die.TagText ?? $"DW_TAG_0x{die.Tag:X}";
+
+		if (string.IsNullOrEmpty(result.DisplayName) && directOffset.HasValue)
+			result.DisplayName = $"unresolved@0x{directOffset.Value:X}";
+
+		return result;
 	}
 
 	private static ElfDwarfSymbolMapping ResolveDwarfSymbolMapping(
