@@ -632,7 +632,254 @@ public static partial class ElfReader
 		};
 	}
 
-		private static string GetRelocationTypeName(ushort machine, uint type)
+	private static readonly IReadOnlyDictionary<ushort, IReadOnlyDictionary<uint, string>> RelocationTypeTables = CreateRelocationTypeTables();
+
+	private static string GetRelocationTypeName(ushort machine, uint type)
+	{
+		if (machine == 8)
+			return GetMipsRelocationTypeName(type);
+
+		if (RelocationTypeTables.TryGetValue(machine, out var table)
+			&& table.TryGetValue(type, out var relocationName))
+		{
+			return relocationName;
+		}
+
+		return GetRelocationTypeNameFromSwitch(machine, type);
+	}
+
+	private static IReadOnlyDictionary<ushort, IReadOnlyDictionary<uint, string>> CreateRelocationTypeTables()
+	{
+		return new Dictionary<ushort, IReadOnlyDictionary<uint, string>>
+		{
+			[3] = CreateRelocationMap(
+				(0, "R_386_NONE"),
+				(1, "R_386_32"),
+				(2, "R_386_PC32"),
+				(3, "R_386_GOT32"),
+				(4, "R_386_PLT32"),
+				(5, "R_386_COPY"),
+				(6, "R_386_GLOB_DAT"),
+				(7, "R_386_JUMP_SLOT"),
+				(8, "R_386_RELATIVE"),
+				(9, "R_386_GOTOFF"),
+				(10, "R_386_GOTPC"),
+				(15, "R_386_TLS_TPOFF"),
+				(16, "R_386_TLS_IE"),
+				(17, "R_386_TLS_GOTIE"),
+				(18, "R_386_TLS_LE"),
+				(19, "R_386_TLS_GD"),
+				(20, "R_386_TLS_LDM"),
+				(36, "R_386_TLS_DTPMOD32"),
+				(37, "R_386_TLS_DTPOFF32"),
+				(38, "R_386_TLS_TPOFF32"),
+				(39, "R_386_SIZE32"),
+				(42, "R_386_IRELATIVE")),
+			[20] = CreateRelocationMap(
+				(0, "R_PPC_NONE"),
+				(1, "R_PPC_ADDR32"),
+				(10, "R_PPC_REL24"),
+				(19, "R_PPC_COPY"),
+				(20, "R_PPC_GLOB_DAT"),
+				(21, "R_PPC_JMP_SLOT"),
+				(22, "R_PPC_RELATIVE"),
+				(26, "R_PPC_REL32"),
+				(67, "R_PPC_TLS_DTPMOD32"),
+				(68, "R_PPC_TLS_DTPREL32"),
+				(69, "R_PPC_TLS_TPREL32"),
+				(70, "R_PPC_TLS_GD"),
+				(71, "R_PPC_TLS_LDM"),
+				(248, "R_PPC_IRELATIVE")),
+			[21] = CreateRelocationMap(
+				(0, "R_PPC64_NONE"),
+				(1, "R_PPC64_ADDR32"),
+				(10, "R_PPC64_REL24"),
+				(20, "R_PPC64_GLOB_DAT"),
+				(21, "R_PPC64_JMP_SLOT"),
+				(22, "R_PPC64_RELATIVE"),
+				(38, "R_PPC64_ADDR64"),
+				(67, "R_PPC64_TLS_DTPMOD64"),
+				(68, "R_PPC64_TLS_DTPREL64"),
+				(69, "R_PPC64_TLS_TPREL64"),
+				(107, "R_PPC64_TLSDESC"),
+				(248, "R_PPC64_IRELATIVE")),
+			[22] = CreateRelocationMap(
+				(0, "R_390_NONE"),
+				(1, "R_390_8"),
+				(2, "R_390_12"),
+				(3, "R_390_16"),
+				(4, "R_390_32"),
+				(5, "R_390_PC32"),
+				(9, "R_390_COPY"),
+				(10, "R_390_GLOB_DAT"),
+				(11, "R_390_JMP_SLOT"),
+				(12, "R_390_RELATIVE"),
+				(22, "R_390_64"),
+				(23, "R_390_PC64"),
+				(60, "R_390_TLS_LOAD"),
+				(61, "R_390_IRELATIVE")),
+			[2] = CreateRelocationMap(
+				(0, "R_SPARC_NONE"),
+				(3, "R_SPARC_32"),
+				(8, "R_SPARC_WDISP30"),
+				(10, "R_SPARC_HI22"),
+				(13, "R_SPARC_LO10"),
+				(19, "R_SPARC_COPY"),
+				(20, "R_SPARC_GLOB_DAT"),
+				(21, "R_SPARC_JMP_SLOT"),
+				(22, "R_SPARC_RELATIVE"),
+				(32, "R_SPARC_64"),
+				(48, "R_SPARC_DISP64"),
+				(49, "R_SPARC_PLT64"),
+				(249, "R_SPARC_IRELATIVE")),
+			[43] = CreateRelocationMap(
+				(0, "R_SPARC_NONE"),
+				(3, "R_SPARC_32"),
+				(8, "R_SPARC_WDISP30"),
+				(10, "R_SPARC_HI22"),
+				(13, "R_SPARC_LO10"),
+				(19, "R_SPARC_COPY"),
+				(20, "R_SPARC_GLOB_DAT"),
+				(21, "R_SPARC_JMP_SLOT"),
+				(22, "R_SPARC_RELATIVE"),
+				(32, "R_SPARC_64"),
+				(48, "R_SPARC_DISP64"),
+				(49, "R_SPARC_PLT64"),
+				(249, "R_SPARC_IRELATIVE")),
+			[40] = CreateRelocationMap(
+				(0, "R_ARM_NONE"),
+				(1, "R_ARM_PC24"),
+				(2, "R_ARM_ABS32"),
+				(3, "R_ARM_REL32"),
+				(10, "R_ARM_THM_CALL"),
+				(17, "R_ARM_TLS_DTPMOD32"),
+				(18, "R_ARM_TLS_DTPOFF32"),
+				(19, "R_ARM_TLS_TPOFF32"),
+				(20, "R_ARM_COPY"),
+				(21, "R_ARM_GLOB_DAT"),
+				(22, "R_ARM_JUMP_SLOT"),
+				(23, "R_ARM_RELATIVE"),
+				(26, "R_ARM_GOT_BREL"),
+				(27, "R_ARM_PLT32"),
+				(28, "R_ARM_CALL"),
+				(29, "R_ARM_JUMP24"),
+				(30, "R_ARM_THM_JUMP24"),
+				(42, "R_ARM_PREL31"),
+				(43, "R_ARM_MOVW_ABS_NC"),
+				(44, "R_ARM_MOVT_ABS"),
+				(45, "R_ARM_MOVW_PREL_NC"),
+				(46, "R_ARM_MOVT_PREL"),
+				(47, "R_ARM_THM_MOVW_ABS_NC"),
+				(48, "R_ARM_THM_MOVT_ABS"),
+				(49, "R_ARM_THM_MOVW_PREL_NC"),
+				(50, "R_ARM_THM_MOVT_PREL"),
+				(160, "R_ARM_IRELATIVE")),
+			[62] = CreateRelocationMap(
+				(0, "R_X86_64_NONE"),
+				(1, "R_X86_64_64"),
+				(2, "R_X86_64_PC32"),
+				(4, "R_X86_64_PLT32"),
+				(5, "R_X86_64_COPY"),
+				(6, "R_X86_64_GLOB_DAT"),
+				(7, "R_X86_64_JUMP_SLOT"),
+				(8, "R_X86_64_RELATIVE"),
+				(9, "R_X86_64_GOTPCREL"),
+				(16, "R_X86_64_DTPMOD64"),
+				(17, "R_X86_64_DTPOFF64"),
+				(18, "R_X86_64_TPOFF64"),
+				(19, "R_X86_64_TLSGD"),
+				(20, "R_X86_64_TLSLD"),
+				(21, "R_X86_64_DTPOFF32"),
+				(22, "R_X86_64_GOTTPOFF"),
+				(23, "R_X86_64_TPOFF32"),
+				(32, "R_X86_64_SIZE32"),
+				(33, "R_X86_64_SIZE64"),
+				(37, "R_X86_64_IRELATIVE")),
+			[183] = CreateRelocationMap(
+				(0, "R_AARCH64_NONE"),
+				(257, "R_AARCH64_ABS64"),
+				(258, "R_AARCH64_ABS32"),
+				(259, "R_AARCH64_ABS16"),
+				(260, "R_AARCH64_PREL64"),
+				(261, "R_AARCH64_PREL32"),
+				(262, "R_AARCH64_PREL16"),
+				(1024, "R_AARCH64_COPY"),
+				(1025, "R_AARCH64_GLOB_DAT"),
+				(1026, "R_AARCH64_JUMP_SLOT"),
+				(1027, "R_AARCH64_RELATIVE"),
+				(1028, "R_AARCH64_TLS_DTPMOD64"),
+				(1029, "R_AARCH64_TLS_DTPREL64"),
+				(1030, "R_AARCH64_TLS_TPREL64"),
+				(1031, "R_AARCH64_TLSDESC"),
+				(1032, "R_AARCH64_IRELATIVE")),
+			[243] = CreateRelocationMap(
+				(0, "R_RISCV_NONE"),
+				(1, "R_RISCV_32"),
+				(2, "R_RISCV_64"),
+				(3, "R_RISCV_RELATIVE"),
+				(4, "R_RISCV_COPY"),
+				(5, "R_RISCV_JUMP_SLOT"),
+				(6, "R_RISCV_TLS_DTPMOD32"),
+				(7, "R_RISCV_TLS_DTPMOD64"),
+				(8, "R_RISCV_TLS_DTPREL32"),
+				(9, "R_RISCV_TLS_DTPREL64"),
+				(10, "R_RISCV_TLS_TPREL32"),
+				(11, "R_RISCV_TLS_TPREL64"),
+				(12, "R_RISCV_TLSDESC"),
+				(16, "R_RISCV_BRANCH"),
+				(17, "R_RISCV_JAL"),
+				(18, "R_RISCV_CALL"),
+				(19, "R_RISCV_CALL_PLT"),
+				(20, "R_RISCV_GOT_HI20"),
+				(21, "R_RISCV_TLS_GOT_HI20"),
+				(22, "R_RISCV_TLS_GD_HI20"),
+				(23, "R_RISCV_PCREL_HI20"),
+				(24, "R_RISCV_PCREL_LO12_I"),
+				(25, "R_RISCV_PCREL_LO12_S"),
+				(26, "R_RISCV_HI20"),
+				(27, "R_RISCV_LO12_I"),
+				(28, "R_RISCV_LO12_S"),
+				(29, "R_RISCV_TPREL_HI20"),
+				(30, "R_RISCV_TPREL_LO12_I"),
+				(31, "R_RISCV_TPREL_LO12_S"),
+				(32, "R_RISCV_TPREL_ADD"),
+				(33, "R_RISCV_ADD8"),
+				(34, "R_RISCV_ADD16"),
+				(35, "R_RISCV_ADD32"),
+				(36, "R_RISCV_ADD64"),
+				(37, "R_RISCV_SUB8"),
+				(38, "R_RISCV_SUB16"),
+				(39, "R_RISCV_SUB32"),
+				(40, "R_RISCV_SUB64"),
+				(43, "R_RISCV_ALIGN"),
+				(44, "R_RISCV_RVC_BRANCH"),
+				(45, "R_RISCV_RVC_JUMP"),
+				(46, "R_RISCV_RELAX"),
+				(47, "R_RISCV_SUB6"),
+				(48, "R_RISCV_SET6"),
+				(49, "R_RISCV_SET8"),
+				(50, "R_RISCV_SET16"),
+				(51, "R_RISCV_SET32"),
+				(52, "R_RISCV_32_PCREL"),
+				(58, "R_RISCV_IRELATIVE"))
+		};
+	}
+
+	private static IReadOnlyDictionary<uint, string> CreateRelocationMap(params (uint Type, string Name)[] entries)
+	{
+		var map = new Dictionary<uint, string>();
+		for (var i = 0; i < entries.Length; i++)
+			map[entries[i].Type] = entries[i].Name;
+
+		return map;
+	}
+
+	private static bool HasRelocationTypeTableEntry(ushort machine, uint type)
+	{
+		return RelocationTypeTables.TryGetValue(machine, out var table) && table.ContainsKey(type);
+	}
+
+	private static string GetRelocationTypeNameFromSwitch(ushort machine, uint type)
 		{
 			return machine switch
 			{

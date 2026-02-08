@@ -3,6 +3,18 @@ namespace ELFInspector.Parser;
 public static partial class ElfReader
 {
 	private const ulong DwTagCompileUnit = 0x11;
+	private const ulong DwTagArrayType = 0x01;
+	private const ulong DwTagBaseType = 0x24;
+	private const ulong DwTagPointerType = 0x0F;
+	private const ulong DwTagReferenceType = 0x10;
+	private const ulong DwTagRvalueReferenceType = 0x42;
+	private const ulong DwTagConstType = 0x26;
+	private const ulong DwTagVolatileType = 0x35;
+	private const ulong DwTagRestrictType = 0x37;
+	private const ulong DwTagSubroutineType = 0x15;
+	private const ulong DwTagUnionType = 0x17;
+	private const ulong DwTagEnumerationType = 0x04;
+	private const ulong DwTagUnspecifiedType = 0x3B;
 	private const ulong DwTagSubprogram = 0x2E;
 	private const ulong DwTagInlinedSubroutine = 0x1D;
 	private const ulong DwTagVariable = 0x34;
@@ -17,6 +29,7 @@ public static partial class ElfReader
 	private const ulong DwAtName = 0x03;
 	private const ulong DwAtLocation = 0x02;
 	private const ulong DwAtOrdering = 0x09;
+	private const ulong DwAtByteSize = 0x0B;
 	private const ulong DwAtLowPc = 0x11;
 	private const ulong DwAtHighPc = 0x12;
 	private const ulong DwAtLanguage = 0x13;
@@ -25,6 +38,8 @@ public static partial class ElfReader
 	private const ulong DwAtAccessibility = 0x32;
 	private const ulong DwAtCallingConvention = 0x36;
 	private const ulong DwAtIdentifierCase = 0x42;
+	private const ulong DwAtType = 0x49;
+	private const ulong DwAtExternal = 0x3F;
 	private const ulong DwAtEncoding = 0x3E;
 	private const ulong DwAtVirtuality = 0x4C;
 	private const ulong DwAtDecimalSign = 0x5E;
@@ -230,6 +245,7 @@ public static partial class ElfReader
 			DebugLoclistsPayload = debugLoclistsPayload
 		};
 		BuildDwarfSymbolMappings(elf, dwarf.SemanticUnits, dwarf.SymbolMappings, mappingContext);
+		BuildDwarfQueryModel(dwarf.SemanticUnits, dwarf.Query, mappingContext);
 	}
 
 	private static byte[] TryReadOptionalDebugSectionPayload(IEndianDataSource data, ElfFile elf, ElfSectionHeader section)
@@ -1246,6 +1262,224 @@ public static partial class ElfReader
 
 			output.Add(mapping);
 		}
+	}
+
+	private static void BuildDwarfQueryModel(
+		List<ElfDwarfSemanticCompilationUnit> units,
+		ElfDwarfQueryModel query,
+		DwarfMappingSectionContext context)
+	{
+		query.Types.Clear();
+		query.Functions.Clear();
+		query.Variables.Clear();
+		if (units.Count == 0)
+			return;
+
+		var seenTypes = new HashSet<ulong>();
+		var seenFunctions = new HashSet<ulong>();
+		var seenVariables = new HashSet<ulong>();
+		for (var unitIndex = 0; unitIndex < units.Count; unitIndex++)
+		{
+			var unit = units[unitIndex];
+			var unitContext = CreateUnitMappingContext(unit, context);
+			BuildDwarfQueryModelForDies(
+				unit.RootDies,
+				unitContext,
+				query,
+				seenTypes,
+				seenFunctions,
+				seenVariables,
+				activeFunction: null);
+		}
+	}
+
+	private static void BuildDwarfQueryModelForDies(
+		List<ElfDwarfDie> dies,
+		DwarfUnitMappingContext context,
+		ElfDwarfQueryModel query,
+		HashSet<ulong> seenTypes,
+		HashSet<ulong> seenFunctions,
+		HashSet<ulong> seenVariables,
+		ElfDwarfFunctionQuery activeFunction)
+	{
+		for (var i = 0; i < dies.Count; i++)
+		{
+			var die = dies[i];
+			var nextActiveFunction = activeFunction;
+
+			if (IsDwarfTypeLikeTag(die.Tag)
+				&& seenTypes.Add(die.Offset)
+				&& TryCreateDwarfTypeQuery(die, context, out var typeQuery))
+			{
+				query.Types.Add(typeQuery);
+			}
+
+			if (IsDwarfFunctionLikeTag(die.Tag)
+				&& seenFunctions.Add(die.Offset)
+				&& TryCreateDwarfFunctionQuery(die, context, out var functionQuery))
+			{
+				query.Functions.Add(functionQuery);
+				nextActiveFunction = functionQuery;
+			}
+
+			if (die.Tag == DwTagVariable
+				&& seenVariables.Add(die.Offset)
+				&& TryCreateDwarfVariableQuery(die, context, out var variableQuery))
+			{
+				query.Variables.Add(variableQuery);
+			}
+
+			if (nextActiveFunction != null && die.Tag == DwTagFormalParameter)
+				TryAddDwarfParameterQuery(nextActiveFunction, die, context);
+
+			if (die.Children.Count > 0)
+			{
+				BuildDwarfQueryModelForDies(
+					die.Children,
+					context,
+					query,
+					seenTypes,
+					seenFunctions,
+					seenVariables,
+					nextActiveFunction);
+			}
+		}
+	}
+
+	private static bool IsDwarfTypeLikeTag(ulong tag)
+	{
+		return tag is
+			DwTagArrayType
+			or DwTagBaseType
+			or DwTagPointerType
+			or DwTagReferenceType
+			or DwTagRvalueReferenceType
+			or DwTagConstType
+			or DwTagVolatileType
+			or DwTagRestrictType
+			or DwTagSubroutineType
+			or DwTagStructureType
+			or DwTagClassType
+			or DwTagUnionType
+			or DwTagEnumerationType
+			or DwTagTypedef
+			or DwTagUnspecifiedType;
+	}
+
+	private static bool IsDwarfFunctionLikeTag(ulong tag)
+	{
+		return tag is DwTagSubprogram or DwTagInlinedSubroutine;
+	}
+
+	private static bool TryCreateDwarfTypeQuery(ElfDwarfDie die, DwarfUnitMappingContext context, out ElfDwarfTypeQuery query)
+	{
+		var name = GetDwarfAttributeString(die, DwAtName, context);
+		var typeDieOffset = GetDwarfAttributeUnsigned(die, DwAtType);
+		var byteSize = GetDwarfAttributeUnsigned(die, DwAtByteSize);
+		var encoding = GetDwarfAttributeUnsigned(die, DwAtEncoding);
+		var hasData = !string.IsNullOrEmpty(name) || typeDieOffset.HasValue || byteSize.HasValue || encoding.HasValue;
+		if (!hasData)
+		{
+			query = default!;
+			return false;
+		}
+
+		query = new ElfDwarfTypeQuery
+		{
+			DieOffset = die.Offset,
+			Name = name ?? string.Empty,
+			TagText = die.TagText ?? string.Empty,
+			TypeDieOffset = typeDieOffset,
+			ByteSize = byteSize,
+			Encoding = encoding,
+			EncodingText = encoding.HasValue ? GetDwarfEncodingName(encoding.Value) : string.Empty,
+			IsDeclaration = GetDwarfAttributeFlag(die, DwAtDeclaration)
+		};
+		return true;
+	}
+
+	private static bool TryCreateDwarfFunctionQuery(ElfDwarfDie die, DwarfUnitMappingContext context, out ElfDwarfFunctionQuery query)
+	{
+		var name = GetDwarfAttributeString(die, DwAtName, context);
+		var linkageName = GetDwarfAttributeString(die, DwAtLinkageName, context);
+		if (string.IsNullOrEmpty(linkageName))
+			linkageName = GetDwarfAttributeString(die, DwAtMipsLinkageName, context);
+		var ranges = GetDwarfAddressRanges(die, context);
+		var returnTypeDieOffset = GetDwarfAttributeUnsigned(die, DwAtType);
+		var hasData = !string.IsNullOrEmpty(name)
+			|| !string.IsNullOrEmpty(linkageName)
+			|| returnTypeDieOffset.HasValue
+			|| ranges.Count > 0;
+		if (!hasData)
+		{
+			query = default!;
+			return false;
+		}
+
+		query = new ElfDwarfFunctionQuery
+		{
+			DieOffset = die.Offset,
+			Name = name ?? string.Empty,
+			LinkageName = linkageName ?? string.Empty,
+			ReturnTypeDieOffset = returnTypeDieOffset,
+			IsDeclaration = GetDwarfAttributeFlag(die, DwAtDeclaration)
+		};
+		for (var rangeIndex = 0; rangeIndex < ranges.Count; rangeIndex++)
+		{
+			query.AddressRanges.Add(new ElfDwarfAddressRange
+			{
+				Start = ranges[rangeIndex].Start,
+				End = ranges[rangeIndex].End
+			});
+		}
+
+		return true;
+	}
+
+	private static bool TryCreateDwarfVariableQuery(ElfDwarfDie die, DwarfUnitMappingContext context, out ElfDwarfVariableQuery query)
+	{
+		var name = GetDwarfAttributeString(die, DwAtName, context);
+		var typeDieOffset = GetDwarfAttributeUnsigned(die, DwAtType);
+		var ranges = GetDwarfAddressRanges(die, context);
+		var hasData = !string.IsNullOrEmpty(name) || typeDieOffset.HasValue || ranges.Count > 0;
+		if (!hasData)
+		{
+			query = default!;
+			return false;
+		}
+
+		query = new ElfDwarfVariableQuery
+		{
+			DieOffset = die.Offset,
+			Name = name ?? string.Empty,
+			TypeDieOffset = typeDieOffset,
+			IsExternal = GetDwarfAttributeFlag(die, DwAtExternal),
+			IsDeclaration = GetDwarfAttributeFlag(die, DwAtDeclaration)
+		};
+		for (var rangeIndex = 0; rangeIndex < ranges.Count; rangeIndex++)
+		{
+			query.AddressRanges.Add(new ElfDwarfAddressRange
+			{
+				Start = ranges[rangeIndex].Start,
+				End = ranges[rangeIndex].End
+			});
+		}
+
+		return true;
+	}
+
+	private static void TryAddDwarfParameterQuery(ElfDwarfFunctionQuery function, ElfDwarfDie parameterDie, DwarfUnitMappingContext context)
+	{
+		var name = GetDwarfAttributeString(parameterDie, DwAtName, context);
+		var typeDieOffset = GetDwarfAttributeUnsigned(parameterDie, DwAtType);
+		if (string.IsNullOrEmpty(name) && !typeDieOffset.HasValue)
+			return;
+
+		function.Parameters.Add(new ElfDwarfFunctionParameterQuery
+		{
+			Name = name ?? string.Empty,
+			TypeDieOffset = typeDieOffset
+		});
 	}
 
 	private static ElfDwarfSymbolMapping ResolveDwarfSymbolMapping(

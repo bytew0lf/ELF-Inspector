@@ -361,7 +361,52 @@ public static class ElfReportMapper
 				DieOffset = mapping.DieOffset,
 				DieTagText = mapping.DieTagText,
 				MatchType = mapping.MatchType
-			}).ToList()
+			}).ToList(),
+			Query = new DwarfQueryReport
+			{
+				Types = dwarf.Query.Types.Select(type => new DwarfTypeQueryReport
+				{
+					DieOffset = type.DieOffset,
+					Name = type.Name,
+					TagText = type.TagText,
+					TypeDieOffset = type.TypeDieOffset,
+					ByteSize = type.ByteSize,
+					Encoding = type.Encoding,
+					EncodingText = type.EncodingText,
+					IsDeclaration = type.IsDeclaration
+				}).ToList(),
+				Functions = dwarf.Query.Functions.Select(function => new DwarfFunctionQueryReport
+				{
+					DieOffset = function.DieOffset,
+					Name = function.Name,
+					LinkageName = function.LinkageName,
+					ReturnTypeDieOffset = function.ReturnTypeDieOffset,
+					IsDeclaration = function.IsDeclaration,
+					AddressRanges = function.AddressRanges.Select(range => new DwarfAddressRangeReport
+					{
+						Start = range.Start,
+						End = range.End
+					}).ToList(),
+					Parameters = function.Parameters.Select(parameter => new DwarfFunctionParameterQueryReport
+					{
+						Name = parameter.Name,
+						TypeDieOffset = parameter.TypeDieOffset
+					}).ToList()
+				}).ToList(),
+				Variables = dwarf.Query.Variables.Select(variable => new DwarfVariableQueryReport
+				{
+					DieOffset = variable.DieOffset,
+					Name = variable.Name,
+					TypeDieOffset = variable.TypeDieOffset,
+					IsExternal = variable.IsExternal,
+					IsDeclaration = variable.IsDeclaration,
+					AddressRanges = variable.AddressRanges.Select(range => new DwarfAddressRangeReport
+					{
+						Start = range.Start,
+						End = range.End
+					}).ToList()
+				}).ToList()
+			}
 		};
 	}
 

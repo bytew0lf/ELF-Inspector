@@ -181,6 +181,7 @@ public class ElfDwarfIndexInfo
 	public List<ElfDwarfLineTableInfo> LineTables { get; } = new();
 	public List<ElfDwarfSemanticCompilationUnit> SemanticUnits { get; } = new();
 	public List<ElfDwarfSymbolMapping> SymbolMappings { get; } = new();
+	public ElfDwarfQueryModel Query { get; } = new();
 }
 
 public enum ElfDwarfAttributeValueKind
@@ -260,6 +261,58 @@ public class ElfDwarfSymbolMapping
 	public ulong DieOffset { get; set; }
 	public string DieTagText { get; set; }
 	public string MatchType { get; set; }
+}
+
+public class ElfDwarfAddressRange
+{
+	public ulong Start { get; set; }
+	public ulong End { get; set; }
+}
+
+public class ElfDwarfFunctionParameterQuery
+{
+	public string Name { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+}
+
+public class ElfDwarfTypeQuery
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public string TagText { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+	public ulong? ByteSize { get; set; }
+	public ulong? Encoding { get; set; }
+	public string EncodingText { get; set; }
+	public bool IsDeclaration { get; set; }
+}
+
+public class ElfDwarfFunctionQuery
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public string LinkageName { get; set; }
+	public ulong? ReturnTypeDieOffset { get; set; }
+	public bool IsDeclaration { get; set; }
+	public List<ElfDwarfAddressRange> AddressRanges { get; } = new();
+	public List<ElfDwarfFunctionParameterQuery> Parameters { get; } = new();
+}
+
+public class ElfDwarfVariableQuery
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+	public bool IsExternal { get; set; }
+	public bool IsDeclaration { get; set; }
+	public List<ElfDwarfAddressRange> AddressRanges { get; } = new();
+}
+
+public class ElfDwarfQueryModel
+{
+	public List<ElfDwarfTypeQuery> Types { get; } = new();
+	public List<ElfDwarfFunctionQuery> Functions { get; } = new();
+	public List<ElfDwarfVariableQuery> Variables { get; } = new();
 }
 
 public class ElfCoreThreadInfo

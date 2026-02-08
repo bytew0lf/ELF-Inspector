@@ -302,6 +302,59 @@ public class DwarfReport
 	public List<DwarfLineTableReport> LineTables { get; set; }
 	public List<DwarfSemanticUnitReport> SemanticUnits { get; set; }
 	public List<DwarfSymbolMappingReport> SymbolMappings { get; set; }
+	public DwarfQueryReport Query { get; set; }
+}
+
+public class DwarfAddressRangeReport
+{
+	public ulong Start { get; set; }
+	public ulong End { get; set; }
+}
+
+public class DwarfFunctionParameterQueryReport
+{
+	public string Name { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+}
+
+public class DwarfTypeQueryReport
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public string TagText { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+	public ulong? ByteSize { get; set; }
+	public ulong? Encoding { get; set; }
+	public string EncodingText { get; set; }
+	public bool IsDeclaration { get; set; }
+}
+
+public class DwarfFunctionQueryReport
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public string LinkageName { get; set; }
+	public ulong? ReturnTypeDieOffset { get; set; }
+	public bool IsDeclaration { get; set; }
+	public List<DwarfAddressRangeReport> AddressRanges { get; set; }
+	public List<DwarfFunctionParameterQueryReport> Parameters { get; set; }
+}
+
+public class DwarfVariableQueryReport
+{
+	public ulong DieOffset { get; set; }
+	public string Name { get; set; }
+	public ulong? TypeDieOffset { get; set; }
+	public bool IsExternal { get; set; }
+	public bool IsDeclaration { get; set; }
+	public List<DwarfAddressRangeReport> AddressRanges { get; set; }
+}
+
+public class DwarfQueryReport
+{
+	public List<DwarfTypeQueryReport> Types { get; set; }
+	public List<DwarfFunctionQueryReport> Functions { get; set; }
+	public List<DwarfVariableQueryReport> Variables { get; set; }
 }
 
 public class DwarfAttributeReport

@@ -354,6 +354,22 @@ public static class ExampleUsage
 				sb.AppendLine($"- {mapping.SymbolName} @ 0x{mapping.SymbolAddress:X} -> DIE@0x{mapping.DieOffset:X} ({mapping.DieTagText}), match={mapping.MatchType}");
 			if (symbolMappings.Count > MaxDetailedItems)
 				sb.AppendLine($"... {symbolMappings.Count - MaxDetailedItems} more");
+
+			var query = dwarf.Query ?? new ELFInspector.Reporting.DwarfQueryReport();
+			var queryTypes = query.Types ?? new List<ELFInspector.Reporting.DwarfTypeQueryReport>();
+			var queryFunctions = query.Functions ?? new List<ELFInspector.Reporting.DwarfFunctionQueryReport>();
+			var queryVariables = query.Variables ?? new List<ELFInspector.Reporting.DwarfVariableQueryReport>();
+			sb.AppendLine($"Query Model: types={queryTypes.Count}, functions={queryFunctions.Count}, variables={queryVariables.Count}");
+			foreach (var function in queryFunctions.Take(Math.Min(MaxDetailedItems, 24)))
+			{
+				var displayName = !string.IsNullOrEmpty(function.LinkageName) ? function.LinkageName : function.Name;
+				var ranges = function.AddressRanges == null || function.AddressRanges.Count == 0
+					? "(none)"
+					: string.Join(", ", function.AddressRanges.Take(4).Select(range => $"0x{range.Start:X}-0x{range.End:X}"));
+				sb.AppendLine($"- fn DIE@0x{function.DieOffset:X}: {OrNone(displayName)}, return_type={(function.ReturnTypeDieOffset.HasValue ? $"0x{function.ReturnTypeDieOffset.Value:X}" : "(n/a)")}, params={(function.Parameters?.Count ?? 0)}, ranges={ranges}");
+			}
+			if (queryFunctions.Count > 24)
+				sb.AppendLine($"... {queryFunctions.Count - 24} more query functions");
 		}
 		sb.AppendLine();
 

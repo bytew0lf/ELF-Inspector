@@ -280,6 +280,7 @@ Compile Units: 0
 Line Tables: 0
 Semantic Units: 0
 Symbol↔DIE Mappings: 0
+Query Model: types=0, functions=0, variables=0
 
 Section Special Cases
 ---------------------

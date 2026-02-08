@@ -193,6 +193,48 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void Parse_RelocationTypeTables_CoverKnownSampleRelocationTypes()
+	{
+		Assert.True(InvokeRelocationTypeTableLookup(62, 8));
+		Assert.True(InvokeRelocationTypeTableLookup(40, 23));
+		Assert.True(InvokeRelocationTypeTableLookup(243, 58));
+		Assert.True(InvokeRelocationTypeTableLookup(21, 38));
+		Assert.True(InvokeRelocationTypeTableLookup(22, 10));
+		Assert.True(InvokeRelocationTypeTableLookup(43, 21));
+
+		var sampleFiles = new[]
+		{
+			"hello_x86_64",
+			"hello_armhf",
+			"hello_riscv64",
+			"hello_ppc64le",
+			"hello_s390x",
+			"hello_sparc64"
+		};
+
+		foreach (var sample in sampleFiles)
+		{
+			var elf = ElfReader.Parse(File.ReadAllBytes(GetRequiredSample(sample)));
+			foreach (var relocation in elf.Relocations)
+			{
+				if (relocation.Type == 0)
+					continue;
+				if (elf.Header.Machine == 8)
+					continue;
+				if (relocation.TypeName.Contains("_UNKNOWN_", StringComparison.Ordinal)
+					|| relocation.TypeName.StartsWith("R_MACHINE_", StringComparison.Ordinal))
+				{
+					continue;
+				}
+
+				Assert.True(
+					InvokeRelocationTypeTableLookup(elf.Header.Machine, relocation.Type),
+					$"Missing table entry for machine={elf.Header.Machine}, type={relocation.Type}, name={relocation.TypeName}, sample={sample}");
+			}
+		}
+	}
+
+	[Fact]
 	public void Parse_Nano_DecodesDynamicFlags()
 	{
 		var nanoFile = GetRequiredSample("nano");
@@ -524,6 +566,93 @@ public sealed class ElfReaderTests
 
 		Assert.Single(report.Dwarf.SemanticUnits);
 		Assert.Contains(report.Dwarf.SymbolMappings, mapping => mapping.SymbolName == "_Z4mainv");
+	}
+
+	[Fact]
+	public void ParseDwarfIndex_QueryModel_BuildsFunctionTypeAndRangeRelationships()
+	{
+		var data = new byte[0x600];
+		var infoOffset = 0x100;
+		var abbrevOffset = 0x200;
+
+		var debugAbbrev = new byte[]
+		{
+			0x01, 0x11, 0x01, 0x03, 0x08, 0x00, 0x00, // CU
+			0x02, 0x24, 0x00, 0x03, 0x08, 0x0B, 0x0B, 0x3E, 0x0B, 0x00, 0x00, // base type
+			0x03, 0x0F, 0x00, 0x49, 0x13, 0x00, 0x00, // pointer type
+			0x04, 0x2E, 0x01, 0x03, 0x08, 0x11, 0x01, 0x12, 0x06, 0x49, 0x13, 0x6E, 0x08, 0x00, 0x00, // subprogram
+			0x05, 0x05, 0x00, 0x03, 0x08, 0x49, 0x13, 0x00, 0x00, // formal parameter
+			0x00
+		};
+		Array.Copy(debugAbbrev, 0, data, abbrevOffset, debugAbbrev.Length);
+
+		var body = new List<byte>
+		{
+			0x04, 0x00,             // version
+			0x00, 0x00, 0x00, 0x00, // abbrev offset
+			0x08,                   // address size
+			0x01                    // CU DIE
+		};
+		body.AddRange(Encoding.ASCII.GetBytes("synthetic-cu\0"));
+
+		// base type DIE @ section offset 0x19 in this synthetic fixture.
+		body.Add(0x02);
+		body.AddRange(Encoding.ASCII.GetBytes("int\0"));
+		body.Add(0x04); // byte_size
+		body.Add(0x05); // DW_ATE_signed
+
+		// pointer type DIE
+		body.Add(0x03);
+		body.AddRange(new byte[] { 0x19, 0x00, 0x00, 0x00 }); // ref4 to base type DIE
+
+		// function DIE
+		body.Add(0x04);
+		body.AddRange(Encoding.ASCII.GetBytes("foo\0"));
+		body.AddRange(BitConverter.GetBytes(0x401000UL));      // low_pc
+		body.AddRange(BitConverter.GetBytes(0x20U));           // high_pc offset
+		body.AddRange(new byte[] { 0x20, 0x00, 0x00, 0x00 }); // ref4 to pointer type DIE
+		body.AddRange(Encoding.ASCII.GetBytes("_Z3foov\0"));   // linkage name
+
+		// formal parameter DIE
+		body.Add(0x05);
+		body.AddRange(Encoding.ASCII.GetBytes("p\0"));
+		body.AddRange(new byte[] { 0x19, 0x00, 0x00, 0x00 }); // ref4 to base type DIE
+
+		body.Add(0x00); // end function children
+		body.Add(0x00); // end CU children
+
+		WriteUInt32(data.AsSpan(infoOffset, 4), (uint)body.Count, littleEndian: true);
+		Array.Copy(body.ToArray(), 0, data, infoOffset + 4, body.Count);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian,
+				Machine = 62
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_info", Offset = (ulong)infoOffset, Size = (ulong)(4 + body.Count) });
+		elf.Sections.Add(new ElfSectionHeader { Name = ".debug_abbrev", Offset = (ulong)abbrevOffset, Size = (ulong)debugAbbrev.Length });
+
+		ElfReader.ParseDwarfIndex(data, elf);
+		var report = ElfReportMapper.Create(elf);
+
+		var baseType = Assert.Single(elf.Dwarf.Query.Types, type => type.Name == "int");
+		Assert.Equal((ulong?)4, baseType.ByteSize);
+		Assert.Equal("DW_ATE_signed", baseType.EncodingText);
+
+		var function = Assert.Single(elf.Dwarf.Query.Functions, entry => entry.Name == "foo");
+		Assert.Equal("_Z3foov", function.LinkageName);
+		var parameter = Assert.Single(function.Parameters);
+		Assert.Equal("p", parameter.Name);
+		Assert.Equal(baseType.DieOffset, parameter.TypeDieOffset);
+		Assert.Contains(function.AddressRanges, range => range.Start == 0x401000UL && range.End == 0x401020UL);
+
+		Assert.NotNull(report.Dwarf.Query);
+		Assert.Contains(report.Dwarf.Query.Functions, entry => entry.Name == "foo" && entry.Parameters.Count == 1);
+		Assert.Contains(report.Dwarf.Query.Types, entry => entry.Name == "int" && entry.ByteSize == 4);
 	}
 
 	[Fact]
@@ -2562,6 +2691,80 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void Parse_FullFileMutationCorpus_ProducesOnlyControlledFailures()
+	{
+		var controlled = GetControlledParseFailureTypes();
+		foreach (var sample in new[] { "busybox", "nano", "hello_x86_64" })
+		{
+			var source = File.ReadAllBytes(GetRequiredSample(sample));
+			var rng = new Random(10_000 + sample.Length);
+			var mutationWindow = Math.Max(512, source.Length);
+			for (var i = 0; i < 96; i++)
+			{
+				var mutated = (byte[])source.Clone();
+				var mutations = 2 + (i % 5);
+				for (var j = 0; j < mutations; j++)
+				{
+					var offset = rng.Next(0, mutationWindow);
+					mutated[offset] ^= (byte)(1 << rng.Next(0, 8));
+				}
+
+				AssertParseProducesOnlyControlledFailure(mutated, controlled);
+			}
+		}
+	}
+
+	[Fact]
+	public void Parse_TargetedDynamicAndRelocationMutationCorpus_ProducesOnlyControlledFailures()
+	{
+		var source = File.ReadAllBytes(GetRequiredSample("nano"));
+		var baseline = ElfReader.Parse(source);
+		var controlled = GetControlledParseFailureTypes();
+		var rng = new Random(424242);
+
+		var mutationOffsets = new List<int>();
+		var dynamicSegment = baseline.ProgramHeaders.FirstOrDefault(header => header.Type == 2 && header.FileSize > 0);
+		if (dynamicSegment != null)
+		{
+			var dynamicStart = (int)Math.Min((ulong)int.MaxValue, dynamicSegment.Offset);
+			var dynamicEnd = (int)Math.Min((ulong)source.Length, dynamicSegment.Offset + dynamicSegment.FileSize);
+			for (var i = dynamicStart; i < dynamicEnd; i += 8)
+				mutationOffsets.Add(i);
+		}
+
+		var relocationSections = baseline.Sections
+			.Where(section => section.Type is 4U or 9U or 19U)
+			.ToList();
+		foreach (var relocationSection in relocationSections)
+		{
+			var sectionStart = (int)Math.Min((ulong)int.MaxValue, relocationSection.Offset);
+			var sectionEnd = (int)Math.Min((ulong)source.Length, relocationSection.Offset + relocationSection.Size);
+			for (var i = sectionStart; i < sectionEnd; i += 8)
+				mutationOffsets.Add(i);
+		}
+
+		mutationOffsets = mutationOffsets
+			.Where(offset => offset >= 0 && offset < source.Length)
+			.Distinct()
+			.ToList();
+		Assert.NotEmpty(mutationOffsets);
+
+		var iterations = Math.Min(96, mutationOffsets.Count);
+		for (var i = 0; i < iterations; i++)
+		{
+			var mutated = (byte[])source.Clone();
+			var mutationCount = 1 + (i % 4);
+			for (var j = 0; j < mutationCount; j++)
+			{
+				var offset = mutationOffsets[rng.Next(0, mutationOffsets.Count)];
+				mutated[offset] ^= (byte)(1 << rng.Next(0, 8));
+			}
+
+			AssertParseProducesOnlyControlledFailure(mutated, controlled);
+		}
+	}
+
+	[Fact]
 	public void ExampleUsage_ReturnsErrorCode_ForMalformedElf()
 	{
 		var source = File.ReadAllBytes(GetRequiredSample("nano"));
@@ -2656,6 +2859,14 @@ public sealed class ElfReaderTests
 		return Assert.IsType<string>(value);
 	}
 
+	private static bool InvokeRelocationTypeTableLookup(ushort machine, uint type)
+	{
+		var method = typeof(ElfReader).GetMethod("HasRelocationTypeTableEntry", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+		var value = method!.Invoke(null, new object[] { machine, type });
+		return Assert.IsType<bool>(value);
+	}
+
 	private static string InvokeReaderString(string methodName, object value)
 	{
 		var method = typeof(ElfReader).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
@@ -2706,6 +2917,29 @@ public sealed class ElfReaderTests
 		WriteUInt16(header.AsSpan(54, 2), 0, littleEndian: true); // e_phentsize (no PH table)
 		WriteUInt16(header.AsSpan(58, 2), 0, littleEndian: true); // e_shentsize (no SH table)
 		return header;
+	}
+
+	private static IReadOnlyList<Type> GetControlledParseFailureTypes()
+	{
+		return new[]
+		{
+			typeof(InvalidDataException),
+			typeof(NotSupportedException),
+			typeof(OverflowException),
+			typeof(ArgumentException)
+		};
+	}
+
+	private static void AssertParseProducesOnlyControlledFailure(byte[] data, IReadOnlyList<Type> controlledFailureTypes)
+	{
+		try
+		{
+			_ = ElfReader.Parse(data);
+		}
+		catch (Exception ex)
+		{
+			Assert.Contains(controlledFailureTypes, type => type.IsAssignableFrom(ex.GetType()));
+		}
 	}
 
 	private sealed class SparseEndianDataSource : IEndianDataSource
