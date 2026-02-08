@@ -1,5 +1,8 @@
 namespace ELFInspector.Reporting;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static class ElfReportMapper
 {
 	private const uint PtInterp = 3;
@@ -38,6 +41,9 @@ public static class ElfReportMapper
 	private const uint PfW = 0x2;
 	private const uint PfR = 0x4;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfReport Create(ELFInspector.Parser.ElfFile elf)
 	{
 		var symbols = elf.Symbols.Select(MapSymbol).ToList();

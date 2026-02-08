@@ -1,30 +1,90 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public class ElfRelocation
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Offset { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Info { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string Encoding { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public long Addend { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool HasAddend { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong SymbolIndex { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint Type { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string TypeName { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string SymbolName { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string SymbolVersion { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string SymbolLibrary { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string SourceSection { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string AppliesToSection { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string LoaderPath { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsPltPath { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsGotPath { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsTlsPath { get; set; }
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const ulong ShfAlloc = 0x2;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseRelocations(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Relocations.Clear();
@@ -43,6 +103,9 @@ public static partial class ElfReader
 		ParseRelocationsFromDynamicEntries(data, elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseRelocations(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

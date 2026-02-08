@@ -1,5 +1,8 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private static bool TryVirtualAddressToFileOffset(ElfFile elf, ulong virtualAddress, out ulong fileOffset)

@@ -1,14 +1,35 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public class ElfDynamicEntry
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public long Tag { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string TagName { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Value { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string StringValue { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string DecodedValue { get; set; }
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const long DtNull = 0;
@@ -126,6 +147,9 @@ public static partial class ElfReader
 	private const long DtX86_64PltSz = 0x70000001;
 	private const long DtX86_64PltEnt = 0x70000003;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseDynamic(IEndianDataSource data, ElfFile elf)
 	{
 		elf.DynamicEntries.Clear();
@@ -152,6 +176,9 @@ public static partial class ElfReader
 		EnrichDynamicEntrySemantics(elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseDynamic(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

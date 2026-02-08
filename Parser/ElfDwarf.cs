@@ -1,7 +1,13 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseDwarfIndex(IEndianDataSource data, ElfFile elf)
 	{
 		var dwarf = new ElfDwarfIndexInfo();
@@ -63,6 +69,9 @@ public static partial class ElfReader
 		elf.Dwarf = dwarf;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseDwarfIndex(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

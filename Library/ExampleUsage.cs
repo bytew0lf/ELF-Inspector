@@ -1,10 +1,16 @@
 namespace ELFInspector.Library;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static class ExampleUsage
 {
 	private const int MaxDetailedItems = 500;
 	private const int MaxHashPreviewEntries = 32;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static int RunWithArgs(string[] args)
 	{
 		if (!TryParseArguments(args, out var filePath, out var outputFileName, out var outputDirectory, out var deterministic, out var compatHeaderValidation, out var error))
@@ -47,6 +53,9 @@ public static class ExampleUsage
 		}
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void Run(string path)
 	{
 		var exitCode = RunWithArgs(new[]

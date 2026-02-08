@@ -1,56 +1,155 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public enum ElfSymbolBinding
 {
+	/// <summary>
+	/// Symbol is local to the object.
+	/// </summary>
 	Local = 0,
+	/// <summary>
+	/// Symbol has global linkage.
+	/// </summary>
 	Global = 1,
+	/// <summary>
+	/// Symbol has weak linkage.
+	/// </summary>
 	Weak = 2,
+	/// <summary>
+	/// GNU unique symbol binding.
+	/// </summary>
 	GnuUnique = 10,
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public enum ElfSymbolType
 {
+	/// <summary>
+	/// Unspecified symbol type.
+	/// </summary>
 	Notype = 0,
+	/// <summary>
+	/// Data object.
+	/// </summary>
 	Object = 1,
+	/// <summary>
+	/// Function entry point.
+	/// </summary>
 	Function = 2,
+	/// <summary>
+	/// Section symbol.
+	/// </summary>
 	Section = 3,
+	/// <summary>
+	/// Source file symbol.
+	/// </summary>
 	File = 4,
+	/// <summary>
+	/// Common symbol.
+	/// </summary>
 	Common = 5,
+	/// <summary>
+	/// Thread-local storage symbol.
+	/// </summary>
 	Tls = 6,
+	/// <summary>
+	/// GNU indirect function symbol.
+	/// </summary>
 	GnuIfunc = 10,
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public class ElfSymbol
 {
 	private const uint ShnUndef = 0;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string Name { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Value { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Size { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ElfSymbolBinding Binding { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ElfSymbolType Type { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint SectionIndexRaw { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint SectionIndex { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte Visibility { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsDynamic { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint TableSectionIndex { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint Index { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ushort VersionIndex { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsVersionHidden { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string VersionName { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string LibraryName { get; set; }
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsImport =>
 		IsDynamic &&
 		SectionIndex == ShnUndef &&
 		!string.IsNullOrEmpty(Name);
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public bool IsExport =>
 		(Binding is ElfSymbolBinding.Global or ElfSymbolBinding.Weak or ElfSymbolBinding.GnuUnique) &&
 		SectionIndex != ShnUndef &&
 		!string.IsNullOrEmpty(Name) &&
 		Type is not (ElfSymbolType.Section or ElfSymbolType.File);
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string QualifiedName
 	{
 		get
@@ -69,12 +168,18 @@ public class ElfSymbol
 	}
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const ushort SymbolVersionLocal = 0;
 	private const ushort SymbolVersionGlobal = 1;
 	private const uint ShnUndef = 0;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseSymbolTables(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Symbols.Clear();
@@ -101,6 +206,9 @@ public static partial class ElfReader
 		AssignFallbackImportLibraries(elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseSymbolTables(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

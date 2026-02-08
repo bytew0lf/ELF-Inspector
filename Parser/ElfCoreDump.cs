@@ -1,5 +1,8 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const ushort Em386 = 3;
@@ -24,6 +27,9 @@ public static partial class ElfReader
 
 	private readonly struct CorePrStatusLayout
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public CorePrStatusLayout(
 			int signalOffset,
 			int currentSignalOffset,
@@ -44,28 +50,61 @@ public static partial class ElfReader
 			SessionIdOffset = sessionIdOffset;
 		}
 
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int SignalOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int CurrentSignalOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int ThreadIdOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int RegistersOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int RegisterCount { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int? ParentProcessIdOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int? ProcessGroupIdOffset { get; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int? SessionIdOffset { get; }
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseCoreDumpInfo(ElfFile elf)
 	{
 		using var empty = ElfDataSourceFactory.CreateInMemory(Array.Empty<byte>());
 		ParseCoreDumpInfo(empty, elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseCoreDumpInfo(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);
 		ParseCoreDumpInfo(source, elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseCoreDumpInfo(IEndianDataSource data, ElfFile elf)
 	{
 		var core = new ElfCoreDumpInfo

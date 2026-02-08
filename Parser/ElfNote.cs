@@ -1,14 +1,35 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public class ElfNote
 {
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string Name { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint Type { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string TypeName { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte[] Descriptor { get; set; }
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public string DecodedDescription { get; set; }
 }
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const uint NtGnuAbiTag = 1;
@@ -103,6 +124,9 @@ public static partial class ElfReader
 	private const ulong MaxNoteDescriptorBytes = 64UL * 1024UL * 1024UL;
 	private const ulong NotePreviewBytes = 64UL;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseNotes(IEndianDataSource data, ElfFile elf)
 	{
 		elf.Notes.Clear();
@@ -119,6 +143,9 @@ public static partial class ElfReader
 		ParseNoteProgramHeaders(data, elf, dedupeKeys);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseNotes(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

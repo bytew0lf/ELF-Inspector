@@ -1,11 +1,17 @@
 namespace ELFInspector.Endianness;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public ref struct EndianBinaryReader
 {
 	private readonly ReadOnlySpan<byte> _data;
 	private readonly bool _isLittle;
 	private int _position;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public int Position
 	{
 		get => _position;
@@ -18,6 +24,9 @@ public ref struct EndianBinaryReader
 		}
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public EndianBinaryReader(ReadOnlySpan<byte> data, bool isLittle)
 	{
 		_data = data;
@@ -25,6 +34,9 @@ public ref struct EndianBinaryReader
 		_position = 0;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ushort ReadUInt16()
 	{
 		EnsureCanRead(2);
@@ -35,6 +47,9 @@ public ref struct EndianBinaryReader
 		return val;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint ReadUInt32()
 	{
 		EnsureCanRead(4);
@@ -45,6 +60,9 @@ public ref struct EndianBinaryReader
 		return val;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong ReadUInt64()
 	{
 		EnsureCanRead(8);
@@ -55,6 +73,9 @@ public ref struct EndianBinaryReader
 		return val;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte ReadByte()
 	{
 		EnsureCanRead(1);
@@ -63,6 +84,9 @@ public ref struct EndianBinaryReader
 		return value;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public void Skip(int count)
 	{
 		if (count < 0)

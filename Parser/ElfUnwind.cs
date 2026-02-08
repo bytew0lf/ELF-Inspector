@@ -1,5 +1,8 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const byte DwEhPeOmit = 0xFF;
@@ -50,12 +53,30 @@ public static partial class ElfReader
 
 	private sealed class CfiInterpreterState
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public bool HasCfaRule { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public ulong CfaRegister { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public long CfaOffset { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public bool HasReturnAddressOffset { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public long ReturnAddressOffset { get; set; }
 
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public CfiInterpreterState Clone()
 		{
 			return new CfiInterpreterState
@@ -71,16 +92,43 @@ public static partial class ElfReader
 
 	private sealed class EhFrameCieParseState
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public ulong EntryOffset { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public int Index { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public ulong CodeAlignmentFactor { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public long DataAlignmentFactor { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public ulong ReturnAddressRegister { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public byte FdePointerEncoding { get; set; } = DwEhPeAbsPtr;
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public bool HasAugmentationData { get; set; }
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public CfiInterpreterState InitialState { get; } = new();
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseUnwindData(IEndianDataSource data, ElfFile elf)
 	{
 		var unwind = new ElfUnwindInfo();
@@ -90,6 +138,9 @@ public static partial class ElfReader
 		elf.Unwind = unwind;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseUnwindData(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

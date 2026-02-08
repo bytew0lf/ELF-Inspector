@@ -1,10 +1,16 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const uint ShtHash = 5;
 	private const uint ShtGnuHash = 0x6FFFFFF6;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseHashTables(IEndianDataSource data, ElfFile elf)
 	{
 		elf.SysvHashTable = null;
@@ -16,6 +22,9 @@ public static partial class ElfReader
 		BuildHashLookupPaths(elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseHashTables(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

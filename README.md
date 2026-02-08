@@ -183,6 +183,8 @@ Verify generated output against the baseline:
 scripts/verify_golden_reports.sh
 ```
 
+The verifier normalizes environment-specific metadata (for example absolute `File:` paths) before diffing, so CI and local runs remain comparable.
+
 ## P3 Test Matrix
 
 Run positive/negative parser hardening checks:
@@ -222,6 +224,11 @@ Run parser unit tests (positive sample sweep + negative sample-based mutations):
 ```bash
 scripts/run_unit_tests.sh
 ```
+
+## Build Notes
+
+* Public APIs now include XML documentation comments and the project generates XML docs without `CS1591` noise.
+* Nullable annotations are enabled in project configuration (`<Nullable>annotations</Nullable>`), which removes `CS8632` warnings for nullable reference annotations.
 
 ## CI Gate
 

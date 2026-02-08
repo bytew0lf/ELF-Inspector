@@ -1,5 +1,8 @@
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const ulong MaxParserEntryCount = 10_000_000;
@@ -11,11 +14,17 @@ public static partial class ElfReader
 	private const ushort Elf32SectionHeaderEntrySize = 40;
 	private const ushort Elf64SectionHeaderEntrySize = 64;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(string filePath)
 	{
 		return Parse(filePath, ElfParseOptions.StrictDefault);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(string filePath, ElfParseOptions? options)
 	{
 		if (string.IsNullOrWhiteSpace(filePath))
@@ -58,11 +67,17 @@ public static partial class ElfReader
 		}
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(Stream stream)
 	{
 		return Parse(stream, ElfParseOptions.StrictDefault);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(Stream stream, ElfParseOptions? options)
 	{
 		if (stream == null)
@@ -101,11 +116,17 @@ public static partial class ElfReader
 		}
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(ReadOnlySpan<byte> data)
 	{
 		return Parse(data, ElfParseOptions.StrictDefault);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static ElfFile Parse(ReadOnlySpan<byte> data, ElfParseOptions? options)
 	{
 		options ??= ElfParseOptions.StrictDefault;

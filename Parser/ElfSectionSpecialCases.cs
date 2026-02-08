@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace ELFInspector.Parser;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public static partial class ElfReader
 {
 	private const ulong ShfCompressedSection = 0x800;
@@ -51,19 +54,40 @@ public static partial class ElfReader
 	[StructLayout(LayoutKind.Sequential)]
 	private struct ZstdInBuffer
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public IntPtr src;
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public nuint size;
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public nuint pos;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct ZstdOutBuffer
 	{
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public IntPtr dst;
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public nuint size;
+		/// <summary>
+		/// Represents a public API member.
+		/// </summary>
 		public nuint pos;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseSectionSpecialCases(IEndianDataSource data, ElfFile elf)
 	{
 		elf.CompressedSections.Clear();
@@ -73,6 +97,9 @@ public static partial class ElfReader
 		ParseSectionGroups(data, elf);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public static void ParseSectionSpecialCases(ReadOnlySpan<byte> data, ElfFile elf)
 	{
 		using var source = ElfDataSourceFactory.CreateInMemory(data);

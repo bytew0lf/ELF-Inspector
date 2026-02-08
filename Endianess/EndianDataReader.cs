@@ -1,11 +1,17 @@
 namespace ELFInspector.Endianness;
 
+/// <summary>
+/// Represents a public API member.
+/// </summary>
 public ref struct EndianDataReader
 {
 	private readonly IEndianDataSource _data;
 	private readonly bool _isLittle;
 	private ulong _position;
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong Position
 	{
 		get => _position;
@@ -18,6 +24,9 @@ public ref struct EndianDataReader
 		}
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public EndianDataReader(IEndianDataSource data, bool isLittle)
 	{
 		_data = data ?? throw new ArgumentNullException(nameof(data));
@@ -25,6 +34,9 @@ public ref struct EndianDataReader
 		_position = 0;
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ushort ReadUInt16()
 	{
 		EnsureCanRead(2);
@@ -36,6 +48,9 @@ public ref struct EndianDataReader
 			: BinaryPrimitives.ReadUInt16BigEndian(buffer);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public uint ReadUInt32()
 	{
 		EnsureCanRead(4);
@@ -47,6 +62,9 @@ public ref struct EndianDataReader
 			: BinaryPrimitives.ReadUInt32BigEndian(buffer);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public ulong ReadUInt64()
 	{
 		EnsureCanRead(8);
@@ -58,6 +76,9 @@ public ref struct EndianDataReader
 			: BinaryPrimitives.ReadUInt64BigEndian(buffer);
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public byte ReadByte()
 	{
 		EnsureCanRead(1);
@@ -67,6 +88,9 @@ public ref struct EndianDataReader
 		return buffer[0];
 	}
 
+	/// <summary>
+	/// Represents a public API member.
+	/// </summary>
 	public void Skip(ulong count)
 	{
 		Position = checked(_position + count);
