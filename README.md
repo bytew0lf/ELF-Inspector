@@ -1,106 +1,106 @@
 # ELF-Inspector
 
-ELF Parser & Reporter für ELF32 & ELF64-Binaries (.so, Exec, etc.)
+ELF parser and reporter for ELF32 and ELF64 binaries (.so, executables, etc.).
 
 ## Features
 
-* ELF32 & ELF64 (Little/Big Endian)
-* Data-Source Parsing: InMemory, Stream, MemoryMapped (mmap)
-* Large-File-Kern mit `ulong`-Offset-Adressierung (>2GB Offsets ohne globalen `int`-Buffer)
-* Sections & Program Headers
-* Symbol Tables inkl. Versionierung
+* ELF32 and ELF64 (little/big endian)
+* Data-source parsing: InMemory, Stream, MemoryMapped (mmap)
+* Large-file core with `ulong` offset addressing (>2GB offsets without a global `int` buffer)
+* Sections and program headers
+* Symbol tables including versioning
 * Relocations (REL/RELA/RELR)
-* Dynamic Section + Imports/Exports
-* GNU/SYSV Hash Tables
+* Dynamic section plus imports/exports
+* GNU/SYSV hash tables
 * Notes
-* Security-/Loader-Features im Report (PIE, RELRO, NX, BIND_NOW, Canary/FORTIFY-Hinweise)
+* Security/loader features in the report (PIE, RELRO, NX, BIND_NOW, canary/FORTIFY hints)
 
 <!-- COVERAGE_MAP_START -->
-## Aktuelle Coverage-Map (auto-generiert)
+## Current Coverage Map (auto-generated)
 
-Status-Legende:
-* `voll`: Implementiert und durch Unit-/Matrix-Tests abgedeckt
-* `teilweise`: Implementiert, aber nur teilweise testabgedeckt
-* `offen`: Noch nicht implementiert
+Status legend:
+* `full`: Implemented and covered by unit/matrix tests
+* `partial`: Implemented, but only partially covered by tests
+* `open`: Not implemented yet
 
-### Parser-/Report-Abdeckung
+### Parser/Report Coverage
 
-| Bereich | Status | Aktuelle Abdeckung |
+| Area | Status | Current coverage |
 |---|---|---|
-| ELF Header | voll | ELF32/ELF64, Endianness, Typ, Machine, EntryPoint |
-| Section Headers | voll | Normale + Extended Numbering, Section-Name-Auflösung |
-| Section-Spezialfälle | voll | `SHF_COMPRESSED` (ZLIB + ZSTD), GNU `.zdebug*` (ZLIB + ZSTD), `SHT_GROUP`/COMDAT |
-| Program Headers | voll | PT_LOAD/PT_DYNAMIC/PT_INTERP/PT_NOTE inkl. Interpreter-Auflösung |
-| Dynamic | voll | DT_NEEDED, SONAME, RPATH/RUNPATH, FLAGS/FLAGS_1, REL/RELA/RELR Tags, GNU Version-Tags |
-| Symbol Tables | voll | `.symtab`/`.dynsym`, Fallback ohne Section Header Table, Import/Export-Klassifikation |
-| Symbol-Versionierung | voll | `DT_VERSYM`, `DT_VERNEED`, `DT_VERDEF` inkl. Library-/Versionszuordnung |
-| Relocations | voll | REL/RELA/RELR aus Sections und Dynamic Tags, Symbol-/Section-Zuordnung im Report |
-| Relocation Typnamen je Architektur | voll | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V mit erweiterten Typnamens-Maps |
-| Hash Tables | voll | `DT_HASH` und `DT_GNU_HASH` (Buckets/Chains/Bloom), konfigurierbare Lookup-Pfad-Auswertung |
-| Notes | voll | `SHT_NOTE`/`PT_NOTE`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux benannt + Basis-Decoding |
-| Unwind | voll | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE-Parsing, CFA-Regeln, Basis-Stackwalk für Core-Fälle |
-| DWARF/Debug | voll | Index + Teil-Semantik für `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` inkl. robustem Partial-Decoding |
-| ET_CORE | voll | `PT_NOTE`-basierte Process/Thread/Register/Signal-Auswertung + Thread-Unwind-Branch im Report |
-| Security-/Loader-Features | voll | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, Canary-/FORTIFY-Hinweise |
-| Textreport | voll | Deterministische Ausgabe, strukturierte Sektionen inkl. Hash/Security |
+| ELF Header | full | ELF32/ELF64, endianness, type, machine, entry point |
+| Section Headers | full | Standard + extended numbering, section name resolution |
+| Section special cases | full | `SHF_COMPRESSED` (ZLIB + ZSTD), GNU `.zdebug*` (ZLIB + ZSTD), `SHT_GROUP`/COMDAT |
+| Program Headers | full | PT_LOAD/PT_DYNAMIC/PT_INTERP/PT_NOTE including interpreter resolution |
+| Dynamic | full | DT_NEEDED, SONAME, RPATH/RUNPATH, FLAGS/FLAGS_1, REL/RELA/RELR tags, GNU version tags |
+| Symbol Tables | full | `.symtab`/`.dynsym`, fallback without section header table, import/export classification |
+| Symbol versioning | full | `DT_VERSYM`, `DT_VERNEED`, `DT_VERDEF` including library/version mapping |
+| Relocations | full | REL/RELA/RELR from sections and dynamic tags, symbol/section mapping in report |
+| Relocation type names per architecture | full | i386, x86_64, ARM, AArch64, MIPS, PPC/PPC64, S390x, SPARC, RISC-V with extended type-name maps |
+| Hash Tables | full | `DT_HASH` and `DT_GNU_HASH` (buckets/chains/bloom), configurable lookup-path evaluation |
+| Notes | full | `SHT_NOTE`/`PT_NOTE`, GNU/FDO/Go/FreeBSD/NetBSD/OpenBSD/Android/Linux named plus basic decoding |
+| Unwind | full | `.eh_frame`/`.eh_frame_hdr`, CIE/FDE parsing, CFA rules, basic stack walk for core cases |
+| DWARF/Debug | full | Index + partial semantics for `.debug_info/.abbrev/.line/.str/.ranges/.addr/.str_offsets/.rnglists/.loclists` including robust partial decoding |
+| ET_CORE | full | `PT_NOTE`-based process/thread/register/signal evaluation plus thread-unwind branch in report |
+| Security/Loader features | full | PIE, RELRO (partial/full), NX (GNU_STACK), BIND_NOW, canary/FORTIFY hints |
+| Text report | full | Deterministic output, structured sections including hash/security |
 <!-- COVERAGE_MAP_END -->
 
-Coverage-Map aktualisieren:
+Update coverage map:
 
 ```bash
 scripts/generate_coverage_map.sh --write-readme
 ```
 
-### Architektur-Sample-Abdeckung (`samples/`)
+### Architecture sample coverage (`samples/`)
 
-| Architektur | Samples |
+| Architecture | Samples |
 |---|---|
 | x86_64 | `hello_x86_64` |
 | i386 | `hello_i686` |
 | ARM64 | `hello_arm64`, `nano` |
 | ARM32 | `hello_armhf` |
-| MIPS-Familie | `hello_mips`, `hello_mipsel`, `hello_mips64`, `hello_mips64el`, `hello_mipsisa32r6el`, `hello_mipsisa32r6`, `hello_mipsisa64r6`, `hello_mipsisa64r6el` |
+| MIPS family | `hello_mips`, `hello_mipsel`, `hello_mips64`, `hello_mips64el`, `hello_mipsisa32r6el`, `hello_mipsisa32r6`, `hello_mipsisa64r6`, `hello_mipsisa64r6el` |
 | PowerPC | `hello_ppc`, `hello_ppc64le` |
 | S390x | `hello_s390x` |
 | SPARC64 | `hello_sparc64` |
 | RISC-V | `hello_riscv64` |
-| Weitere reale Binaries | `busybox`, `nano` |
+| Additional real-world binaries | `busybox`, `nano` |
 
-### Test-Coverage
+### Test coverage
 
-| Ebene | Status | Ausführung |
+| Level | Status | Execution |
 |---|---|---|
-| Unit Tests (xUnit) | voll | `scripts/run_unit_tests.sh` |
-| Negative Parser-Tests | voll | in Unit Tests + `scripts/run_p3_test_matrix.sh` |
-| Golden Report Regression | voll | `scripts/verify_golden_reports.sh` |
-| Feature Matrix (RELR/Flags/Mapping) | voll | `scripts/run_p4_test_matrix.sh` |
-| Lokales CI-Gate | voll | `scripts/run_ci_gate.sh` |
+| Unit tests (xUnit) | full | `scripts/run_unit_tests.sh` |
+| Negative parser tests | full | in unit tests + `scripts/run_p3_test_matrix.sh` |
+| Golden report regression | full | `scripts/verify_golden_reports.sh` |
+| Feature matrix (RELR/flags/mapping) | full | `scripts/run_p4_test_matrix.sh` |
+| Local CI gate | full | `scripts/run_ci_gate.sh` |
 
-### Bewusst außerhalb des aktuellen Scopes
+### Intentionally out of current scope
 
-* Kein Disassembly/Instruktionsanalyse
-* Keine vollständige Abdeckung aller architekturspezifischen Relocation-Untertypen
-* Keine symbolische Laufzeitbindung wie ein echter Dynamic Loader
-* Keine vollständige DWARF-vollsemantische Auswertung (alle DIE-Typen/Attribute, vollständige Query-Engine)
-* Keine vollumfängliche architekturübergreifende Unwind-Simulation für beliebige CFI-Instruktionsmengen
+* No disassembly/instruction analysis
+* No complete coverage of all architecture-specific relocation subtypes
+* No symbolic runtime binding like a real dynamic loader
+* No full DWARF semantic evaluation (all DIE types/attributes, full query engine)
+* No complete cross-architecture unwind simulation for arbitrary CFI instruction sets
 
-## Samples mit Docker erzeugen
+## Build samples with Docker
 
-Das Skript `build-samples_with_docker.sh` erzeugt die Architektur-Samples in `samples/` und extrahiert zusätzlich `nano` (Debian) sowie `busybox` (Alpine).
+The `build-samples_with_docker.sh` script builds architecture samples in `samples/` and additionally extracts `nano` (Debian) and `busybox` (Alpine).
 
-Standardaufruf:
+Default call:
 
 ```bash
 ./build-samples_with_docker.sh
 ```
 
-Optionale Umgebungsvariablen:
+Optional environment variables:
 
-* `SAMPLES_DIR`: Zielverzeichnis für generierte Samples (Default: `<repo>/samples`)
-* `DEBIAN_IMAGE`: Debian-Image für Cross-Compiler + `nano` (Default: `debian:trixie`)
-* `ALPINE_IMAGE`: Alpine-Image für `busybox` (Default: `alpine:latest`)
+* `SAMPLES_DIR`: target directory for generated samples (default: `<repo>/samples`)
+* `DEBIAN_IMAGE`: Debian image for cross compilers + `nano` (default: `debian:trixie`)
+* `ALPINE_IMAGE`: Alpine image for `busybox` (default: `alpine:latest`)
 
-Beispiel mit überschriebenen Images:
+Example with overridden images:
 
 ```bash
 SAMPLES_DIR="$PWD/samples" \
@@ -111,7 +111,7 @@ ALPINE_IMAGE="alpine:latest" \
 
 ## Usage
 
-Falls `samples/nano` oder andere Sample-Binaries noch fehlen, zuerst `./build-samples_with_docker.sh` ausführen (siehe Abschnitt `Samples mit Docker erzeugen`).
+If `samples/nano` or other sample binaries are missing, run `./build-samples_with_docker.sh` first (see section `Build samples with Docker`).
 
 ```bash
 dotnet run --project ELF-Inspector.csproj -- \
