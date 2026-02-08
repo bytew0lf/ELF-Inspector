@@ -52,7 +52,7 @@ normalize_class() {
 extract_single_value() {
 	local regex="$1"
 	local input="$2"
-	sed -n "s/${regex}/\\1/p" <<<"$input" | head -n1
+	sed -nE "s/${regex}/\\1/p" <<<"$input" | head -n1
 }
 
 assert_equal() {
