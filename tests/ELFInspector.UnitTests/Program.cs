@@ -414,11 +414,25 @@ public sealed class ElfReaderTests
 	{
 		var sampleFiles = new[]
 		{
+			"hello_arm",
+			"hello_arm64",
 			"hello_armhf",
+			"hello_i686",
+			"hello_mips",
+			"hello_mipsel",
+			"hello_mips64",
+			"hello_mips64el",
+			"hello_mipsisa32r6",
+			"hello_mipsisa32r6el",
+			"hello_mipsisa64r6",
+			"hello_mipsisa64r6el",
 			"hello_ppc",
 			"hello_ppc64le",
+			"hello_riscv64",
 			"hello_s390x",
-			"hello_sparc64"
+			"hello_sparc64",
+			"hello_x86",
+			"hello_x86_64"
 		};
 
 		foreach (var sampleFile in sampleFiles)
@@ -428,6 +442,18 @@ public sealed class ElfReaderTests
 				elf.Relocations,
 				relocation => IsRawFallbackRelocationTypeName(elf.Header.Machine, relocation));
 		}
+	}
+
+	[Fact]
+	public void Parse_DynamicTags_X86_64_ProcRangeTags_AreNamedAndClassified()
+	{
+		Assert.Equal("DT_X86_64_PLT", InvokeDynamicTagName(0x70000000, 62));
+		Assert.Equal("DT_X86_64_PLTSZ", InvokeDynamicTagName(0x70000001, 62));
+		Assert.Equal("DT_X86_64_PLTENT", InvokeDynamicTagName(0x70000003, 62));
+
+		Assert.True(InvokeIsAddressDynamicTag(62, 0x70000000));
+		Assert.True(InvokeIsSizeDynamicTag(62, 0x70000001));
+		Assert.True(InvokeIsEntrySizeDynamicTag(62, 0x70000003));
 	}
 
 	[Fact]
@@ -1300,6 +1326,48 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void ParseNotes_SyntheticXenTypes_AreNamedAndDecoded()
+	{
+		var xenEntry = new byte[8];
+		WriteUInt64(xenEntry.AsSpan(0, 8), 0x401000, littleEndian: true);
+		var noteSectionData = BuildNoteSection(
+			CreateNote("xen", 1, xenEntry),
+			CreateNote("Xen", 5, Encoding.ASCII.GetBytes("xen-4.18\0")));
+
+		var elfData = new byte[0x200];
+		var offset = 0x80;
+		Array.Copy(noteSectionData, 0, elfData, offset, noteSectionData.Length);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".note.xen",
+			Type = 7,
+			Offset = (ulong)offset,
+			Size = (ulong)noteSectionData.Length,
+			AddressAlign = 4
+		});
+
+		ElfReader.ParseNotes(elfData, elf);
+
+		Assert.Contains(elf.Notes, note =>
+			note.Name == "Xen"
+			&& note.TypeName == "NT_XEN_ELFNOTE_ENTRY"
+			&& note.DecodedDescription.Contains("0x401000", StringComparison.Ordinal));
+		Assert.Contains(elf.Notes, note =>
+			note.Name == "Xen"
+			&& note.TypeName == "NT_XEN_ELFNOTE_XEN_VERSION"
+			&& note.DecodedDescription.Contains("xen-4.18", StringComparison.Ordinal));
+	}
+
+	[Fact]
 	public void ParseNotes_GnuBuildAttributes_AreNamedAndDecoded_WithCaseInsensitiveNamespace()
 	{
 		var noteSectionData = BuildNoteSection(CreateNote("gnu", 0x100, Encoding.ASCII.GetBytes("build:open\0")));
@@ -1364,6 +1432,43 @@ public sealed class ElfReaderTests
 		Assert.Equal("qemu", note.Name);
 		Assert.Equal("NT_QEMU_0x7", note.TypeName);
 		Assert.Contains("preview=0x", note.DecodedDescription, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void ParseNotes_UnknownNamespace_WithUuidDescriptor_UsesStructuredUuidDecode()
+	{
+		var descriptor = new byte[]
+		{
+			0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
+			0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88
+		};
+		var noteSectionData = BuildNoteSection(CreateNote("qemu", 0xB, descriptor));
+		var elfData = new byte[0x200];
+		var offset = 0x80;
+		Array.Copy(noteSectionData, 0, elfData, offset, noteSectionData.Length);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Name = ".note.qemu.uuid",
+			Type = 7,
+			Offset = (ulong)offset,
+			Size = (ulong)noteSectionData.Length,
+			AddressAlign = 4
+		});
+
+		ElfReader.ParseNotes(elfData, elf);
+
+		var note = Assert.Single(elf.Notes);
+		Assert.Equal("NT_QEMU_0xB", note.TypeName);
+		Assert.StartsWith("uuid=", note.DecodedDescription);
 	}
 
 	[Fact]
@@ -2867,6 +2972,38 @@ public sealed class ElfReaderTests
 		return Assert.IsType<bool>(value);
 	}
 
+	private static string InvokeDynamicTagName(long tag, ushort machine)
+	{
+		var method = typeof(ElfReader).GetMethod("GetDynamicTagName", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+		var value = method!.Invoke(null, new object[] { tag, machine });
+		return Assert.IsType<string>(value);
+	}
+
+	private static bool InvokeIsAddressDynamicTag(ushort machine, long tag)
+	{
+		var method = typeof(ElfReader).GetMethod("IsAddressDynamicTag", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+		var value = method!.Invoke(null, new object[] { machine, tag });
+		return Assert.IsType<bool>(value);
+	}
+
+	private static bool InvokeIsSizeDynamicTag(ushort machine, long tag)
+	{
+		var method = typeof(ElfReader).GetMethod("IsSizeDynamicTag", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+		var value = method!.Invoke(null, new object[] { machine, tag });
+		return Assert.IsType<bool>(value);
+	}
+
+	private static bool InvokeIsEntrySizeDynamicTag(ushort machine, long tag)
+	{
+		var method = typeof(ElfReader).GetMethod("IsEntrySizeDynamicTag", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+		var value = method!.Invoke(null, new object[] { machine, tag });
+		return Assert.IsType<bool>(value);
+	}
+
 	private static string InvokeReaderString(string methodName, object value)
 	{
 		var method = typeof(ElfReader).GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
@@ -2973,6 +3110,12 @@ public sealed class ElfReaderTests
 	{
 		if (relocation.Type == 0)
 			return false;
+		if (!string.IsNullOrEmpty(relocation.TypeName)
+			&& (relocation.TypeName.Contains("_UNKNOWN_", StringComparison.Ordinal)
+				|| relocation.TypeName.StartsWith("R_MACHINE_", StringComparison.Ordinal)))
+		{
+			return true;
+		}
 
 		var prefix = machine switch
 		{

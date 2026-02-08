@@ -650,7 +650,7 @@ public static partial class ElfReader
 
 	private static IReadOnlyDictionary<ushort, IReadOnlyDictionary<uint, string>> CreateRelocationTypeTables()
 	{
-		return new Dictionary<ushort, IReadOnlyDictionary<uint, string>>
+		var tables = new Dictionary<ushort, IReadOnlyDictionary<uint, string>>
 		{
 			[3] = CreateRelocationMap(
 				(0, "R_386_NONE"),
@@ -863,6 +863,25 @@ public static partial class ElfReader
 				(52, "R_RISCV_32_PCREL"),
 				(58, "R_RISCV_IRELATIVE"))
 		};
+
+		// Pull additional known names from the legacy switch mapping so the table
+		// stays complete for long-tail relocation types without duplicating lists.
+		AugmentRelocationTablesFromSwitch(
+			tables,
+			3,   // EM_386
+			20,  // EM_PPC
+			21,  // EM_PPC64
+			22,  // EM_S390
+			2,   // EM_SPARC
+			43,  // EM_SPARCV9
+			40,  // EM_ARM
+			62,  // EM_X86_64
+			183, // EM_AARCH64
+			243  // EM_RISCV
+		);
+
+		tables[8] = BuildMipsRelocationTypeTable();
+		return tables;
 	}
 
 	private static IReadOnlyDictionary<uint, string> CreateRelocationMap(params (uint Type, string Name)[] entries)
@@ -872,6 +891,78 @@ public static partial class ElfReader
 			map[entries[i].Type] = entries[i].Name;
 
 		return map;
+	}
+
+	private static void AugmentRelocationTablesFromSwitch(Dictionary<ushort, IReadOnlyDictionary<uint, string>> tables, params ushort[] machines)
+	{
+		for (var i = 0; i < machines.Length; i++)
+		{
+			var machine = machines[i];
+			var switchMap = BuildRelocationMapFromSwitch(machine, 4096);
+			if (switchMap.Count == 0)
+				continue;
+
+			if (!tables.TryGetValue(machine, out var existing))
+			{
+				tables[machine] = switchMap;
+				continue;
+			}
+
+			tables[machine] = MergeRelocationMaps(existing, switchMap);
+		}
+	}
+
+	private static IReadOnlyDictionary<uint, string> BuildRelocationMapFromSwitch(ushort machine, uint maxTypeInclusive)
+	{
+		var map = new Dictionary<uint, string>();
+		for (uint type = 0; type <= maxTypeInclusive; type++)
+		{
+			var name = GetRelocationTypeNameFromSwitch(machine, type);
+			if (IsRelocationTypeFallbackName(name))
+				continue;
+
+			map[type] = name;
+		}
+
+		return map;
+	}
+
+	private static IReadOnlyDictionary<uint, string> BuildMipsRelocationTypeTable()
+	{
+		var map = new Dictionary<uint, string>();
+		for (uint type = 0; type <= byte.MaxValue; type++)
+		{
+			var name = GetMipsRelocationTypeComponent((byte)type);
+			if (IsRelocationTypeFallbackName(name))
+				continue;
+
+			map[type] = name;
+		}
+
+		return map;
+	}
+
+	private static IReadOnlyDictionary<uint, string> MergeRelocationMaps(IReadOnlyDictionary<uint, string> existing, IReadOnlyDictionary<uint, string> additions)
+	{
+		var merged = new Dictionary<uint, string>();
+		foreach (var entry in existing)
+			merged[entry.Key] = entry.Value;
+		foreach (var entry in additions)
+		{
+			if (!merged.ContainsKey(entry.Key))
+				merged[entry.Key] = entry.Value;
+		}
+
+		return merged;
+	}
+
+	private static bool IsRelocationTypeFallbackName(string name)
+	{
+		if (string.IsNullOrEmpty(name))
+			return true;
+
+		return name.StartsWith("R_MACHINE_", StringComparison.Ordinal)
+			|| name.Contains("_UNKNOWN_", StringComparison.Ordinal);
 	}
 
 	private static bool HasRelocationTypeTableEntry(ushort machine, uint type)

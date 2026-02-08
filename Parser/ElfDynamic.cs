@@ -122,6 +122,9 @@ public static partial class ElfReader
 	private const long DtAArch64PacPlt = 0x70000003;
 	private const long DtAArch64VariantPcs = 0x70000005;
 	private const long DtRiscVVariantCc = 0x70000001;
+	private const long DtX86_64Plt = 0x70000000;
+	private const long DtX86_64PltSz = 0x70000001;
+	private const long DtX86_64PltEnt = 0x70000003;
 
 	public static void ParseDynamic(IEndianDataSource data, ElfFile elf)
 	{
@@ -516,6 +519,17 @@ public static partial class ElfReader
 			};
 		}
 
+		if (machine == EmX86_64)
+		{
+			return tag switch
+			{
+				DtX86_64Plt => "DT_X86_64_PLT",
+				DtX86_64PltSz => "DT_X86_64_PLTSZ",
+				DtX86_64PltEnt => "DT_X86_64_PLTENT",
+				_ => string.Empty
+			};
+		}
+
 		return string.Empty;
 	}
 
@@ -874,6 +888,14 @@ public static partial class ElfReader
 				return true;
 			}
 		}
+		else if (machine == EmX86_64)
+		{
+			if (tag == DtX86_64PltEnt)
+			{
+				decoded = $"entry_size={value}";
+				return true;
+			}
+		}
 
 			return false;
 		}
@@ -882,14 +904,30 @@ public static partial class ElfReader
 		{
 			var knownTagName = GetProcessorSpecificDynamicTagName(machine, tag);
 			if (string.IsNullOrEmpty(knownTagName))
-				return $"processor_specific(tag=DT_PROC_0x{tag:X}, value=0x{value:X})";
+				return $"processor_specific(machine={GetDynamicMachineName(machine)}, tag=0x{tag:X}, value=0x{value:X})";
 
 			// Avoid duplicate detail text where DecodeDynamicValue/TryGetProcessorSpecificDynamicValue already
 			// provides the semantic payload.
-			if (tag is DtMipsFlags or DtPpcOpt or DtPpc64Opt or DtAArch64BtiPlt or DtAArch64PacPlt or DtAArch64VariantPcs or DtRiscVVariantCc)
+			if (tag is DtMipsFlags or DtPpcOpt or DtPpc64Opt or DtAArch64BtiPlt or DtAArch64PacPlt or DtAArch64VariantPcs or DtRiscVVariantCc or DtX86_64PltEnt)
 				return string.Empty;
 
 			return $"{knownTagName}: value=0x{value:X}";
+		}
+
+		private static string GetDynamicMachineName(ushort machine)
+		{
+			return machine switch
+			{
+				EmMips => "MIPS",
+				EmPpc => "PPC",
+				EmPpc64 => "PPC64",
+				EmSparc => "SPARC",
+				EmSparc64 => "SPARC64",
+				EmAArch64 => "AARCH64",
+				EmRiscV => "RISCV",
+				EmX86_64 => "X86_64",
+				_ => $"EM_{machine}"
+			};
 		}
 
 		private static void AppendMachineSpecificDynamicCorrelations(ElfFile elf)
@@ -996,6 +1034,7 @@ public static partial class ElfReader
 			EmMips => tag is DtMipsBaseAddress or DtMipsConflict or DtMipsLibList or DtMipsRldMap or DtMipsRldMapRel or DtMipsXHash,
 			EmPpc => tag == DtPpcGot,
 			EmPpc64 => tag is DtPpc64Glink or DtPpc64Opd,
+			EmX86_64 => tag == DtX86_64Plt,
 			_ => false
 		};
 	}
@@ -1009,12 +1048,16 @@ public static partial class ElfReader
 			return true;
 		}
 
-		return machine == EmPpc64 && tag == DtPpc64OpdSz;
+		return (machine == EmPpc64 && tag == DtPpc64OpdSz)
+			|| (machine == EmX86_64 && tag == DtX86_64PltSz);
 	}
 
 	private static bool IsEntrySizeDynamicTag(ushort machine, long tag)
 	{
-		return tag is DtSymEnt or DtRelaEnt or DtRelEnt or DtRelrEnt or DtMoveEnt or DtSymInEnt;
+		if (tag is DtSymEnt or DtRelaEnt or DtRelEnt or DtRelrEnt or DtMoveEnt or DtSymInEnt)
+			return true;
+
+		return machine == EmX86_64 && tag == DtX86_64PltEnt;
 	}
 
 	private static bool IsCountDynamicTag(ushort machine, long tag)

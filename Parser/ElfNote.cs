@@ -28,6 +28,21 @@ public static partial class ElfReader
 	private const uint NtAndroidAbi = 1;
 	private const uint NtAndroidMemtagLevelAsync = 0x100;
 	private const uint NtAndroidMemtagLevelSync = 0x101;
+	private const uint NtXenElfNoteEntry = 1;
+	private const uint NtXenElfNoteHypercallPage = 2;
+	private const uint NtXenElfNoteVirtBase = 3;
+	private const uint NtXenElfNotePaddrOffset = 4;
+	private const uint NtXenElfNoteXenVersion = 5;
+	private const uint NtXenElfNoteGuestOs = 6;
+	private const uint NtXenElfNoteGuestVersion = 7;
+	private const uint NtXenElfNoteLoader = 8;
+	private const uint NtXenElfNotePaeMode = 9;
+	private const uint NtXenElfNoteFeatures = 10;
+	private const uint NtXenElfNoteBsdSymtab = 11;
+	private const uint NtXenElfNoteHpet = 12;
+	private const uint NtXenElfNoteSuspendCancel = 14;
+	private const uint NtXenElfNoteModStartPfn = 15;
+	private const uint NtXenElfNotePhys32Entry = 18;
 	private const uint NtCoreFpRegSet = 2;
 	private const uint NtCorePpcVmx = 0x100;
 	private const uint NtCorePpcSpe = 0x101;
@@ -372,6 +387,29 @@ public static partial class ElfReader
 			};
 		}
 
+		if (name == "Xen")
+		{
+			return type switch
+			{
+				NtXenElfNoteEntry => "NT_XEN_ELFNOTE_ENTRY",
+				NtXenElfNoteHypercallPage => "NT_XEN_ELFNOTE_HYPERCALL_PAGE",
+				NtXenElfNoteVirtBase => "NT_XEN_ELFNOTE_VIRT_BASE",
+				NtXenElfNotePaddrOffset => "NT_XEN_ELFNOTE_PADDR_OFFSET",
+				NtXenElfNoteXenVersion => "NT_XEN_ELFNOTE_XEN_VERSION",
+				NtXenElfNoteGuestOs => "NT_XEN_ELFNOTE_GUEST_OS",
+				NtXenElfNoteGuestVersion => "NT_XEN_ELFNOTE_GUEST_VERSION",
+				NtXenElfNoteLoader => "NT_XEN_ELFNOTE_LOADER",
+				NtXenElfNotePaeMode => "NT_XEN_ELFNOTE_PAE_MODE",
+				NtXenElfNoteFeatures => "NT_XEN_ELFNOTE_FEATURES",
+				NtXenElfNoteBsdSymtab => "NT_XEN_ELFNOTE_BSD_SYMTAB",
+				NtXenElfNoteHpet => "NT_XEN_ELFNOTE_HPET",
+				NtXenElfNoteSuspendCancel => "NT_XEN_ELFNOTE_SUSPEND_CANCEL",
+				NtXenElfNoteModStartPfn => "NT_XEN_ELFNOTE_MOD_START_PFN",
+				NtXenElfNotePhys32Entry => "NT_XEN_ELFNOTE_PHYS32_ENTRY",
+				_ => $"NT_XEN_0x{type:X}"
+			};
+		}
+
 		if (name == "LINUX")
 		{
 			var linuxCoreName = GetCoreNoteTypeName(type);
@@ -438,6 +476,9 @@ public static partial class ElfReader
 		if (name == "Android")
 			return DecodeAndroidNoteDescriptor(type, descriptor, header.IsLittleEndian);
 
+		if (name == "Xen")
+			return DecodeXenNoteDescriptor(type, descriptor, header.IsLittleEndian);
+
 		if (name == "LINUX")
 		{
 			if (IsKnownCoreNoteType(type))
@@ -478,6 +519,8 @@ public static partial class ElfReader
 			return "OpenBSD";
 		if (string.Equals(name, "Android", StringComparison.OrdinalIgnoreCase))
 			return "Android";
+		if (string.Equals(name, "Xen", StringComparison.OrdinalIgnoreCase))
+			return "Xen";
 		if (string.Equals(name, "LINUX", StringComparison.OrdinalIgnoreCase))
 			return "LINUX";
 		if (string.Equals(name, "CORE", StringComparison.OrdinalIgnoreCase))
@@ -520,6 +563,11 @@ public static partial class ElfReader
 		if (descriptor.Length == 0)
 			return string.Empty;
 
+		if (descriptor.Length == 16)
+		{
+			return $"uuid={FormatUuid(descriptor)}";
+		}
+
 		if (descriptor.Length == 4)
 		{
 			var value = isLittleEndian
@@ -545,6 +593,65 @@ public static partial class ElfReader
 		return descriptor.Length > previewLength
 			? $"bytes={descriptor.Length}, preview=0x{preview}..."
 			: $"bytes={descriptor.Length}, preview=0x{preview}";
+	}
+
+	private static string FormatUuid(byte[] value)
+	{
+		if (value == null || value.Length != 16)
+			return string.Empty;
+
+		return $"{Convert.ToHexString(value.AsSpan(0, 4)).ToLowerInvariant()}-"
+			+ $"{Convert.ToHexString(value.AsSpan(4, 2)).ToLowerInvariant()}-"
+			+ $"{Convert.ToHexString(value.AsSpan(6, 2)).ToLowerInvariant()}-"
+			+ $"{Convert.ToHexString(value.AsSpan(8, 2)).ToLowerInvariant()}-"
+			+ $"{Convert.ToHexString(value.AsSpan(10, 6)).ToLowerInvariant()}";
+	}
+
+	private static string DecodeXenNoteDescriptor(uint type, byte[] descriptor, bool isLittleEndian)
+	{
+		switch (type)
+		{
+			case NtXenElfNoteXenVersion:
+			case NtXenElfNoteGuestOs:
+			case NtXenElfNoteGuestVersion:
+			case NtXenElfNoteLoader:
+			case NtXenElfNotePaeMode:
+			case NtXenElfNoteFeatures:
+			{
+				var ascii = DecodeAsciiDescriptor(descriptor);
+				return string.IsNullOrEmpty(ascii) ? DecodeUnknownNoteDescriptor(descriptor, isLittleEndian) : ascii;
+			}
+			case NtXenElfNoteEntry:
+			case NtXenElfNoteHypercallPage:
+			case NtXenElfNoteVirtBase:
+			case NtXenElfNotePaddrOffset:
+			case NtXenElfNoteBsdSymtab:
+			case NtXenElfNoteHpet:
+			case NtXenElfNoteSuspendCancel:
+			case NtXenElfNoteModStartPfn:
+			case NtXenElfNotePhys32Entry:
+			{
+				if (descriptor.Length >= 8)
+				{
+					var value = isLittleEndian
+						? BinaryPrimitives.ReadUInt64LittleEndian(descriptor.AsSpan(0, 8))
+						: BinaryPrimitives.ReadUInt64BigEndian(descriptor.AsSpan(0, 8));
+					return $"0x{value:X}";
+				}
+
+				if (descriptor.Length >= 4)
+				{
+					var value = isLittleEndian
+						? BinaryPrimitives.ReadUInt32LittleEndian(descriptor.AsSpan(0, 4))
+						: BinaryPrimitives.ReadUInt32BigEndian(descriptor.AsSpan(0, 4));
+					return $"0x{value:X}";
+				}
+
+				return DecodeUnknownNoteDescriptor(descriptor, isLittleEndian);
+			}
+			default:
+				return DecodeUnknownNoteDescriptor(descriptor, isLittleEndian);
+		}
 	}
 
 	private static string DecodeCoreNoteDescriptor(ElfHeader header, uint type, byte[] descriptor)
