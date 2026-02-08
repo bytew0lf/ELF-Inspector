@@ -1,0 +1,1469 @@
+﻿ELF Report
+==========
+File: /Users/mkoenig/Projects/dotnet/ELF-Inspector/samples/busybox
+Generated: (deterministic)
+
+Header
+------
+Class: Elf64
+Endianness: LittleEndian
+Type: ET_DYN (3)
+Machine: AArch64 (code 183)
+OSABI: UNIX - System V (code 0)
+ABI Version: 0
+Flags: 0x0
+EntryPoint: 0x7500
+Interpreter: /lib/ld-musl-aarch64.so.1
+SONAME: (none)
+RPATH: (none)
+RUNPATH: (none)
+
+Security Features
+-----------------
+PIE: Yes
+RELRO: Full
+NX: Enabled
+BIND_NOW: Yes
+Canary Hints: Yes
+Canary Indicators: __stack_chk_fail, __stack_chk_guard
+FORTIFY Hints: No
+FORTIFY Indicators: (none)
+
+Hash Tables
+-----------
+SYSV Hash: (none)
+GNU Hash: present
+- Buckets: declared=8, parsed=8
+- Symbol Offset: 396
+- Bloom Words: declared=1, parsed=1, bits=64, shift=6
+- Bloom Preview: [0]=0x14144990600A000
+- Buckets Preview: [0]=396, [1]=397, [2]=398, [3]=0, [4]=399, [5]=400, [6]=401, [7]=402
+- Chains Preview: [0]=250711481, [1]=1992427545, [2]=250598379, [3]=2527103461, [4]=15514637, [5]=355657391, [6]=2326669543
+Lookup Paths
+- [GNU] _ITM_deregisterTMCloneTable: hash=0x85F4D995, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] _ITM_registerTMCloneTable: hash=0xA1CFB68C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] ___environ: hash=0x0419E9A3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] __ctype_get_mb_cur_max: hash=0xE4BD07C3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] __cxa_finalize: hash=0x6DCE65D0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] __deregister_frame_info: hash=0x8D3F45A6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] __environ: hash=0x409CB9C4, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] __errno_location: hash=0xA4F92301, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] __h_errno_location: hash=0x8CC4D5C8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] __libc_current_sigrtmax: hash=0xAA6FB3ED, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] __libc_current_sigrtmin: hash=0xAA6FB4EB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] __libc_start_main: hash=0xF63D4E2E, bloom=hit, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] __register_frame_info: hash=0x836A923D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] __stack_chk_fail: hash=0x1F4039C9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] __stack_chk_guard: hash=0x07646220, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] _environ: hash=0x900589C5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] _exit: hash=0x0EEF86BE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] _fini: hash=0x0EEFD3EA, bloom=hit, bucket[2]=398, chainStart=398, visited=1, match=yes (sym#398)
+- [GNU] _init: hash=0x0EF18DB8, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=yes (sym#396)
+- [GNU] accept: hash=0xF15AE9B5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] access: hash=0xF15AEA17, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] adjtimex: hash=0x12160CBB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] alarm: hash=0x0F172DB2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] alphasort: hash=0x68388093, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] atan2: hash=0x0F1B8FFB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] atof: hash=0x7C943C6F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] atoi: hash=0x7C943C72, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] atoll: hash=0x0F1BCB81, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] bind: hash=0x7C9499E2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] bsearch: hash=0x8F26ED5D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] capget: hash=0xF5E831F9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] capset: hash=0xF5E86505, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] cfgetispeed: hash=0x0D358048, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] cfgetospeed: hash=0x1B34740E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] cfmakeraw: hash=0xD110E4F6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] cfsetispeed: hash=0x830ACC54, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] cfsetospeed: hash=0x9109C01A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] cfsetspeed: hash=0xC69C2F0B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] chdir: hash=0x0F3938CF, bloom=hit, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] chmod: hash=0x0F395FD0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] chown: hash=0x0F396964, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] chroot: hash=0xF6681994, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] clearenv: hash=0x456ECE55, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] clearerr: hash=0x456ECED5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] clock_gettime: hash=0x71DD557F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] clock_settime: hash=0x0D982E8B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] close: hash=0x0F3B9A5B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] closedir: hash=0x5E00F7DA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] closelog: hash=0x5E011A9D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] connect: hash=0xD3764DCF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] cos: hash=0x0B8866CA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] crypt: hash=0x0F3F0ED7, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] ctime: hash=0x0F3FE317, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] daemon: hash=0xF8376D39, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] dirname: hash=0x12B9E905, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] dprintf: hash=0x230B7FBC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] dup: hash=0x0B886BCE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] dup2: hash=0x7C95E5C0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] endgrent: hash=0xB5FE5BFC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] endmntent: hash=0x83888052, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] endpwent: hash=0xB6A3F66A, bloom=hit, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] endutxent: hash=0x96A089E4, bloom=hit, bucket[4]=399, chainStart=399, visited=1, match=yes (sym#399)
+- [GNU] environ: hash=0x6BA3DDA6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] ether_aton_r: hash=0x60EFDDFF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] ether_hostton: hash=0x8E6581AB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] execle: hash=0xFC2C9E7B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] execlp: hash=0xFC2C9E86, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] execv: hash=0x0F663360, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] execve: hash=0xFC2C9FC5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] execvp: hash=0xFC2C9FD0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] exit: hash=0x7C967E3F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] exp: hash=0x0B887072, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] fchdir: hash=0xFD076D95, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] fchmod: hash=0xFD079496, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] fchown: hash=0xFD079E2A, bloom=hit, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] fclose: hash=0xFD09CF21, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] fcntl: hash=0x0F6CF05C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] fdatasync: hash=0xE5EC90C2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] fdopen: hash=0xFD1D8F41, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] feof_unlocked: hash=0x180D9739, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] ferror_unlocked: hash=0x1852E969, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] fflush: hash=0xFD40322D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] fgets_unlocked: hash=0x71C72472, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] fileno_unlocked: hash=0x1B417056, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] flock: hash=0x0F71E1D4, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] fnmatch: hash=0xB7F6E1C6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] fopen: hash=0x0F738B7D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] fork: hash=0x7C96E577, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] fprintf: hash=0xBCFFF93E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] fputc: hash=0x0F742F07, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] fputs: hash=0x0F742F17, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] fputs_unlocked: hash=0x4B54500B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] fread: hash=0x0F750147, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] free: hash=0x7C96F087, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] freeaddrinfo: hash=0x526629CE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] freeifaddrs: hash=0x8DC52544, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] freopen: hash=0xC0C25CD4, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] fscanf: hash=0xFE262B96, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] fseeko: hash=0xFE275502, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] fstat: hash=0x0F75CD87, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] fsync: hash=0x0F75E468, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] ftell: hash=0x0F761B7C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] ftello: hash=0xFE398B6B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] ftruncate: hash=0xC9DF2371, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] futimens: hash=0xE28BD750, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] fwrite: hash=0xFE76EA16, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getaddrinfo: hash=0x7C84CDCC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] getc_unlocked: hash=0xF61C779C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] getchar_unlocked: hash=0x20B24857, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getcwd: hash=0xFF875943, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] getegid: hash=0xF073575E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getenv: hash=0xFF8760AE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] geteuid: hash=0xF07392EC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] getgid: hash=0xFF876879, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] getgrgid: hash=0xFF0874D2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getgrnam: hash=0xFF08919A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getgrouplist: hash=0x09E0884E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getgroups: hash=0xE01BA725, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] gethostbyaddr: hash=0x30D24839, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] gethostbyname: hash=0x30D95D7F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] gethostid: hash=0xE23CB290, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] getifaddrs: hash=0x60804182, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getline: hash=0xF077372D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] getlogin_r: hash=0x5CDCDE6F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getmntent: hash=0xEDD4B27B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] getmntent_r: hash=0xB5CB49EC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] getnameinfo: hash=0xA9011612, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getopt: hash=0xFF878B78, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] getopt_long: hash=0x27D5AE07, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getopt_long_only: hash=0x4DDC62A8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] getpagesize: hash=0x738B351D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] getpeername: hash=0xA3B233D2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getpgrp: hash=0xF07960BE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getpid: hash=0xFF878EC2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getppid: hash=0xF07985D2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] getpriority: hash=0x9587F727, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getpwent: hash=0xFFAE0773, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] getpwnam: hash=0xFFAE2C08, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] getpwuid: hash=0xFFAE4ACE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getresgid: hash=0xF8DB1C83, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] getresuid: hash=0xF8DB5811, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] getrlimit: hash=0xF95465D6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getservbyname: hash=0x7E23D481, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] getservbyport: hash=0x7E252985, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] getsid: hash=0xFF879B85, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] getsockname: hash=0x65151536, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] getsockopt: hash=0x776D44E8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] getspnam_r: hash=0x7A83F495, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] gettimeofday: hash=0xE6854B87, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getuid: hash=0xFF87A407, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] getusershell: hash=0x4C5EB7DC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] getutxent: hash=0x00ECBC0D, bloom=hit, bucket[5]=400, chainStart=400, visited=1, match=yes (sym#400)
+- [GNU] gmtime: hash=0x00183588, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] gmtime_r: hash=0x66FBC439, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] hasmntopt: hash=0x644FBE03, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] hstrerror: hash=0x58F0D510, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] if_nametoindex: hash=0xB4B1418F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] inet_aton: hash=0xB1AF02A6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] inet_ntoa: hash=0xB1B62386, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] inet_ntop: hash=0xB1B62395, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] inet_pton: hash=0xB1B73C55, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] initgroups: hash=0xAC70ECD9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] inotify_add_watch: hash=0x930A05A5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] inotify_init: hash=0xF7295BDA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] inotify_rm_watch: hash=0xCC37D69B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] ioctl: hash=0x0FA99FA0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] isatty: hash=0x0524DE63, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] isprint: hash=0xAACED1CE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] iswprint: hash=0x14DDD0C5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] kill: hash=0x7C998911, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] killpg: hash=0x09202028, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] klogctl: hash=0x3456F575, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] lchown: hash=0x0B0691F0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] link: hash=0x7C9A15B3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] listen: hash=0x0B794014, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] localtime: hash=0x361527BF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] localtime_r: hash=0x0FFE2030, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] log: hash=0x0B888D07, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] longjmp: hash=0x883EB07C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] lseek: hash=0x0FE22139, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] lstat: hash=0x0FE2608D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] malloc: hash=0x0D39AD3D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] mbsrtowcs: hash=0xA3138889, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] mbstowcs: hash=0xA0396FF7, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] memchr: hash=0x0D827481, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] memcmp: hash=0x0D827524, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] memcpy: hash=0x0D827590, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] memmove: hash=0xBDD69F1B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] mempcpy: hash=0xBDD81080, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] memrchr: hash=0xBDD92833, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] memset: hash=0x0D82B830, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] mkdir: hash=0x0FEFD2FC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] mkdtemp: hash=0xCB366157, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] mkfifo: hash=0x0DEB4A21, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] mknod: hash=0x0FEFFE3E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] mkstemp: hash=0xCC45D0E6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] mktemp: hash=0x0DF2E753, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] mktime: hash=0x0DF2F84C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] mmap: hash=0x7C9AB170, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] mount: hash=0x0FF24D78, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] msgctl: hash=0x0E7C82CF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] msgget: hash=0x0E7C91EC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] munmap: hash=0x0EA4B293, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] nanosleep: hash=0xA357710A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] ns_get16: hash=0x7981534C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] ns_get32: hash=0x7981538A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] ns_initparse: hash=0xBE752F34, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] ns_name_uncompress: hash=0x0B5C8AF4, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] ns_parserr: hash=0x8A9BADA4, bloom=hit, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] open: hash=0x7C9BD777, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] opendir: hash=0x70E36F76, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] openlog: hash=0x70E39239, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] optarg: hash=0x12F7A2B2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] opterr: hash=0x12F7B3C1, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] optind: hash=0x12F7C433, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] pause: hash=0x1020EA43, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] pclose: hash=0x145D656B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] perror: hash=0x1484ECFF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] personality: hash=0x4551669F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] pipe: hash=0x7C9C4773, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] pivot_root: hash=0x1DBE197A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] poll: hash=0x7C9C607C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] popen: hash=0x10288087, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] posix_fallocate: hash=0xE437A182, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] pow: hash=0x0B889E1B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] ppoll: hash=0x1029098C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] prctl: hash=0x1029F04A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] pread: hash=0x1029F651, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] printf: hash=0x156B2BB8, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] putc_unlocked: hash=0xCFA9A335, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] putchar_unlocked: hash=0xC3077950, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] putenv: hash=0x15A75667, bloom=hit, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] puts: hash=0x7C9C7B11, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] pututxline: hash=0x8AAE28E7, bloom=hit, bucket[7]=402, chainStart=402, visited=1, match=yes (sym#402)
+- [GNU] qsort: hash=0x103CC7FE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] raise: hash=0x1044E839, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] rand: hash=0x7C9D3DEA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] read: hash=0x7C9D4D41, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] readahead: hash=0x22AAC8B4, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] readdir: hash=0x3DDB8900, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] readlink: hash=0xF9510BEF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] realloc: hash=0x3DE00EC7, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] realpath: hash=0xF9E3E036, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] reboot: hash=0x19266B70, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] recv: hash=0x7C9D4D95, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] recvfrom: hash=0xFF3DF269, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] recvmsg: hash=0x3E09C05C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] regcomp: hash=0x3E47BEF2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] regerror: hash=0x076588ED, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] regexec: hash=0x3E48FCE8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] regfree: hash=0x3E496FC5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] remove: hash=0x192C7473, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] rename: hash=0x192CC41D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] res_mkquery: hash=0xAF95135C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] rewind: hash=0x1931D5AE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] rmdir: hash=0x104B6643, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] scandir: hash=0x8630F049, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] scanf: hash=0x1057F6D0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] sched_getaffinity: hash=0x378DDB05, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] sched_yield: hash=0xE4CEECE2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] semctl: hash=0x1B8169CD, bloom=hit, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] semget: hash=0x1B8178EA, bloom=hit, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] semop: hash=0x105942C9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] send: hash=0x7C9DDB4F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] sendfile: hash=0x03E2A66F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] sendmsg: hash=0x8BC12BD6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] sendto: hash=0x1B81FA72, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] setbuf: hash=0x1B853C4E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] setegid: hash=0x8C2E306A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] setenv: hash=0x1B85483A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] seteuid: hash=0x8C2E6BF8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] setgid: hash=0x1B855005, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] setgroups: hash=0x55F0F331, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] sethostname: hash=0xA48ED530, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] setitimer: hash=0x5ABC07BB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] setjmp: hash=0x1B855D58, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] setlocale: hash=0x615D8AA1, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] setmntent: hash=0x63A9FE87, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] setns: hash=0x10596072, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] setpgid: hash=0x8C343895, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] setpgrp: hash=0x8C3439CA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] setpriority: hash=0xD5E07633, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] setpwent: hash=0x12C401FF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] setrlimit: hash=0x6F29B1E2, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] setsid: hash=0x1B858311, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] setsockopt: hash=0xA7EC1274, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] settimeofday: hash=0x31EDAC13, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] setuid: hash=0x1B858B93, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] setutxent: hash=0x76C20819, bloom=hit, bucket[1]=397, chainStart=397, visited=1, match=yes (sym#397)
+- [GNU] shmat: hash=0x105AE622, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] shmctl: hash=0x1BB7B350, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] shmdt: hash=0x105AE685, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] shmget: hash=0x1BB7C26D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] shutdown: hash=0xFC460361, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] sigaction: hash=0x0F375846, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] sigaddset: hash=0x0F40D3FD, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] sigdelset: hash=0x1656C969, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] sigemptyset: hash=0x64B43E63, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] sigfillset: hash=0x847575FB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] siglongjmp: hash=0x6073241F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] signal: hash=0x1BC6ADE3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] sigprocmask: hash=0x08DBEB48, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] sigsetjmp: hash=0x3958689B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] sigsuspend: hash=0x89A915EA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] sigtimedwait: hash=0x12195B90, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] sin: hash=0x0B88AA0F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] sleep: hash=0x105CF61E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] snprintf: hash=0xBE582CF9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] socket: hash=0x1C31032E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] socketpair: hash=0x0679FF3A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] sprintf: hash=0xA5B50F0B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] sqrt: hash=0x7C9E0EEF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] srand: hash=0x1060307D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] sscanf: hash=0x1C793BC3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] stat: hash=0x7C9E1981, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] statfs: hash=0x1C8A8B5A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] statvfs: hash=0xADDC3970, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] stderr: hash=0x1C8BF239, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] stdin: hash=0x10615567, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] stdout: hash=0x1C8C1D28, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] stpcpy: hash=0x1C927E08, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] stpncpy: hash=0xAEE80F36, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] strcasecmp: hash=0xB3850D3A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] strcasestr: hash=0xB3855233, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] strcat: hash=0x1C9394D6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] strchr: hash=0x1C9395BB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] strchrnul: hash=0x89CFE34A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] strcmp: hash=0x1C93965E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] strcoll: hash=0xAF066A88, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] strcpy: hash=0x1C9396CA, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] strcspn: hash=0xAF067C12, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] strdup: hash=0x1C939BA7, bloom=hit, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] strerror: hash=0x8FF9AC08, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] strftime: hash=0x900CB6B3, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] strlen: hash=0x1C93BB9D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strncasecmp: hash=0xBBF0BDA8, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] strncmp: hash=0xAF0C3FCC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] strncpy: hash=0xAF0C4038, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] strndup: hash=0xAF0C4515, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strnlen: hash=0xAF0C650B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] strpbrk: hash=0xAF0D54ED, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strptime: hash=0x90C1ABBD, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strrchr: hash=0xAF0E70AD, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strsep: hash=0x1C93D966, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] strsignal: hash=0xAF2E7B1C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] strspn: hash=0x1C93DACF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] strstr: hash=0x1C93DB57, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] strtod: hash=0x1C93DEE5, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strtok_r: hash=0x9107569D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strtol: hash=0x1C93DEED, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] strtoll: hash=0xAF0FBCF9, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] strtoul: hash=0xAF0FBE22, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] strtoull: hash=0x910782CE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] strverscmp: hash=0x7361C6DE, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] swapoff: hash=0xB4D963FB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] swapon: hash=0x1CC0C4FD, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] symlink: hash=0xBA5A914C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] sync: hash=0x7C9E3062, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] syncfs: hash=0x1CEBDE7B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] syscall: hash=0xBAC212A0, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] sysconf: hash=0xBAC24E6A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] sysinfo: hash=0xBAC59370, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] syslog: hash=0x1CEEC3C6, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] system: hash=0x1CEEE48A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] tcdrain: hash=0xD3639B4A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] tcflush: hash=0xD384D85E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] tcgetattr: hash=0x04A6D357, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] tcgetpgrp: hash=0x04AED575, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] tcgetsid: hash=0x45F5D55C, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] tcsendbreak: hash=0x7759624B, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] tcsetattr: hash=0xA061AC63, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] tcsetpgrp: hash=0xA069AE81, bloom=miss, bucket[1]=397, chainStart=397, visited=1, match=no
+- [GNU] time: hash=0x7C9E7894, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] timegm: hash=0x1E1EFB48, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] times: hash=0x106D8B87, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] ttyname_r: hash=0x324B29F8, bloom=hit, bucket[0]=396, chainStart=396, visited=1, match=no
+- [GNU] tzset: hash=0x1076F77F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] umask: hash=0x1081A446, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] umount2: hash=0x387A597F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] uname: hash=0x10822FDB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] ungetc: hash=0x20CB55CB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] unlink: hash=0x20CE23F6, bloom=hit, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] unsetenv: hash=0x9CF5F33D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] unshare: hash=0x3B108BDB, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] updwtmpx: hash=0x1532E6AE, bloom=hit, bucket[6]=401, chainStart=401, visited=1, match=yes (sym#401)
+- [GNU] usleep: hash=0x21288C53, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] utimensat: hash=0xD517D07F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] utimes: hash=0x213921BC, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] vasprintf: hash=0xCA5FBC02, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] vfork: hash=0x1090218D, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] vfprintf: hash=0x1B4BC594, bloom=miss, bucket[4]=399, chainStart=399, visited=1, match=no
+- [GNU] vprintf: hash=0x8CA3C54E, bloom=miss, bucket[6]=401, chainStart=401, visited=1, match=no
+- [GNU] vsnprintf: hash=0xE61D840F, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] wait: hash=0x7C9FFB3A, bloom=miss, bucket[2]=398, chainStart=398, visited=1, match=no
+- [GNU] wait3: hash=0x109F62AD, bloom=miss, bucket[5]=400, chainStart=400, visited=1, match=no
+- [GNU] waitpid: hash=0xB603D357, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] wcrtomb: hash=0xBB50FD63, bloom=miss, bucket[3]=0, chainStart=0, visited=0, match=no
+- [GNU] wcstombs: hash=0x27C5D2D7, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] wcwidth: hash=0xBBA541DF, bloom=miss, bucket[7]=402, chainStart=402, visited=1, match=no
+- [GNU] write: hash=0x10A8B550, bloom=miss, bucket[0]=396, chainStart=396, visited=1, match=no
+
+Unwind / Debug
+--------------
+.eh_frame: addr=0xCFF58, size=0x84, CIE=1, FDE=4, terminator=Yes
+.eh_frame CIE entries: 1
+- CIE#0: off=0x0, len=0x10, v=1, aug=zR, code_align=4, data_align=-8, ra_reg=30, fde_enc=0x1B, instr=1
+.eh_frame FDE entries: 4
+- FDE#0: off=0x14, cie=0, pc=[0x7400,0x7430), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#1: off=0x28, cie=0, pc=[0x7430,0x746C), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#2: off=0x3C, cie=0, pc=[0x746C,0x74CC), cfa=r31+0, ra_off=-24, instr=14
+- FDE#3: off=0x60, cie=0, pc=[0x74CC,0x7500), cfa=r31+0, ra_off=-8, instr=11
+.eh_frame_hdr: v1, eh_ptr_enc=0x1B, fde_enc=0x03, table_enc=0x3B, eh_frame_ptr=0xCFF58, fde_count=4, parsed_table_entries=4
+Debug Sections: (none)
+
+DWARF Index
+-----------
+Sections: info=No, abbrev=No, line=No, str=No, ranges=No, addr=No, str_offsets=No, rnglists=No, loclists=No
+Compile Units: 0
+Line Tables: 0
+Semantic Units: 0
+Symbol↔DIE Mappings: 0
+
+Section Special Cases
+---------------------
+Compressed Sections: (none)
+Section Groups: (none)
+
+Core Dump
+---------
+Type: not ET_CORE
+
+Counts
+------
+Sections: 24
+Segments: 9
+Symbols: 403
+Imported Symbols: 393
+Exported Symbols: 7
+Relocations: 1475
+Dynamic Entries: 26
+Notes: 1
+
+Sections
+--------
+- [0] (unnamed): SHT_NULL (0), flags=0, addr=0x0, off=0x0, size=0x0
+- [1] .note.gnu.build-id: SHT_NOTE (7), flags=ALLOC, addr=0x238, off=0x238, size=0x24
+- [2] .interp: SHT_PROGBITS (1), flags=ALLOC, addr=0x25C, off=0x25C, size=0x1A
+- [3] .gnu.hash: SHT_GNU_HASH (1879048182), flags=ALLOC, addr=0x278, off=0x278, size=0x54
+- [4] .dynsym: SHT_DYNSYM (11), flags=ALLOC, addr=0x2D0, off=0x2D0, size=0x25C8
+- [5] .dynstr: SHT_STRTAB (3), flags=ALLOC, addr=0x2898, off=0x2898, size=0xD15
+- [6] .rela.dyn: SHT_RELA (4), flags=ALLOC, addr=0x35B0, off=0x35B0, size=0x210
+- [7] .rela.plt: SHT_RELA (4), flags=ALLOC|INFO_LINK, addr=0x37C0, off=0x37C0, size=0x2388
+- [8] .relr.dyn: SHT_RELR (19), flags=ALLOC, addr=0x5B48, off=0x5B48, size=0xC8
+- [9] .init: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x5C10, off=0x5C10, size=0x10
+- [10] .plt: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x5C20, off=0x5C20, size=0x17D0
+- [11] .text: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x7400, off=0x7400, size=0xA8DB0
+- [12] .fini: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0xB01B0, off=0xB01B0, size=0x10
+- [13] .rodata: SHT_PROGBITS (1), flags=ALLOC, addr=0xB01C0, off=0xB01C0, size=0x1FD65
+- [14] .eh_frame_hdr: SHT_PROGBITS (1), flags=ALLOC, addr=0xCFF28, off=0xCFF28, size=0x2C
+- [15] .eh_frame: SHT_PROGBITS (1), flags=ALLOC, addr=0xCFF58, off=0xCFF58, size=0x84
+- [16] .init_array: SHT_INIT_ARRAY (14), flags=WRITE|ALLOC, addr=0xDC728, off=0xDC728, size=0x8
+- [17] .fini_array: SHT_FINI_ARRAY (15), flags=WRITE|ALLOC, addr=0xDC730, off=0xDC730, size=0x8
+- [18] .data.rel.ro: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0xDC738, off=0xDC738, size=0x29B0
+- [19] .dynamic: SHT_DYNAMIC (6), flags=WRITE|ALLOC, addr=0xDF0E8, off=0xDF0E8, size=0x1F0
+- [20] .got: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0xDF2D8, off=0xDF2D8, size=0xD28
+- [21] .data: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0xE0000, off=0xE0000, size=0x39
+- [22] .bss: SHT_NOBITS (8), flags=WRITE|ALLOC, addr=0xE0040, off=0xE0039, size=0xAD0
+- [23] .shstrtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0xE0039, size=0xCE
+
+Segments
+--------
+- [0] PT_PHDR (6), flags=R--, off=0x40, vaddr=0x40, filesz=0x1F8, memsz=0x1F8
+- [1] PT_INTERP (3), flags=R--, off=0x25C, vaddr=0x25C, filesz=0x1A, memsz=0x1A
+- [2] PT_LOAD (1), flags=R-X, off=0x0, vaddr=0x0, filesz=0xCFFDC, memsz=0xCFFDC
+- [3] PT_LOAD (1), flags=RW-, off=0xDC728, vaddr=0xDC728, filesz=0x3911, memsz=0x43E8
+- [4] PT_DYNAMIC (2), flags=RW-, off=0xDF0E8, vaddr=0xDF0E8, filesz=0x1F0, memsz=0x1F0
+- [5] PT_NOTE (4), flags=R--, off=0x238, vaddr=0x238, filesz=0x24, memsz=0x24
+- [6] PT_GNU_EH_FRAME (1685382480), flags=R--, off=0xCFF28, vaddr=0xCFF28, filesz=0x2C, memsz=0x2C
+- [7] PT_GNU_STACK (1685382481), flags=RW-, off=0x0, vaddr=0x0, filesz=0x0, memsz=0x0
+- [8] PT_GNU_RELRO (1685382482), flags=R--, off=0xDC728, vaddr=0xDC728, filesz=0x38D8, memsz=0x38D8
+
+Import Libraries
+----------------
+- libc.musl-aarch64.so.1
+
+Imported Symbols
+----------------
+- _ITM_deregisterTMCloneTable <= libc.musl-aarch64.so.1
+- _ITM_registerTMCloneTable <= libc.musl-aarch64.so.1
+- ___environ <= libc.musl-aarch64.so.1
+- __ctype_get_mb_cur_max <= libc.musl-aarch64.so.1
+- __cxa_finalize <= libc.musl-aarch64.so.1
+- __deregister_frame_info <= libc.musl-aarch64.so.1
+- __environ <= libc.musl-aarch64.so.1
+- __errno_location <= libc.musl-aarch64.so.1
+- __h_errno_location <= libc.musl-aarch64.so.1
+- __libc_current_sigrtmax <= libc.musl-aarch64.so.1
+- __libc_current_sigrtmin <= libc.musl-aarch64.so.1
+- __libc_start_main <= libc.musl-aarch64.so.1
+- __register_frame_info <= libc.musl-aarch64.so.1
+- __stack_chk_fail <= libc.musl-aarch64.so.1
+- __stack_chk_guard <= libc.musl-aarch64.so.1
+- _environ <= libc.musl-aarch64.so.1
+- _exit <= libc.musl-aarch64.so.1
+- accept <= libc.musl-aarch64.so.1
+- access <= libc.musl-aarch64.so.1
+- adjtimex <= libc.musl-aarch64.so.1
+- alarm <= libc.musl-aarch64.so.1
+- alphasort <= libc.musl-aarch64.so.1
+- atan2 <= libc.musl-aarch64.so.1
+- atof <= libc.musl-aarch64.so.1
+- atoi <= libc.musl-aarch64.so.1
+- atoll <= libc.musl-aarch64.so.1
+- bind <= libc.musl-aarch64.so.1
+- bsearch <= libc.musl-aarch64.so.1
+- capget <= libc.musl-aarch64.so.1
+- capset <= libc.musl-aarch64.so.1
+- cfgetispeed <= libc.musl-aarch64.so.1
+- cfgetospeed <= libc.musl-aarch64.so.1
+- cfmakeraw <= libc.musl-aarch64.so.1
+- cfsetispeed <= libc.musl-aarch64.so.1
+- cfsetospeed <= libc.musl-aarch64.so.1
+- cfsetspeed <= libc.musl-aarch64.so.1
+- chdir <= libc.musl-aarch64.so.1
+- chmod <= libc.musl-aarch64.so.1
+- chown <= libc.musl-aarch64.so.1
+- chroot <= libc.musl-aarch64.so.1
+- clearenv <= libc.musl-aarch64.so.1
+- clearerr <= libc.musl-aarch64.so.1
+- clock_gettime <= libc.musl-aarch64.so.1
+- clock_settime <= libc.musl-aarch64.so.1
+- close <= libc.musl-aarch64.so.1
+- closedir <= libc.musl-aarch64.so.1
+- closelog <= libc.musl-aarch64.so.1
+- connect <= libc.musl-aarch64.so.1
+- cos <= libc.musl-aarch64.so.1
+- crypt <= libc.musl-aarch64.so.1
+- ctime <= libc.musl-aarch64.so.1
+- daemon <= libc.musl-aarch64.so.1
+- dirname <= libc.musl-aarch64.so.1
+- dprintf <= libc.musl-aarch64.so.1
+- dup <= libc.musl-aarch64.so.1
+- dup2 <= libc.musl-aarch64.so.1
+- endgrent <= libc.musl-aarch64.so.1
+- endmntent <= libc.musl-aarch64.so.1
+- endpwent <= libc.musl-aarch64.so.1
+- environ <= libc.musl-aarch64.so.1
+- ether_aton_r <= libc.musl-aarch64.so.1
+- ether_hostton <= libc.musl-aarch64.so.1
+- execle <= libc.musl-aarch64.so.1
+- execlp <= libc.musl-aarch64.so.1
+- execv <= libc.musl-aarch64.so.1
+- execve <= libc.musl-aarch64.so.1
+- execvp <= libc.musl-aarch64.so.1
+- exit <= libc.musl-aarch64.so.1
+- exp <= libc.musl-aarch64.so.1
+- fchdir <= libc.musl-aarch64.so.1
+- fchmod <= libc.musl-aarch64.so.1
+- fchown <= libc.musl-aarch64.so.1
+- fclose <= libc.musl-aarch64.so.1
+- fcntl <= libc.musl-aarch64.so.1
+- fdatasync <= libc.musl-aarch64.so.1
+- fdopen <= libc.musl-aarch64.so.1
+- feof_unlocked <= libc.musl-aarch64.so.1
+- ferror_unlocked <= libc.musl-aarch64.so.1
+- fflush <= libc.musl-aarch64.so.1
+- fgets_unlocked <= libc.musl-aarch64.so.1
+- fileno_unlocked <= libc.musl-aarch64.so.1
+- flock <= libc.musl-aarch64.so.1
+- fnmatch <= libc.musl-aarch64.so.1
+- fopen <= libc.musl-aarch64.so.1
+- fork <= libc.musl-aarch64.so.1
+- fprintf <= libc.musl-aarch64.so.1
+- fputc <= libc.musl-aarch64.so.1
+- fputs <= libc.musl-aarch64.so.1
+- fputs_unlocked <= libc.musl-aarch64.so.1
+- fread <= libc.musl-aarch64.so.1
+- free <= libc.musl-aarch64.so.1
+- freeaddrinfo <= libc.musl-aarch64.so.1
+- freeifaddrs <= libc.musl-aarch64.so.1
+- freopen <= libc.musl-aarch64.so.1
+- fscanf <= libc.musl-aarch64.so.1
+- fseeko <= libc.musl-aarch64.so.1
+- fstat <= libc.musl-aarch64.so.1
+- fsync <= libc.musl-aarch64.so.1
+- ftell <= libc.musl-aarch64.so.1
+- ftello <= libc.musl-aarch64.so.1
+- ftruncate <= libc.musl-aarch64.so.1
+- futimens <= libc.musl-aarch64.so.1
+- fwrite <= libc.musl-aarch64.so.1
+- getaddrinfo <= libc.musl-aarch64.so.1
+- getc_unlocked <= libc.musl-aarch64.so.1
+- getchar_unlocked <= libc.musl-aarch64.so.1
+- getcwd <= libc.musl-aarch64.so.1
+- getegid <= libc.musl-aarch64.so.1
+- getenv <= libc.musl-aarch64.so.1
+- geteuid <= libc.musl-aarch64.so.1
+- getgid <= libc.musl-aarch64.so.1
+- getgrgid <= libc.musl-aarch64.so.1
+- getgrnam <= libc.musl-aarch64.so.1
+- getgrouplist <= libc.musl-aarch64.so.1
+- getgroups <= libc.musl-aarch64.so.1
+- gethostbyaddr <= libc.musl-aarch64.so.1
+- gethostbyname <= libc.musl-aarch64.so.1
+- gethostid <= libc.musl-aarch64.so.1
+- getifaddrs <= libc.musl-aarch64.so.1
+- getline <= libc.musl-aarch64.so.1
+- getlogin_r <= libc.musl-aarch64.so.1
+- getmntent <= libc.musl-aarch64.so.1
+- getmntent_r <= libc.musl-aarch64.so.1
+- getnameinfo <= libc.musl-aarch64.so.1
+- getopt <= libc.musl-aarch64.so.1
+- getopt_long <= libc.musl-aarch64.so.1
+- getopt_long_only <= libc.musl-aarch64.so.1
+- getpagesize <= libc.musl-aarch64.so.1
+- getpeername <= libc.musl-aarch64.so.1
+- getpgrp <= libc.musl-aarch64.so.1
+- getpid <= libc.musl-aarch64.so.1
+- getppid <= libc.musl-aarch64.so.1
+- getpriority <= libc.musl-aarch64.so.1
+- getpwent <= libc.musl-aarch64.so.1
+- getpwnam <= libc.musl-aarch64.so.1
+- getpwuid <= libc.musl-aarch64.so.1
+- getresgid <= libc.musl-aarch64.so.1
+- getresuid <= libc.musl-aarch64.so.1
+- getrlimit <= libc.musl-aarch64.so.1
+- getservbyname <= libc.musl-aarch64.so.1
+- getservbyport <= libc.musl-aarch64.so.1
+- getsid <= libc.musl-aarch64.so.1
+- getsockname <= libc.musl-aarch64.so.1
+- getsockopt <= libc.musl-aarch64.so.1
+- getspnam_r <= libc.musl-aarch64.so.1
+- gettimeofday <= libc.musl-aarch64.so.1
+- getuid <= libc.musl-aarch64.so.1
+- getusershell <= libc.musl-aarch64.so.1
+- gmtime <= libc.musl-aarch64.so.1
+- gmtime_r <= libc.musl-aarch64.so.1
+- hasmntopt <= libc.musl-aarch64.so.1
+- hstrerror <= libc.musl-aarch64.so.1
+- if_nametoindex <= libc.musl-aarch64.so.1
+- inet_aton <= libc.musl-aarch64.so.1
+- inet_ntoa <= libc.musl-aarch64.so.1
+- inet_ntop <= libc.musl-aarch64.so.1
+- inet_pton <= libc.musl-aarch64.so.1
+- initgroups <= libc.musl-aarch64.so.1
+- inotify_add_watch <= libc.musl-aarch64.so.1
+- inotify_init <= libc.musl-aarch64.so.1
+- inotify_rm_watch <= libc.musl-aarch64.so.1
+- ioctl <= libc.musl-aarch64.so.1
+- isatty <= libc.musl-aarch64.so.1
+- isprint <= libc.musl-aarch64.so.1
+- iswprint <= libc.musl-aarch64.so.1
+- kill <= libc.musl-aarch64.so.1
+- killpg <= libc.musl-aarch64.so.1
+- klogctl <= libc.musl-aarch64.so.1
+- lchown <= libc.musl-aarch64.so.1
+- link <= libc.musl-aarch64.so.1
+- listen <= libc.musl-aarch64.so.1
+- localtime <= libc.musl-aarch64.so.1
+- localtime_r <= libc.musl-aarch64.so.1
+- log <= libc.musl-aarch64.so.1
+- longjmp <= libc.musl-aarch64.so.1
+- lseek <= libc.musl-aarch64.so.1
+- lstat <= libc.musl-aarch64.so.1
+- malloc <= libc.musl-aarch64.so.1
+- mbsrtowcs <= libc.musl-aarch64.so.1
+- mbstowcs <= libc.musl-aarch64.so.1
+- memchr <= libc.musl-aarch64.so.1
+- memcmp <= libc.musl-aarch64.so.1
+- memcpy <= libc.musl-aarch64.so.1
+- memmove <= libc.musl-aarch64.so.1
+- mempcpy <= libc.musl-aarch64.so.1
+- memrchr <= libc.musl-aarch64.so.1
+- memset <= libc.musl-aarch64.so.1
+- mkdir <= libc.musl-aarch64.so.1
+- mkdtemp <= libc.musl-aarch64.so.1
+- mkfifo <= libc.musl-aarch64.so.1
+- mknod <= libc.musl-aarch64.so.1
+- mkstemp <= libc.musl-aarch64.so.1
+- mktemp <= libc.musl-aarch64.so.1
+- mktime <= libc.musl-aarch64.so.1
+- mmap <= libc.musl-aarch64.so.1
+- mount <= libc.musl-aarch64.so.1
+- msgctl <= libc.musl-aarch64.so.1
+- msgget <= libc.musl-aarch64.so.1
+- munmap <= libc.musl-aarch64.so.1
+- nanosleep <= libc.musl-aarch64.so.1
+- ns_get16 <= libc.musl-aarch64.so.1
+- ns_get32 <= libc.musl-aarch64.so.1
+- ns_initparse <= libc.musl-aarch64.so.1
+- ns_name_uncompress <= libc.musl-aarch64.so.1
+- ns_parserr <= libc.musl-aarch64.so.1
+- open <= libc.musl-aarch64.so.1
+- opendir <= libc.musl-aarch64.so.1
+- openlog <= libc.musl-aarch64.so.1
+- optarg <= libc.musl-aarch64.so.1
+- opterr <= libc.musl-aarch64.so.1
+- optind <= libc.musl-aarch64.so.1
+- pause <= libc.musl-aarch64.so.1
+- pclose <= libc.musl-aarch64.so.1
+- perror <= libc.musl-aarch64.so.1
+- personality <= libc.musl-aarch64.so.1
+- pipe <= libc.musl-aarch64.so.1
+- pivot_root <= libc.musl-aarch64.so.1
+- poll <= libc.musl-aarch64.so.1
+- popen <= libc.musl-aarch64.so.1
+- posix_fallocate <= libc.musl-aarch64.so.1
+- pow <= libc.musl-aarch64.so.1
+- ppoll <= libc.musl-aarch64.so.1
+- prctl <= libc.musl-aarch64.so.1
+- pread <= libc.musl-aarch64.so.1
+- printf <= libc.musl-aarch64.so.1
+- putc_unlocked <= libc.musl-aarch64.so.1
+- putchar_unlocked <= libc.musl-aarch64.so.1
+- putenv <= libc.musl-aarch64.so.1
+- puts <= libc.musl-aarch64.so.1
+- qsort <= libc.musl-aarch64.so.1
+- raise <= libc.musl-aarch64.so.1
+- rand <= libc.musl-aarch64.so.1
+- read <= libc.musl-aarch64.so.1
+- readahead <= libc.musl-aarch64.so.1
+- readdir <= libc.musl-aarch64.so.1
+- readlink <= libc.musl-aarch64.so.1
+- realloc <= libc.musl-aarch64.so.1
+- realpath <= libc.musl-aarch64.so.1
+- reboot <= libc.musl-aarch64.so.1
+- recv <= libc.musl-aarch64.so.1
+- recvfrom <= libc.musl-aarch64.so.1
+- recvmsg <= libc.musl-aarch64.so.1
+- regcomp <= libc.musl-aarch64.so.1
+- regerror <= libc.musl-aarch64.so.1
+- regexec <= libc.musl-aarch64.so.1
+- regfree <= libc.musl-aarch64.so.1
+- remove <= libc.musl-aarch64.so.1
+- rename <= libc.musl-aarch64.so.1
+- res_mkquery <= libc.musl-aarch64.so.1
+- rewind <= libc.musl-aarch64.so.1
+- rmdir <= libc.musl-aarch64.so.1
+- scandir <= libc.musl-aarch64.so.1
+- scanf <= libc.musl-aarch64.so.1
+- sched_getaffinity <= libc.musl-aarch64.so.1
+- sched_yield <= libc.musl-aarch64.so.1
+- semctl <= libc.musl-aarch64.so.1
+- semget <= libc.musl-aarch64.so.1
+- semop <= libc.musl-aarch64.so.1
+- send <= libc.musl-aarch64.so.1
+- sendfile <= libc.musl-aarch64.so.1
+- sendmsg <= libc.musl-aarch64.so.1
+- sendto <= libc.musl-aarch64.so.1
+- setbuf <= libc.musl-aarch64.so.1
+- setegid <= libc.musl-aarch64.so.1
+- setenv <= libc.musl-aarch64.so.1
+- seteuid <= libc.musl-aarch64.so.1
+- setgid <= libc.musl-aarch64.so.1
+- setgroups <= libc.musl-aarch64.so.1
+- sethostname <= libc.musl-aarch64.so.1
+- setitimer <= libc.musl-aarch64.so.1
+- setjmp <= libc.musl-aarch64.so.1
+- setlocale <= libc.musl-aarch64.so.1
+- setmntent <= libc.musl-aarch64.so.1
+- setns <= libc.musl-aarch64.so.1
+- setpgid <= libc.musl-aarch64.so.1
+- setpgrp <= libc.musl-aarch64.so.1
+- setpriority <= libc.musl-aarch64.so.1
+- setpwent <= libc.musl-aarch64.so.1
+- setrlimit <= libc.musl-aarch64.so.1
+- setsid <= libc.musl-aarch64.so.1
+- setsockopt <= libc.musl-aarch64.so.1
+- settimeofday <= libc.musl-aarch64.so.1
+- setuid <= libc.musl-aarch64.so.1
+- shmat <= libc.musl-aarch64.so.1
+- shmctl <= libc.musl-aarch64.so.1
+- shmdt <= libc.musl-aarch64.so.1
+- shmget <= libc.musl-aarch64.so.1
+- shutdown <= libc.musl-aarch64.so.1
+- sigaction <= libc.musl-aarch64.so.1
+- sigaddset <= libc.musl-aarch64.so.1
+- sigdelset <= libc.musl-aarch64.so.1
+- sigemptyset <= libc.musl-aarch64.so.1
+- sigfillset <= libc.musl-aarch64.so.1
+- siglongjmp <= libc.musl-aarch64.so.1
+- signal <= libc.musl-aarch64.so.1
+- sigprocmask <= libc.musl-aarch64.so.1
+- sigsetjmp <= libc.musl-aarch64.so.1
+- sigsuspend <= libc.musl-aarch64.so.1
+- sigtimedwait <= libc.musl-aarch64.so.1
+- sin <= libc.musl-aarch64.so.1
+- sleep <= libc.musl-aarch64.so.1
+- snprintf <= libc.musl-aarch64.so.1
+- socket <= libc.musl-aarch64.so.1
+- socketpair <= libc.musl-aarch64.so.1
+- sprintf <= libc.musl-aarch64.so.1
+- sqrt <= libc.musl-aarch64.so.1
+- srand <= libc.musl-aarch64.so.1
+- sscanf <= libc.musl-aarch64.so.1
+- stat <= libc.musl-aarch64.so.1
+- statfs <= libc.musl-aarch64.so.1
+- statvfs <= libc.musl-aarch64.so.1
+- stderr <= libc.musl-aarch64.so.1
+- stdin <= libc.musl-aarch64.so.1
+- stdout <= libc.musl-aarch64.so.1
+- stpcpy <= libc.musl-aarch64.so.1
+- stpncpy <= libc.musl-aarch64.so.1
+- strcasecmp <= libc.musl-aarch64.so.1
+- strcasestr <= libc.musl-aarch64.so.1
+- strcat <= libc.musl-aarch64.so.1
+- strchr <= libc.musl-aarch64.so.1
+- strchrnul <= libc.musl-aarch64.so.1
+- strcmp <= libc.musl-aarch64.so.1
+- strcoll <= libc.musl-aarch64.so.1
+- strcpy <= libc.musl-aarch64.so.1
+- strcspn <= libc.musl-aarch64.so.1
+- strdup <= libc.musl-aarch64.so.1
+- strerror <= libc.musl-aarch64.so.1
+- strftime <= libc.musl-aarch64.so.1
+- strlen <= libc.musl-aarch64.so.1
+- strncasecmp <= libc.musl-aarch64.so.1
+- strncmp <= libc.musl-aarch64.so.1
+- strncpy <= libc.musl-aarch64.so.1
+- strndup <= libc.musl-aarch64.so.1
+- strnlen <= libc.musl-aarch64.so.1
+- strpbrk <= libc.musl-aarch64.so.1
+- strptime <= libc.musl-aarch64.so.1
+- strrchr <= libc.musl-aarch64.so.1
+- strsep <= libc.musl-aarch64.so.1
+- strsignal <= libc.musl-aarch64.so.1
+- strspn <= libc.musl-aarch64.so.1
+- strstr <= libc.musl-aarch64.so.1
+- strtod <= libc.musl-aarch64.so.1
+- strtok_r <= libc.musl-aarch64.so.1
+- strtol <= libc.musl-aarch64.so.1
+- strtoll <= libc.musl-aarch64.so.1
+- strtoul <= libc.musl-aarch64.so.1
+- strtoull <= libc.musl-aarch64.so.1
+- strverscmp <= libc.musl-aarch64.so.1
+- swapoff <= libc.musl-aarch64.so.1
+- swapon <= libc.musl-aarch64.so.1
+- symlink <= libc.musl-aarch64.so.1
+- sync <= libc.musl-aarch64.so.1
+- syncfs <= libc.musl-aarch64.so.1
+- syscall <= libc.musl-aarch64.so.1
+- sysconf <= libc.musl-aarch64.so.1
+- sysinfo <= libc.musl-aarch64.so.1
+- syslog <= libc.musl-aarch64.so.1
+- system <= libc.musl-aarch64.so.1
+- tcdrain <= libc.musl-aarch64.so.1
+- tcflush <= libc.musl-aarch64.so.1
+- tcgetattr <= libc.musl-aarch64.so.1
+- tcgetpgrp <= libc.musl-aarch64.so.1
+- tcgetsid <= libc.musl-aarch64.so.1
+- tcsendbreak <= libc.musl-aarch64.so.1
+- tcsetattr <= libc.musl-aarch64.so.1
+- tcsetpgrp <= libc.musl-aarch64.so.1
+- time <= libc.musl-aarch64.so.1
+- timegm <= libc.musl-aarch64.so.1
+- times <= libc.musl-aarch64.so.1
+- ttyname_r <= libc.musl-aarch64.so.1
+- tzset <= libc.musl-aarch64.so.1
+- umask <= libc.musl-aarch64.so.1
+- umount2 <= libc.musl-aarch64.so.1
+- uname <= libc.musl-aarch64.so.1
+- ungetc <= libc.musl-aarch64.so.1
+- unlink <= libc.musl-aarch64.so.1
+- unsetenv <= libc.musl-aarch64.so.1
+- unshare <= libc.musl-aarch64.so.1
+- usleep <= libc.musl-aarch64.so.1
+- utimensat <= libc.musl-aarch64.so.1
+- utimes <= libc.musl-aarch64.so.1
+- vasprintf <= libc.musl-aarch64.so.1
+- vfork <= libc.musl-aarch64.so.1
+- vfprintf <= libc.musl-aarch64.so.1
+- vprintf <= libc.musl-aarch64.so.1
+- vsnprintf <= libc.musl-aarch64.so.1
+- wait <= libc.musl-aarch64.so.1
+- wait3 <= libc.musl-aarch64.so.1
+- waitpid <= libc.musl-aarch64.so.1
+- wcrtomb <= libc.musl-aarch64.so.1
+- wcstombs <= libc.musl-aarch64.so.1
+- wcwidth <= libc.musl-aarch64.so.1
+- write <= libc.musl-aarch64.so.1
+
+Exported Symbols
+----------------
+- _fini @ 0xB01B0
+- _init @ 0x5C10
+- endutxent @ 0xAEED4
+- getutxent @ 0xAEEE0
+- pututxline @ 0xAEF24
+- setutxent @ 0xAEF74
+- updwtmpx @ 0xAEFA0
+
+Dynamic Entries
+---------------
+- DT_NEEDED (1) = 0xC9A -> libc.musl-aarch64.so.1
+- DT_INIT (12) = 0x5C10 -> addr=0x5C10, file_off=0x5C10, section=.init
+- DT_FINI (13) = 0xB01B0 -> addr=0xB01B0, file_off=0xB01B0, section=.fini
+- DT_INIT_ARRAY (25) = 0xDC728 -> addr=0xDC728, file_off=0xDC728, section=.init_array
+- DT_INIT_ARRAYSZ (27) = 0x8 -> size=8 (0x8), entries=1
+- DT_FINI_ARRAY (26) = 0xDC730 -> addr=0xDC730, file_off=0xDC730, section=.fini_array
+- DT_FINI_ARRAYSZ (28) = 0x8 -> size=8 (0x8), entries=1
+- DT_GNU_HASH (1879047925) = 0x278 -> addr=0x278, file_off=0x278, section=.gnu.hash
+- DT_STRTAB (5) = 0x2898 -> addr=0x2898, file_off=0x2898, section=.dynstr
+- DT_SYMTAB (6) = 0x2D0 -> addr=0x2D0, file_off=0x2D0, section=.dynsym
+- DT_STRSZ (10) = 0xD15 -> size=3349 (0xD15)
+- DT_SYMENT (11) = 0x18 -> entry_size=24
+- DT_DEBUG (21) = 0x0
+- DT_PLTGOT (3) = 0xDF2D8 -> addr=0xDF2D8, file_off=0xDF2D8, section=.got
+- DT_PLTRELSZ (2) = 0x2388 -> size=9096 (0x2388)
+- DT_PLTREL (20) = 0x7 -> DT_RELA
+- DT_JMPREL (23) = 0x37C0 -> addr=0x37C0, file_off=0x37C0, section=.rela.plt
+- DT_RELA (7) = 0x35B0 -> addr=0x35B0, file_off=0x35B0, section=.rela.dyn
+- DT_RELASZ (8) = 0x210 -> size=528 (0x210), entries=22
+- DT_RELAENT (9) = 0x18 -> entry_size=24
+- DT_FLAGS (30) = 0x8 -> DF_BIND_NOW
+- DT_FLAGS_1 (1879048187) = 0x8000001 -> DF_1_NOW|DF_1_PIE
+- DT_RELR (36) = 0x5B48 -> addr=0x5B48, file_off=0x5B48, section=.relr.dyn
+- DT_RELRSZ (35) = 0xC8 -> size=200 (0xC8), entries=25
+- DT_RELRENT (37) = 0x8 -> entry_size=8
+- DT_NULL (0) = 0x0
+
+Relocations (resolved)
+----------------------
+- 0xDFED8: R_AARCH64_GLOB_DAT (1025) [RELA] -> stdout <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFEE8: R_AARCH64_GLOB_DAT (1025) [RELA] -> __stack_chk_guard <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFEF8: R_AARCH64_GLOB_DAT (1025) [RELA] -> __cxa_finalize <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF08: R_AARCH64_GLOB_DAT (1025) [RELA] -> optarg <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF10: R_AARCH64_GLOB_DAT (1025) [RELA] -> opterr <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF18: R_AARCH64_GLOB_DAT (1025) [RELA] -> lchown <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF20: R_AARCH64_GLOB_DAT (1025) [RELA] -> chown <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF48: R_AARCH64_GLOB_DAT (1025) [RELA] -> environ <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF50: R_AARCH64_GLOB_DAT (1025) [RELA] -> __deregister_frame_info <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF58: R_AARCH64_GLOB_DAT (1025) [RELA] -> _ITM_registerTMCloneTable <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF60: R_AARCH64_GLOB_DAT (1025) [RELA] -> optind <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF68: R_AARCH64_GLOB_DAT (1025) [RELA] -> stdin <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF70: R_AARCH64_GLOB_DAT (1025) [RELA] -> lstat <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF78: R_AARCH64_GLOB_DAT (1025) [RELA] -> alphasort <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF88: R_AARCH64_GLOB_DAT (1025) [RELA] -> _ITM_deregisterTMCloneTable <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFF90: R_AARCH64_GLOB_DAT (1025) [RELA] -> symlink <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFA8: R_AARCH64_GLOB_DAT (1025) [RELA] -> stderr <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFC0: R_AARCH64_GLOB_DAT (1025) [RELA] -> stat <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFC8: R_AARCH64_GLOB_DAT (1025) [RELA] -> link <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFE0: R_AARCH64_GLOB_DAT (1025) [RELA] -> __register_frame_info <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFF0: R_AARCH64_GLOB_DAT (1025) [RELA] -> free <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDFFF8: R_AARCH64_GLOB_DAT (1025) [RELA] -> getsockname <= libc.musl-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0xDF2F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> longjmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF2F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> stpcpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF300: R_AARCH64_JUMP_SLOT (1026) [RELA] -> clock_gettime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF308: R_AARCH64_JUMP_SLOT (1026) [RELA] -> chroot <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF310: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF318: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigsetjmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF320: R_AARCH64_JUMP_SLOT (1026) [RELA] -> unsetenv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF328: R_AARCH64_JUMP_SLOT (1026) [RELA] -> log <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF330: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sqrt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF338: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setjmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF340: R_AARCH64_JUMP_SLOT (1026) [RELA] -> waitpid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF348: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getrlimit <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF350: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pause <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF358: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ioctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF360: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtok_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF368: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getgid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF370: R_AARCH64_JUMP_SLOT (1026) [RELA] -> popen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF378: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sysconf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF380: R_AARCH64_JUMP_SLOT (1026) [RELA] -> printf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF388: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getspnam_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF390: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfgetospeed <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF398: R_AARCH64_JUMP_SLOT (1026) [RELA] -> putc_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> recv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> connect <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ungetc <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcgetsid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigemptyset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> utimes <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> shmctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strerror <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memrchr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strndup <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> geteuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF3F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inet_pton <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF400: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memmove <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF408: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ns_initparse <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF410: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pclose <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF418: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getopt_long <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF420: R_AARCH64_JUMP_SLOT (1026) [RELA] -> snprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF428: R_AARCH64_JUMP_SLOT (1026) [RELA] -> syscall <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF430: R_AARCH64_JUMP_SLOT (1026) [RELA] -> munmap <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF438: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fileno_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF440: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mknod <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF448: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getc_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF450: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getgrgid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF458: R_AARCH64_JUMP_SLOT (1026) [RELA] -> times <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF460: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getenv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF468: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fchmod <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF470: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getegid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF478: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setpriority <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF480: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpriority <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF488: R_AARCH64_JUMP_SLOT (1026) [RELA] -> personality <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF490: R_AARCH64_JUMP_SLOT (1026) [RELA] -> unshare <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF498: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getresuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> bsearch <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> usleep <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execve <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __libc_current_sigrtmax <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> utimensat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> semget <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpagesize <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> qsort <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fchown <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fscanf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF4F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> dirname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF500: R_AARCH64_JUMP_SLOT (1026) [RELA] -> prctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF508: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fchdir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF510: R_AARCH64_JUMP_SLOT (1026) [RELA] -> res_mkquery <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF518: R_AARCH64_JUMP_SLOT (1026) [RELA] -> shmat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF520: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ns_name_uncompress <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF528: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memcpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF530: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setitimer <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF538: R_AARCH64_JUMP_SLOT (1026) [RELA] -> perror <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF540: R_AARCH64_JUMP_SLOT (1026) [RELA] -> readlink <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF548: R_AARCH64_JUMP_SLOT (1026) [RELA] -> puts <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF550: R_AARCH64_JUMP_SLOT (1026) [RELA] -> clock_settime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF558: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __cxa_finalize <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF560: R_AARCH64_JUMP_SLOT (1026) [RELA] -> dup2 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF568: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __libc_current_sigrtmin <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF570: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcflush <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF578: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execle <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF580: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF588: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcsendbreak <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF590: R_AARCH64_JUMP_SLOT (1026) [RELA] -> semctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF598: R_AARCH64_JUMP_SLOT (1026) [RELA] -> system <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> hasmntopt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> malloc <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> remove <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> isatty <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfgetispeed <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> endpwent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> siglongjmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sleep <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sysinfo <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtoll <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> vsnprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF5F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> recvfrom <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF600: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcdrain <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF608: R_AARCH64_JUMP_SLOT (1026) [RELA] -> statfs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF610: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pivot_root <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF618: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtoul <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF620: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mktemp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF628: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gethostbyaddr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF630: R_AARCH64_JUMP_SLOT (1026) [RELA] -> settimeofday <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF638: R_AARCH64_JUMP_SLOT (1026) [RELA] -> rmdir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF640: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wcstombs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF648: R_AARCH64_JUMP_SLOT (1026) [RELA] -> socket <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF650: R_AARCH64_JUMP_SLOT (1026) [RELA] -> readdir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF658: R_AARCH64_JUMP_SLOT (1026) [RELA] -> lchown <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF660: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ns_parserr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF668: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setgroups <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF670: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inotify_init <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF678: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mempcpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF680: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fflush <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF688: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ftruncate <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF690: R_AARCH64_JUMP_SLOT (1026) [RELA] -> realpath <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF698: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ns_get32 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mbstowcs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> putenv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> lseek <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigaddset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> clearenv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> chown <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mmap <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strncasecmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setpgid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> send <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> freeaddrinfo <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF6F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __stack_chk_fail <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF700: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gmtime_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF708: R_AARCH64_JUMP_SLOT (1026) [RELA] -> chmod <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF710: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getnameinfo <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF718: R_AARCH64_JUMP_SLOT (1026) [RELA] -> alarm <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF720: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtol <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF728: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pipe <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF730: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ether_hostton <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF738: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpgrp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF740: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strnlen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF748: R_AARCH64_JUMP_SLOT (1026) [RELA] -> capget <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF750: R_AARCH64_JUMP_SLOT (1026) [RELA] -> uname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF758: R_AARCH64_JUMP_SLOT (1026) [RELA] -> iswprint <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF760: R_AARCH64_JUMP_SLOT (1026) [RELA] -> accept <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF768: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfsetispeed <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF770: R_AARCH64_JUMP_SLOT (1026) [RELA] -> rename <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF778: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strrchr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF780: R_AARCH64_JUMP_SLOT (1026) [RELA] -> nanosleep <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF788: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setrlimit <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF790: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtod <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF798: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sendfile <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> write <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __ctype_get_mb_cur_max <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> atof <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fdatasync <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fstat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> kill <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fputs_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setpwent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ctime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF7F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> bind <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF800: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getmntent_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF808: R_AARCH64_JUMP_SLOT (1026) [RELA] -> vprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF810: R_AARCH64_JUMP_SLOT (1026) [RELA] -> readahead <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF818: R_AARCH64_JUMP_SLOT (1026) [RELA] -> umount2 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF820: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mkfifo <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF828: R_AARCH64_JUMP_SLOT (1026) [RELA] -> if_nametoindex <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF830: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __deregister_frame_info <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF838: R_AARCH64_JUMP_SLOT (1026) [RELA] -> reboot <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF840: R_AARCH64_JUMP_SLOT (1026) [RELA] -> chdir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF848: R_AARCH64_JUMP_SLOT (1026) [RELA] -> initgroups <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF850: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fseeko <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF858: R_AARCH64_JUMP_SLOT (1026) [RELA] -> shmdt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF860: R_AARCH64_JUMP_SLOT (1026) [RELA] -> endgrent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF868: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setsockopt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF870: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wait3 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF878: R_AARCH64_JUMP_SLOT (1026) [RELA] -> shmget <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF880: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfsetospeed <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF888: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cos <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF890: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memchr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF898: R_AARCH64_JUMP_SLOT (1026) [RELA] -> swapoff <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wait <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> scandir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> umask <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> dprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mktime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcasestr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> lstat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strstr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sin <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> rand <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ftello <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF8F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> flock <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF900: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setgid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF908: R_AARCH64_JUMP_SLOT (1026) [RELA] -> atan2 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF910: R_AARCH64_JUMP_SLOT (1026) [RELA] -> signal <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF918: R_AARCH64_JUMP_SLOT (1026) [RELA] -> read <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF920: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inotify_rm_watch <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF928: R_AARCH64_JUMP_SLOT (1026) [RELA] -> openlog <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF930: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sendmsg <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF938: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcoll <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF940: R_AARCH64_JUMP_SLOT (1026) [RELA] -> closelog <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF948: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strncmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF950: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getusershell <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF958: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sethostname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF960: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setpgrp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF968: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pow <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF970: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strncpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF978: R_AARCH64_JUMP_SLOT (1026) [RELA] -> unlink <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF980: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sync <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF988: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setenv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF990: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcasecmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF998: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sendto <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wcwidth <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> realloc <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigfillset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memcmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> listen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> crypt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> posix_fallocate <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fdopen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fork <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sscanf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execv <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDF9F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setmntent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA00: R_AARCH64_JUMP_SLOT (1026) [RELA] -> statvfs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA08: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execlp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA10: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigaction <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA18: R_AARCH64_JUMP_SLOT (1026) [RELA] -> endmntent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA20: R_AARCH64_JUMP_SLOT (1026) [RELA] -> killpg <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA28: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fread <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA30: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ttyname_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA38: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getlogin_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA40: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strdup <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA48: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inet_aton <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA50: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtoull <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA58: R_AARCH64_JUMP_SLOT (1026) [RELA] -> regcomp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA60: R_AARCH64_JUMP_SLOT (1026) [RELA] -> symlink <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA68: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gettimeofday <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA70: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fopen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA78: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getopt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA80: R_AARCH64_JUMP_SLOT (1026) [RELA] -> localtime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA88: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA90: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fnmatch <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFA98: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfmakeraw <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAA0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getsid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAA8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ftell <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAB0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> srand <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAB8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mbsrtowcs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAC0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> clearerr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAC8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fclose <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAD0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inet_ntoa <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAD8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getppid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAE0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcgetattr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAE8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getservbyport <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAF0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> regexec <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFAF8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> time <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB00: R_AARCH64_JUMP_SLOT (1026) [RELA] -> opendir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB08: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getgroups <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB10: R_AARCH64_JUMP_SLOT (1026) [RELA] -> msgctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB18: R_AARCH64_JUMP_SLOT (1026) [RELA] -> poll <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB20: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigtimedwait <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB28: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setns <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB30: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getgrouplist <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB38: R_AARCH64_JUMP_SLOT (1026) [RELA] -> syslog <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB40: R_AARCH64_JUMP_SLOT (1026) [RELA] -> isprint <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB48: R_AARCH64_JUMP_SLOT (1026) [RELA] -> seteuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB50: R_AARCH64_JUMP_SLOT (1026) [RELA] -> exp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB58: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getopt_long_only <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB60: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mount <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB68: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB70: R_AARCH64_JUMP_SLOT (1026) [RELA] -> shutdown <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB78: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpwuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB80: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __h_errno_location <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB88: R_AARCH64_JUMP_SLOT (1026) [RELA] -> dup <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB90: R_AARCH64_JUMP_SLOT (1026) [RELA] -> swapon <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFB98: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getcwd <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBA0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gethostbyname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBA8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strsignal <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBB0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpwnam <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBB8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> futimens <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBC0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getservbyname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBC8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBD0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ether_aton_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBD8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strcspn <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBE0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setlocale <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBE8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpeername <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBF0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> cfsetspeed <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFBF8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> scanf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC00: R_AARCH64_JUMP_SLOT (1026) [RELA] -> regerror <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC08: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mkstemp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC10: R_AARCH64_JUMP_SLOT (1026) [RELA] -> vfork <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC18: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sched_getaffinity <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC20: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strsep <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC28: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getifaddrs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC30: R_AARCH64_JUMP_SLOT (1026) [RELA] -> putchar_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC38: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fsync <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC40: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inotify_add_watch <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC48: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fputc <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC50: R_AARCH64_JUMP_SLOT (1026) [RELA] -> feof_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC58: R_AARCH64_JUMP_SLOT (1026) [RELA] -> timegm <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC60: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getchar_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC68: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pread <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC70: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getsockopt <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC78: R_AARCH64_JUMP_SLOT (1026) [RELA] -> hstrerror <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC80: R_AARCH64_JUMP_SLOT (1026) [RELA] -> localtime_r <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC88: R_AARCH64_JUMP_SLOT (1026) [RELA] -> freeifaddrs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC90: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getaddrinfo <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFC98: R_AARCH64_JUMP_SLOT (1026) [RELA] -> socketpair <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCA0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strftime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCA8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> stat <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCB0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> syncfs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCB8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mkdtemp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCC0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> stpncpy <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCC8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getmntent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCD0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fwrite <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCD8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ns_get16 <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCE0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> access <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCE8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strptime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCF0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> rewind <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFCF8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> freopen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD00: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcgetpgrp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD08: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __errno_location <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD10: R_AARCH64_JUMP_SLOT (1026) [RELA] -> link <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD18: R_AARCH64_JUMP_SLOT (1026) [RELA] -> semop <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD20: R_AARCH64_JUMP_SLOT (1026) [RELA] -> exit <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD28: R_AARCH64_JUMP_SLOT (1026) [RELA] -> klogctl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD30: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigdelset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD38: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setbuf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD40: R_AARCH64_JUMP_SLOT (1026) [RELA] -> inet_ntop <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD48: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getresgid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD50: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getgrnam <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD58: R_AARCH64_JUMP_SLOT (1026) [RELA] -> atoi <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD60: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ferror_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD68: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fgets_unlocked <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD70: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getline <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD78: R_AARCH64_JUMP_SLOT (1026) [RELA] -> _exit <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD80: R_AARCH64_JUMP_SLOT (1026) [RELA] -> ppoll <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD88: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strverscmp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD90: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpwent <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFD98: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gmtime <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDA0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strspn <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDA8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> daemon <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDB0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __libc_start_main <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDB8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strlen <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDC0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> open <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDC8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> atoll <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDD0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> regfree <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDD8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strchr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDE0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fputs <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDE8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> adjtimex <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDF0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execvp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFDF8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setsid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE00: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setegid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE08: R_AARCH64_JUMP_SLOT (1026) [RELA] -> capset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE10: R_AARCH64_JUMP_SLOT (1026) [RELA] -> closedir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE18: R_AARCH64_JUMP_SLOT (1026) [RELA] -> vasprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE20: R_AARCH64_JUMP_SLOT (1026) [RELA] -> recvmsg <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE28: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strchrnul <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE30: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fcntl <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE38: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tzset <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE40: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sched_yield <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE48: R_AARCH64_JUMP_SLOT (1026) [RELA] -> setuid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE50: R_AARCH64_JUMP_SLOT (1026) [RELA] -> gethostid <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE58: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcsetattr <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE60: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mkdir <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE68: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __register_frame_info <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE70: R_AARCH64_JUMP_SLOT (1026) [RELA] -> msgget <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE78: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wcrtomb <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE80: R_AARCH64_JUMP_SLOT (1026) [RELA] -> close <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE88: R_AARCH64_JUMP_SLOT (1026) [RELA] -> vfprintf <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE90: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strpbrk <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFE98: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcsetpgrp <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFEA0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigsuspend <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFEA8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> raise <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFEB0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> free <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFEB8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigprocmask <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDFEC0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getsockname <= libc.musl-aarch64.so.1, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0xDC728: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.init_array, loader=RELATIVE
+- 0xDC730: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.fini_array, loader=RELATIVE
+- 0xDC738: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC740: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC748: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC750: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC758: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC760: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC768: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC770: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC778: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC780: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC788: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC790: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC798: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7A0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7A8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7B8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7C8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7D8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7E8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC7F8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC808: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC818: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC828: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC830: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC838: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC840: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC848: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC850: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC858: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC860: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC868: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC870: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC878: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC880: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC888: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC890: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8A0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8B0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8C0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8D0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8E0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC8F0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC900: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC910: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC920: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC930: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC940: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC950: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC960: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC970: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC980: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC990: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9A0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9B0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9C0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9D0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9E0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDC9F0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA10: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA20: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA30: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA40: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA50: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA60: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA70: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA80: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCA90: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAA0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAB0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAC0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAD0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAE0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCAF0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB00: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB10: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB18: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB20: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB30: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB40: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB48: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB50: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB58: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB60: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB70: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB78: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB80: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB88: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB90: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCB98: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBA0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBA8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBB0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBB8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBC0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBC8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBD0: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+- 0xDCBD8: R_AARCH64_RELATIVE (1027) [RELR] -> relative, source=.relr.dyn, section=.data.rel.ro, loader=RELATIVE
+... 975 more
+
+Notes
+-----
+- GNU NT_GNU_BUILD_ID (3) -> ad58c9a725d44cfcf22d94f3abd0df3693727dbb

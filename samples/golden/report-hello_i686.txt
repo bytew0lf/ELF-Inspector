@@ -1,0 +1,236 @@
+﻿ELF Report
+==========
+File: /Users/mkoenig/Projects/dotnet/ELF-Inspector/samples/hello_i686
+Generated: (deterministic)
+
+Header
+------
+Class: Elf32
+Endianness: LittleEndian
+Type: ET_DYN (3)
+Machine: Intel 80386 (code 3)
+OSABI: UNIX - System V (code 0)
+ABI Version: 0
+Flags: 0x0
+EntryPoint: 0x1060
+Interpreter: /lib/ld-linux.so.2
+SONAME: (none)
+RPATH: (none)
+RUNPATH: (none)
+
+Security Features
+-----------------
+PIE: Yes
+RELRO: Partial
+NX: Enabled
+BIND_NOW: No
+Canary Hints: No
+Canary Indicators: (none)
+FORTIFY Hints: No
+FORTIFY Indicators: (none)
+
+Hash Tables
+-----------
+SYSV Hash: (none)
+GNU Hash: present
+- Buckets: declared=2, parsed=2
+- Symbol Offset: 7
+- Bloom Words: declared=1, parsed=1, bits=32, shift=5
+- Bloom Preview: [0]=0x20002000
+- Buckets Preview: [0]=0, [1]=7
+- Chains Preview: [0]=3236121517
+Lookup Paths
+- [GNU] _IO_stdin_used: hash=0xC0E34BAD, bloom=hit, bucket[1]=7, chainStart=7, visited=1, match=yes (sym#7)
+- [GNU] _ITM_deregisterTMCloneTable: hash=0x85F4D995, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] _ITM_registerTMCloneTable: hash=0xA1CFB68C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __TMC_END__: hash=0x39838ABB, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] __bss_start: hash=0x1C5871D8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __cxa_finalize: hash=0x6DCE65D0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __data_start: hash=0xD643096A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __dso_handle: hash=0xE37ACFD4, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __gmon_start__: hash=0x1C7A971F, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] __libc_start_main: hash=0xF63D4E2E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __x86.get_pc_thunk.ax: hash=0x1F43A719, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] __x86.get_pc_thunk.bx: hash=0x1F43A73A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __x86.get_pc_thunk.dx: hash=0x1F43A77C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _edata: hash=0xECD54543, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] _end: hash=0x7C92E3BB, bloom=miss, bucket[1]=7, chainStart=7, visited=1, match=no
+- [GNU] _fini: hash=0x0EEFD3EA, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _fp_hw: hash=0xECEDE858, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _init: hash=0x0EF18DB8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _start: hash=0xEDDB6232, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] data_start: hash=0x0B973A0C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] main: hash=0x7C9A7F6A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] printf: hash=0x156B2BB8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+
+Unwind / Debug
+--------------
+.eh_frame: addr=0x2054, size=0xC8, CIE=2, FDE=5, terminator=Yes
+.eh_frame CIE entries: 2
+- CIE#0: off=0x0, len=0x14, v=1, aug=zR, code_align=1, data_align=-4, ra_reg=8, fde_enc=0x1B, instr=3
+- CIE#1: off=0x2C, len=0x14, v=1, aug=zR, code_align=1, data_align=-4, ra_reg=8, fde_enc=0x1B, instr=4
+.eh_frame FDE entries: 5
+- FDE#0: off=0x18, cie=0, pc=[0x1060,0x108C), cfa=r4+4, ra_off=(n/a), instr=3
+- FDE#1: off=0x44, cie=1, pc=[0x1020,0x1050), cfa=(n/a), ra_off=-4, instr=5
+- FDE#2: off=0x68, cie=1, pc=[0x1050,0x1058), cfa=r4+4, ra_off=-4, instr=3
+- FDE#3: off=0x7C, cie=1, pc=[0x1189,0x11CC), cfa=r4+4, ra_off=-4, instr=17
+- FDE#4: off=0xB0, cie=1, pc=[0x11CC,0x11D0), cfa=r4+4, ra_off=-4, instr=3
+.eh_frame_hdr: v1, eh_ptr_enc=0x1B, fde_enc=0x03, table_enc=0x3B, eh_frame_ptr=0x2054, fde_count=5, parsed_table_entries=5
+Debug Sections: (none)
+
+DWARF Index
+-----------
+Sections: info=No, abbrev=No, line=No, str=No, ranges=No, addr=No, str_offsets=No, rnglists=No, loclists=No
+Compile Units: 0
+Line Tables: 0
+Semantic Units: 0
+Symbol↔DIE Mappings: 0
+
+Section Special Cases
+---------------------
+Compressed Sections: (none)
+Section Groups: (none)
+
+Core Dump
+---------
+Type: not ET_CORE
+
+Counts
+------
+Sections: 31
+Segments: 12
+Symbols: 48
+Imported Symbols: 6
+Exported Symbols: 16
+Relocations: 10
+Dynamic Entries: 26
+Notes: 3
+
+Sections
+--------
+- [0] (unnamed): SHT_NULL (0), flags=0, addr=0x0, off=0x0, size=0x0
+- [1] .note.gnu.build-id: SHT_NOTE (7), flags=ALLOC, addr=0x1B4, off=0x1B4, size=0x24
+- [2] .interp: SHT_PROGBITS (1), flags=ALLOC, addr=0x1D8, off=0x1D8, size=0x13
+- [3] .gnu.hash: SHT_GNU_HASH (1879048182), flags=ALLOC, addr=0x1EC, off=0x1EC, size=0x20
+- [4] .dynsym: SHT_DYNSYM (11), flags=ALLOC, addr=0x20C, off=0x20C, size=0x80
+- [5] .dynstr: SHT_STRTAB (3), flags=ALLOC, addr=0x28C, off=0x28C, size=0xA8
+- [6] .gnu.version: SHT_GNU_versym (1879048191), flags=ALLOC, addr=0x334, off=0x334, size=0x10
+- [7] .gnu.version_r: SHT_GNU_verneed (1879048190), flags=ALLOC, addr=0x344, off=0x344, size=0x40
+- [8] .rel.dyn: SHT_REL (9), flags=ALLOC, addr=0x384, off=0x384, size=0x40
+- [9] .rel.plt: SHT_REL (9), flags=ALLOC|INFO_LINK, addr=0x3C4, off=0x3C4, size=0x10
+- [10] .init: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x1000, off=0x1000, size=0x20
+- [11] .plt: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x1020, off=0x1020, size=0x30
+- [12] .plt.got: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x1050, off=0x1050, size=0x8
+- [13] .text: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x1060, off=0x1060, size=0x170
+- [14] .fini: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x11D0, off=0x11D0, size=0x14
+- [15] .rodata: SHT_PROGBITS (1), flags=ALLOC, addr=0x2000, off=0x2000, size=0x1D
+- [16] .eh_frame_hdr: SHT_PROGBITS (1), flags=ALLOC, addr=0x2020, off=0x2020, size=0x34
+- [17] .eh_frame: SHT_PROGBITS (1), flags=ALLOC, addr=0x2054, off=0x2054, size=0xC8
+- [18] .note.ABI-tag: SHT_NOTE (7), flags=ALLOC, addr=0x211C, off=0x211C, size=0x20
+- [19] .note.package: SHT_NOTE (7), flags=ALLOC, addr=0x213C, off=0x213C, size=0x74
+- [20] .init_array: SHT_INIT_ARRAY (14), flags=WRITE|ALLOC, addr=0x3EE8, off=0x2EE8, size=0x4
+- [21] .fini_array: SHT_FINI_ARRAY (15), flags=WRITE|ALLOC, addr=0x3EEC, off=0x2EEC, size=0x4
+- [22] .dynamic: SHT_DYNAMIC (6), flags=WRITE|ALLOC, addr=0x3EF0, off=0x2EF0, size=0xF0
+- [23] .got: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x3FE0, off=0x2FE0, size=0x14
+- [24] .got.plt: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x3FF4, off=0x2FF4, size=0x14
+- [25] .data: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x4008, off=0x3008, size=0x8
+- [26] .bss: SHT_NOBITS (8), flags=WRITE|ALLOC, addr=0x4010, off=0x3010, size=0x4
+- [27] .comment: SHT_PROGBITS (1), flags=MERGE|STRINGS, addr=0x0, off=0x3010, size=0x1F
+- [28] .symtab: SHT_SYMTAB (2), flags=0, addr=0x0, off=0x3030, size=0x280
+- [29] .strtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0x32B0, size=0x224
+- [30] .shstrtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0x34D4, size=0x113
+
+Segments
+--------
+- [0] PT_PHDR (6), flags=R--, off=0x34, vaddr=0x34, filesz=0x180, memsz=0x180
+- [1] PT_INTERP (3), flags=R--, off=0x1D8, vaddr=0x1D8, filesz=0x13, memsz=0x13
+- [2] PT_LOAD (1), flags=R--, off=0x0, vaddr=0x0, filesz=0x3D4, memsz=0x3D4
+- [3] PT_LOAD (1), flags=R-X, off=0x1000, vaddr=0x1000, filesz=0x1E4, memsz=0x1E4
+- [4] PT_LOAD (1), flags=R--, off=0x2000, vaddr=0x2000, filesz=0x1B0, memsz=0x1B0
+- [5] PT_LOAD (1), flags=RW-, off=0x2EE8, vaddr=0x3EE8, filesz=0x128, memsz=0x12C
+- [6] PT_DYNAMIC (2), flags=RW-, off=0x2EF0, vaddr=0x3EF0, filesz=0xF0, memsz=0xF0
+- [7] PT_NOTE (4), flags=R--, off=0x1B4, vaddr=0x1B4, filesz=0x24, memsz=0x24
+- [8] PT_NOTE (4), flags=R--, off=0x211C, vaddr=0x211C, filesz=0x94, memsz=0x94
+- [9] PT_GNU_EH_FRAME (1685382480), flags=R--, off=0x2020, vaddr=0x2020, filesz=0x34, memsz=0x34
+- [10] PT_GNU_STACK (1685382481), flags=RW-, off=0x0, vaddr=0x0, filesz=0x0, memsz=0x0
+- [11] PT_GNU_RELRO (1685382482), flags=R--, off=0x2EE8, vaddr=0x3EE8, filesz=0x118, memsz=0x118
+
+Import Libraries
+----------------
+- libc.so.6
+
+Imported Symbols
+----------------
+- _ITM_deregisterTMCloneTable <= libc.so.6
+- _ITM_registerTMCloneTable <= libc.so.6
+- __cxa_finalize@GLIBC_2.1.3 <= libc.so.6
+- __gmon_start__ <= libc.so.6
+- __libc_start_main@GLIBC_2.34 <= libc.so.6
+- printf@GLIBC_2.0 <= libc.so.6
+
+Exported Symbols
+----------------
+- _IO_stdin_used @ 0x2004
+- __TMC_END__ @ 0x4010
+- __bss_start @ 0x4010
+- __data_start @ 0x4008
+- __dso_handle @ 0x400C
+- __x86.get_pc_thunk.ax @ 0x11CC
+- __x86.get_pc_thunk.bx @ 0x1090
+- __x86.get_pc_thunk.dx @ 0x1185
+- _edata @ 0x4010
+- _end @ 0x4014
+- _fini @ 0x11D0
+- _fp_hw @ 0x2000
+- _init @ 0x1000
+- _start @ 0x1060
+- data_start @ 0x4008
+- main @ 0x1189
+
+Dynamic Entries
+---------------
+- DT_NEEDED (1) = 0x38 -> libc.so.6
+- DT_INIT (12) = 0x1000 -> addr=0x1000, file_off=0x1000, section=.init
+- DT_FINI (13) = 0x11D0 -> addr=0x11D0, file_off=0x11D0, section=.fini
+- DT_INIT_ARRAY (25) = 0x3EE8 -> addr=0x3EE8, file_off=0x2EE8, section=.init_array
+- DT_INIT_ARRAYSZ (27) = 0x4 -> size=4 (0x4), entries=1
+- DT_FINI_ARRAY (26) = 0x3EEC -> addr=0x3EEC, file_off=0x2EEC, section=.fini_array
+- DT_FINI_ARRAYSZ (28) = 0x4 -> size=4 (0x4), entries=1
+- DT_GNU_HASH (1879047925) = 0x1EC -> addr=0x1EC, file_off=0x1EC, section=.gnu.hash
+- DT_STRTAB (5) = 0x28C -> addr=0x28C, file_off=0x28C, section=.dynstr
+- DT_SYMTAB (6) = 0x20C -> addr=0x20C, file_off=0x20C, section=.dynsym
+- DT_STRSZ (10) = 0xA8 -> size=168 (0xA8)
+- DT_SYMENT (11) = 0x10 -> entry_size=16
+- DT_DEBUG (21) = 0x0
+- DT_PLTGOT (3) = 0x3FF4 -> addr=0x3FF4, file_off=0x2FF4, section=.got.plt
+- DT_PLTRELSZ (2) = 0x10 -> size=16 (0x10)
+- DT_PLTREL (20) = 0x11 -> DT_REL
+- DT_JMPREL (23) = 0x3C4 -> addr=0x3C4, file_off=0x3C4, section=.rel.plt
+- DT_REL (17) = 0x384 -> addr=0x384, file_off=0x384, section=.rel.dyn
+- DT_RELSZ (18) = 0x40 -> size=64 (0x40), entries=8
+- DT_RELENT (19) = 0x8 -> entry_size=8
+- DT_FLAGS_1 (1879048187) = 0x8000000 -> DF_1_PIE
+- DT_VERNEED (1879048190) = 0x344 -> addr=0x344, file_off=0x344, section=.gnu.version_r
+- DT_VERNEEDNUM (1879048191) = 0x1 -> count=1
+- DT_VERSYM (1879048176) = 0x334 -> addr=0x334, file_off=0x334, section=.gnu.version
+- DT_RELCOUNT (1879048186) = 0x4 -> 4; count=4
+- DT_NULL (0) = 0x0
+
+Relocations (resolved)
+----------------------
+- 0x3EE8: R_386_RELATIVE (8) [REL] -> sym#0, source=.rel.dyn, section=.init_array, loader=GENERAL
+- 0x3EEC: R_386_RELATIVE (8) [REL] -> sym#0, source=.rel.dyn, section=.fini_array, loader=GENERAL
+- 0x3FEC: R_386_RELATIVE (8) [REL] -> sym#0, source=.rel.dyn, section=.got, loader=GOT
+- 0x400C: R_386_RELATIVE (8) [REL] -> sym#0, source=.rel.dyn, section=.data, loader=GENERAL
+- 0x3FE0: R_386_GLOB_DAT (6) [REL] -> _ITM_deregisterTMCloneTable <= libc.so.6, source=.rel.dyn, section=.got, loader=GOT
+- 0x3FE4: R_386_GLOB_DAT (6) [REL] -> __cxa_finalize@GLIBC_2.1.3 <= libc.so.6, source=.rel.dyn, section=.got, loader=GOT
+- 0x3FE8: R_386_GLOB_DAT (6) [REL] -> __gmon_start__ <= libc.so.6, source=.rel.dyn, section=.got, loader=GOT
+- 0x3FF0: R_386_GLOB_DAT (6) [REL] -> _ITM_registerTMCloneTable <= libc.so.6, source=.rel.dyn, section=.got, loader=GOT
+- 0x4000: R_386_JUMP_SLOT (7) [REL] -> __libc_start_main@GLIBC_2.34 <= libc.so.6, source=.rel.plt, section=.got.plt, loader=PLT+GOT
+- 0x4004: R_386_JUMP_SLOT (7) [REL] -> printf@GLIBC_2.0 <= libc.so.6, source=.rel.plt, section=.got.plt, loader=PLT+GOT
+
+Notes
+-----
+- GNU NT_GNU_BUILD_ID (3) -> de02571bd62d33e45838562db692450ecd31d114
+- GNU NT_GNU_ABI_TAG (1) -> Linux 3.2.0
+- FDO NT_FDO_PACKAGING_METADATA (3405650558) -> {"type":"deb","os":"debian","name":"cross-toolchain-base","version":"77","architecture":"amd64"}

@@ -1,0 +1,1096 @@
+﻿ELF Report
+==========
+File: /Users/mkoenig/Projects/dotnet/ELF-Inspector/samples/nano
+Generated: (deterministic)
+
+Header
+------
+Class: Elf64
+Endianness: LittleEndian
+Type: ET_DYN (3)
+Machine: AArch64 (code 183)
+OSABI: UNIX - System V (code 0)
+ABI Version: 0
+Flags: 0x0
+EntryPoint: 0x8440
+Interpreter: /lib/ld-linux-aarch64.so.1
+SONAME: (none)
+RPATH: (none)
+RUNPATH: (none)
+
+Security Features
+-----------------
+PIE: Yes
+RELRO: Full
+NX: Enabled
+BIND_NOW: Yes
+Canary Hints: Yes
+Canary Indicators: __stack_chk_fail, __stack_chk_guard
+FORTIFY Hints: Yes
+FORTIFY Indicators: __fprintf_chk, __printf_chk, __snprintf_chk, __sprintf_chk, __strncpy_chk, __vfprintf_chk, __vsnprintf_chk
+
+Hash Tables
+-----------
+SYSV Hash: (none)
+GNU Hash: present
+- Buckets: declared=1, parsed=1
+- Symbol Offset: 1
+- Bloom Words: declared=1, parsed=1, bits=64, shift=0
+- Bloom Preview: [0]=0x0
+- Buckets Preview: [0]=0
+- Chains Preview: (none)
+Lookup Paths
+- [GNU] COLORS: hash=0xA9E93E77, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] COLS: hash=0x7C832716, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] LINES: hash=0x0D87A320, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _ITM_deregisterTMCloneTable: hash=0x85F4D995, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] _ITM_registerTMCloneTable: hash=0xA1CFB68C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __ctype_b_loc: hash=0x22494966, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __ctype_get_mb_cur_max: hash=0xE4BD07C3, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __ctype_tolower_loc: hash=0x94A8B0B0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __ctype_toupper_loc: hash=0x7E72D553, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __cxa_finalize: hash=0x6DCE65D0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __errno_location: hash=0xA4F92301, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __fprintf_chk: hash=0xE311EE51, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __getdelim: hash=0x72DF7F8E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __gmon_start__: hash=0x1C7A971F, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __isoc23_sscanf: hash=0x92F51CD3, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __isoc23_strtol: hash=0x930FBFFD, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __libc_start_main: hash=0xF63D4E2E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __printf_chk: hash=0xB4EBE20B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __snprintf_chk: hash=0x7D3AEB4C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __sprintf_chk: hash=0xA8C7229E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __stack_chk_fail: hash=0x1F4039C9, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __stack_chk_guard: hash=0x07646220, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __strncpy_chk: hash=0xFF7D224B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __uflow: hash=0x7AB53890, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __vfprintf_chk: hash=0xE52F5967, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __vsnprintf_chk: hash=0xC305B922, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] __xpg_basename: hash=0x5238B42D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] abort: hash=0x0F11ED7D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] access: hash=0xF15AEA17, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] beep: hash=0x7C9487C1, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] bindtextdomain: hash=0xC53B745F, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] chdir: hash=0x0F3938CF, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] chmod: hash=0x0F395FD0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] close: hash=0x0F3B9A5B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] closedir: hash=0x5E00F7DA, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] curs_set: hash=0x19C9898D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] curscr: hash=0xF7536797, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] dcgettext: hash=0xBCE9EF31, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] dcngettext: hash=0x46F3A95F, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] define_key: hash=0x7BB5EF18, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] delwin: hash=0xF883CFA8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] dirname: hash=0x12B9E905, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] doupdate: hash=0x3EF9957B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] dup2: hash=0x7C95E5C0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] endpwent: hash=0xB6A3F66A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] endwin: hash=0xFB7771CA, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] execl: hash=0x0F663356, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] execlp: hash=0xFC2C9E86, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] execvp: hash=0xFC2C9FD0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] exit: hash=0x7C967E3F, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fchmod: hash=0xFD079496, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fchown: hash=0xFD079E2A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fclose: hash=0xFD09CF21, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fcntl: hash=0x0F6CF05C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fdopen: hash=0xFD1D8F41, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] ferror: hash=0xFD3156B5, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fflush: hash=0xFD40322D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fileno: hash=0xFD763702, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] flockfile: hash=0x56B06774, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fopen: hash=0x0F738B7D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fork: hash=0x7C96E577, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fpathconf: hash=0xF978463E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fputc: hash=0x0F742F07, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fread: hash=0x0F750147, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] free: hash=0x7C96F087, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fsync: hash=0x0F75E468, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] funlockfile: hash=0xEFA5B8B7, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] futimens: hash=0xE28BD750, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] fwrite: hash=0xFE76EA16, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getenv: hash=0xFF8760AE, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] geteuid: hash=0xF07392EC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] gethostname: hash=0x64365624, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getmouse: hash=0xFF739F8E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getopt_long: hash=0x27D5AE07, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getpid: hash=0xFF878EC2, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getpwent: hash=0xFFAE0773, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] getpwuid: hash=0xFFAE4ACE, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] glob: hash=0x7C9764A9, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] globfree: hash=0x0DD5722B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] halfdelay: hash=0x3866BAEF, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] has_colors: hash=0x9E934932, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] init_pair: hash=0xE59FDDC4, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] initscr: hash=0x9EA79D01, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] ioctl: hash=0x0FA99FA0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] isatty: hash=0x0524DE63, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] isendwin: hash=0xEAB55206, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] iswalnum: hash=0x13CB2D15, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] iswalpha: hash=0x13CB33DE, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] iswblank: hash=0x13DD0D60, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] iswpunct: hash=0x14DF89C2, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] key_defined: hash=0x015E307C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] keypad: hash=0x08DEEE23, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] kill: hash=0x7C998911, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] lstat: hash=0x0FE2608D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] malloc: hash=0x0D39AD3D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mbstowcs: hash=0xA0396FF7, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] memcpy: hash=0x0D827590, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] memmove: hash=0xBDD69F1B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] memset: hash=0x0D82B830, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mkdir: hash=0x0FEFD2FC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mkstemp: hash=0xCC45D0E6, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mkstemps: hash=0x54FFEE19, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mouseinterval: hash=0x3BAF8133, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mousemask: hash=0x3DA4163A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] mvwprintw: hash=0x474F2C83, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] napms: hash=0x0FFCA344, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] newwin: hash=0x0FDD6E1D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] nl_langinfo: hash=0x06946D8C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] nodelay: hash=0x217D2331, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] noecho: hash=0x10882F21, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] nonl: hash=0x7C9B47FC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] open: hash=0x7C9BD777, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] opendir: hash=0x70E36F76, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] optarg: hash=0x12F7A2B2, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] optind: hash=0x12F7C433, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] pipe: hash=0x7C9C4773, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] putc: hash=0x7C9C7B01, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] putchar: hash=0xCA90EEBC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] putenv: hash=0x15A75667, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] puts: hash=0x7C9C7B11, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] qsort: hash=0x103CC7FE, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] raw: hash=0x0B88A4CF, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] read: hash=0x7C9D4D41, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] readdir: hash=0x3DDB8900, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] realloc: hash=0x3DE00EC7, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] realpath: hash=0xF9E3E036, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] regcomp: hash=0x3E47BEF2, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] regerror: hash=0x076588ED, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] regexec: hash=0x3E48FCE8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] regfree: hash=0x3E496FC5, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] rewinddir: hash=0xCCBED64D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] scrollok: hash=0x740D346E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] set_escdelay: hash=0xBB1CB6DA, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] setlocale: hash=0x615D8AA1, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] sigaction: hash=0x0F375846, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] sigaddset: hash=0x0F40D3FD, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] sigemptyset: hash=0x64B43E63, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] sigfillset: hash=0x847575FB, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] sigprocmask: hash=0x08DBEB48, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] snprintf: hash=0xBE582CF9, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] start_color: hash=0xC78C61F1, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] stat: hash=0x7C9E1981, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] stderr: hash=0x1C8BF239, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] stdout: hash=0x1C8C1D28, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] stdscr: hash=0x1C8C2BD8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] stpcpy: hash=0x1C927E08, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strcasecmp: hash=0xB3850D3A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strcasestr: hash=0xB3855233, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strcat: hash=0x1C9394D6, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strchr: hash=0x1C9395BB, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strcmp: hash=0x1C93965E, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strcpy: hash=0x1C9396CA, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strerror: hash=0x8FF9AC08, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strlen: hash=0x1C93BB9D, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strncasecmp: hash=0xBBF0BDA8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strncmp: hash=0xAF0C3FCC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strncpy: hash=0xAF0C4038, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strpbrk: hash=0xAF0D54ED, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strrchr: hash=0xAF0E70AD, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strstr: hash=0x1C93DB57, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] strtok: hash=0x1C93DEEC, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] tcgetattr: hash=0x04A6D357, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] tcsetattr: hash=0xA061AC63, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] textdomain: hash=0x91297742, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] tgetstr: hash=0xDCCBBD12, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] tigetstr: hash=0x13D3435B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] time: hash=0x7C9E7894, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] towlower: hash=0x077F36A8, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] typeahead: hash=0x05C7043A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] ungetch: hash=0x3A360F93, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] unlink: hash=0x20CE23F6, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] use_default_colors: hash=0x98D5BDC7, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] waddch: hash=0x2488BCF0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] waddnstr: hash=0x69B1FF4C, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wait: hash=0x7C9FFB3A, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] waitpid: hash=0xB603D357, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wattr_off: hash=0x952592F1, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wattr_on: hash=0x9027ED33, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wclrtoeol: hash=0x0159D320, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wctomb: hash=0x24B5E411, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wcwidth: hash=0xBBA541DF, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wenclose: hash=0xB4DB4625, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wgetch: hash=0x24F62067, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wmouse_trafo: hash=0x460AE0E0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wmove: hash=0x10A61133, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wnoutrefresh: hash=0xAD603031, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wprintw: hash=0xD99E0220, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wredrawln: hash=0x9D89D81B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wrefresh: hash=0x88CB578B, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+- [GNU] wscrl: hash=0x10A927F0, bloom=miss, bucket[0]=0, chainStart=0, visited=0, match=no
+
+Unwind / Debug
+--------------
+.eh_frame: addr=0x43618, size=0x6BF0, CIE=1, FDE=484, terminator=Yes
+.eh_frame CIE entries: 1
+- CIE#0: off=0x0, len=0x10, v=1, aug=zR, code_align=4, data_align=-8, ra_reg=30, fde_enc=0x1B, instr=1
+.eh_frame FDE entries: 484
+- FDE#0: off=0x14, cie=0, pc=[0x8440,0x8474), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#1: off=0x28, cie=0, pc=[0x84A0,0x84D0), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#2: off=0x3C, cie=0, pc=[0x84D0,0x850C), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#3: off=0x50, cie=0, pc=[0x850C,0x855C), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#4: off=0x78, cie=0, pc=[0x8560,0x8568), cfa=r31+0, ra_off=(n/a), instr=7
+- FDE#5: off=0x90, cie=0, pc=[0x8580,0x8590), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#6: off=0xA4, cie=0, pc=[0x8590,0x85AC), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#7: off=0xB8, cie=0, pc=[0x85AC,0x8AF4), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#8: off=0x138, cie=0, pc=[0x8B00,0x8CF0), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#9: off=0x17C, cie=0, pc=[0x8CF0,0x8D98), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#10: off=0x1D0, cie=0, pc=[0x8DA0,0x8EF4), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#11: off=0x224, cie=0, pc=[0x8F00,0x916C), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#12: off=0x29C, cie=0, pc=[0x916C,0x91FC), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#13: off=0x2D0, cie=0, pc=[0x9200,0x923C), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#14: off=0x2F8, cie=0, pc=[0x9240,0x9DEC), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#15: off=0x340, cie=0, pc=[0x9DEC,0x9F50), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#16: off=0x370, cie=0, pc=[0x9F60,0x9F74), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#17: off=0x384, cie=0, pc=[0x9F80,0x9F90), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#18: off=0x398, cie=0, pc=[0x9F90,0x9FEC), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#19: off=0x3AC, cie=0, pc=[0x9FEC,0xA034), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#20: off=0x3C0, cie=0, pc=[0xA040,0xA100), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#21: off=0x3D4, cie=0, pc=[0xA100,0xA1F8), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#22: off=0x3E8, cie=0, pc=[0xA200,0xA280), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#23: off=0x410, cie=0, pc=[0xA280,0xA300), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#24: off=0x438, cie=0, pc=[0xA300,0xA398), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#25: off=0x460, cie=0, pc=[0xA3A0,0xA420), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#26: off=0x488, cie=0, pc=[0xA420,0xA4B8), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#27: off=0x4B0, cie=0, pc=[0xA4C0,0xA558), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#28: off=0x4D8, cie=0, pc=[0xA560,0xA620), cfa=r31+0, ra_off=(n/a), instr=3
+- FDE#29: off=0x4EC, cie=0, pc=[0xA620,0xA6C4), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#30: off=0x510, cie=0, pc=[0xA6C4,0xA8D4), cfa=r31+0, ra_off=(n/a), instr=2
+- FDE#31: off=0x580, cie=0, pc=[0xA8E0,0xAA00), cfa=r31+0, ra_off=(n/a), instr=2
+... 452 more FDE entries
+.eh_frame_hdr: v1, eh_ptr_enc=0x1B, fde_enc=0x03, table_enc=0x3B, eh_frame_ptr=0x43618, fde_count=484, parsed_table_entries=484
+Debug Sections: (none)
+
+DWARF Index
+-----------
+Sections: info=No, abbrev=No, line=No, str=No, ranges=No, addr=No, str_offsets=No, rnglists=No, loclists=No
+Compile Units: 0
+Line Tables: 0
+Semantic Units: 0
+Symbol↔DIE Mappings: 0
+
+Section Special Cases
+---------------------
+Compressed Sections: (none)
+Section Groups: (none)
+
+Core Dump
+---------
+Type: not ET_CORE
+
+Counts
+------
+Sections: 28
+Segments: 12
+Symbols: 193
+Imported Symbols: 190
+Exported Symbols: 0
+Relocations: 617
+Dynamic Entries: 31
+Notes: 3
+
+Sections
+--------
+- [0] (unnamed): SHT_NULL (0), flags=0, addr=0x0, off=0x0, size=0x0
+- [1] .note.gnu.property: SHT_NOTE (7), flags=ALLOC, addr=0x2E0, off=0x2E0, size=0x20
+- [2] .note.gnu.build-id: SHT_NOTE (7), flags=ALLOC, addr=0x300, off=0x300, size=0x24
+- [3] .interp: SHT_PROGBITS (1), flags=ALLOC, addr=0x324, off=0x324, size=0x1B
+- [4] .gnu.hash: SHT_GNU_HASH (1879048182), flags=ALLOC, addr=0x340, off=0x340, size=0x1C
+- [5] .dynsym: SHT_DYNSYM (11), flags=ALLOC, addr=0x360, off=0x360, size=0x1218
+- [6] .dynstr: SHT_STRTAB (3), flags=ALLOC, addr=0x1578, off=0x1578, size=0x774
+- [7] .gnu.version: SHT_GNU_versym (1879048191), flags=ALLOC, addr=0x1CEC, off=0x1CEC, size=0x182
+- [8] .gnu.version_r: SHT_GNU_verneed (1879048190), flags=ALLOC, addr=0x1E70, off=0x1E70, size=0xE0
+- [9] .rela.dyn: SHT_RELA (4), flags=ALLOC, addr=0x1F50, off=0x1F50, size=0x2928
+- [10] .rela.plt: SHT_RELA (4), flags=ALLOC|INFO_LINK, addr=0x4878, off=0x4878, size=0x10B0
+- [11] .init: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x5928, off=0x5928, size=0x1C
+- [12] .plt: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x5950, off=0x5950, size=0x10D0
+- [13] .text: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x6A40, off=0x6A40, size=0x340A8
+- [14] .fini: SHT_PROGBITS (1), flags=ALLOC|EXECINSTR, addr=0x3AAE8, off=0x3AAE8, size=0x18
+- [15] .rodata: SHT_PROGBITS (1), flags=ALLOC, addr=0x3AB00, off=0x3AB00, size=0x7BEC
+- [16] .eh_frame_hdr: SHT_PROGBITS (1), flags=ALLOC, addr=0x426EC, off=0x426EC, size=0xF2C
+- [17] .eh_frame: SHT_PROGBITS (1), flags=ALLOC, addr=0x43618, off=0x43618, size=0x6BF0
+- [18] .note.ABI-tag: SHT_NOTE (7), flags=ALLOC, addr=0x4A208, off=0x4A208, size=0x20
+- [19] .init_array: SHT_INIT_ARRAY (14), flags=WRITE|ALLOC, addr=0x5EC78, off=0x4EC78, size=0x8
+- [20] .fini_array: SHT_FINI_ARRAY (15), flags=WRITE|ALLOC, addr=0x5EC80, off=0x4EC80, size=0x8
+- [21] .data.rel.ro: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x5EC88, off=0x4EC88, size=0x430
+- [22] .dynamic: SHT_DYNAMIC (6), flags=WRITE|ALLOC, addr=0x5F0B8, off=0x4F0B8, size=0x230
+- [23] .got: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x5F2E8, off=0x4F2E8, size=0xD18
+- [24] .data: SHT_PROGBITS (1), flags=WRITE|ALLOC, addr=0x60000, off=0x50000, size=0xAF8
+- [25] .bss: SHT_NOBITS (8), flags=WRITE|ALLOC, addr=0x60B00, off=0x50AF8, size=0x768
+- [26] .gnu_debuglink: SHT_PROGBITS (1), flags=0, addr=0x0, off=0x50AF8, size=0x34
+- [27] .shstrtab: SHT_STRTAB (3), flags=0, addr=0x0, off=0x50B2C, size=0x110
+
+Segments
+--------
+- [0] PT_PHDR (6), flags=R--, off=0x40, vaddr=0x40, filesz=0x2A0, memsz=0x2A0
+- [1] PT_INTERP (3), flags=R--, off=0x324, vaddr=0x324, filesz=0x1B, memsz=0x1B
+- [2] PT_LOAD (1), flags=R-X, off=0x0, vaddr=0x0, filesz=0x4A228, memsz=0x4A228
+- [3] PT_LOAD (1), flags=RW-, off=0x4EC78, vaddr=0x5EC78, filesz=0x1E80, memsz=0x25F0
+- [4] PT_DYNAMIC (2), flags=RW-, off=0x4F0B8, vaddr=0x5F0B8, filesz=0x230, memsz=0x230
+- [5] PT_NOTE (4), flags=R--, off=0x2E0, vaddr=0x2E0, filesz=0x20, memsz=0x20
+- [6] PT_NOTE (4), flags=R--, off=0x300, vaddr=0x300, filesz=0x24, memsz=0x24
+- [7] PT_NOTE (4), flags=R--, off=0x4A208, vaddr=0x4A208, filesz=0x20, memsz=0x20
+- [8] PT_GNU_PROPERTY (1685382483), flags=R--, off=0x2E0, vaddr=0x2E0, filesz=0x20, memsz=0x20
+- [9] PT_GNU_EH_FRAME (1685382480), flags=R--, off=0x426EC, vaddr=0x426EC, filesz=0xF2C, memsz=0xF2C
+- [10] PT_GNU_STACK (1685382481), flags=RW-, off=0x0, vaddr=0x0, filesz=0x0, memsz=0x0
+- [11] PT_GNU_RELRO (1685382482), flags=R--, off=0x4EC78, vaddr=0x5EC78, filesz=0x1388, memsz=0x1388
+
+Import Libraries
+----------------
+- ld-linux-aarch64.so.1
+- libc.so.6
+- libncursesw.so.6
+- libtinfo.so.6
+
+Imported Symbols
+----------------
+- COLORS@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- COLS@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- LINES@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- _ITM_deregisterTMCloneTable <= (unknown)
+- _ITM_registerTMCloneTable <= (unknown)
+- __ctype_b_loc@GLIBC_2.17 <= libc.so.6
+- __ctype_get_mb_cur_max@GLIBC_2.17 <= libc.so.6
+- __ctype_tolower_loc@GLIBC_2.17 <= libc.so.6
+- __ctype_toupper_loc@GLIBC_2.17 <= libc.so.6
+- __cxa_finalize@GLIBC_2.17 <= libc.so.6
+- __errno_location@GLIBC_2.17 <= libc.so.6
+- __fprintf_chk@GLIBC_2.17 <= libc.so.6
+- __getdelim@GLIBC_2.17 <= libc.so.6
+- __gmon_start__ <= (unknown)
+- __isoc23_sscanf@GLIBC_2.38 <= libc.so.6
+- __isoc23_strtol@GLIBC_2.38 <= libc.so.6
+- __libc_start_main@GLIBC_2.34 <= libc.so.6
+- __printf_chk@GLIBC_2.17 <= libc.so.6
+- __snprintf_chk@GLIBC_2.17 <= libc.so.6
+- __sprintf_chk@GLIBC_2.17 <= libc.so.6
+- __stack_chk_fail@GLIBC_2.17 <= libc.so.6
+- __stack_chk_guard@GLIBC_2.17 <= ld-linux-aarch64.so.1
+- __strncpy_chk@GLIBC_2.17 <= libc.so.6
+- __uflow@GLIBC_2.17 <= libc.so.6
+- __vfprintf_chk@GLIBC_2.17 <= libc.so.6
+- __vsnprintf_chk@GLIBC_2.17 <= libc.so.6
+- __xpg_basename@GLIBC_2.17 <= libc.so.6
+- abort@GLIBC_2.17 <= libc.so.6
+- access@GLIBC_2.17 <= libc.so.6
+- beep@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- bindtextdomain@GLIBC_2.17 <= libc.so.6
+- chdir@GLIBC_2.17 <= libc.so.6
+- chmod@GLIBC_2.17 <= libc.so.6
+- close@GLIBC_2.17 <= libc.so.6
+- closedir@GLIBC_2.17 <= libc.so.6
+- curs_set@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- curscr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- dcgettext@GLIBC_2.17 <= libc.so.6
+- dcngettext@GLIBC_2.17 <= libc.so.6
+- define_key@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- delwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- dirname@GLIBC_2.17 <= libc.so.6
+- doupdate@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- dup2@GLIBC_2.17 <= libc.so.6
+- endpwent@GLIBC_2.17 <= libc.so.6
+- endwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- execl@GLIBC_2.17 <= libc.so.6
+- execlp@GLIBC_2.17 <= libc.so.6
+- execvp@GLIBC_2.17 <= libc.so.6
+- exit@GLIBC_2.17 <= libc.so.6
+- fchmod@GLIBC_2.17 <= libc.so.6
+- fchown@GLIBC_2.17 <= libc.so.6
+- fclose@GLIBC_2.17 <= libc.so.6
+- fcntl@GLIBC_2.17 <= libc.so.6
+- fdopen@GLIBC_2.17 <= libc.so.6
+- ferror@GLIBC_2.17 <= libc.so.6
+- fflush@GLIBC_2.17 <= libc.so.6
+- fileno@GLIBC_2.17 <= libc.so.6
+- flockfile@GLIBC_2.17 <= libc.so.6
+- fopen@GLIBC_2.17 <= libc.so.6
+- fork@GLIBC_2.17 <= libc.so.6
+- fpathconf@GLIBC_2.17 <= libc.so.6
+- fputc@GLIBC_2.17 <= libc.so.6
+- fread@GLIBC_2.17 <= libc.so.6
+- free@GLIBC_2.17 <= libc.so.6
+- fsync@GLIBC_2.17 <= libc.so.6
+- funlockfile@GLIBC_2.17 <= libc.so.6
+- futimens@GLIBC_2.17 <= libc.so.6
+- fwrite@GLIBC_2.17 <= libc.so.6
+- getenv@GLIBC_2.17 <= libc.so.6
+- geteuid@GLIBC_2.17 <= libc.so.6
+- gethostname@GLIBC_2.17 <= libc.so.6
+- getmouse@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- getopt_long@GLIBC_2.17 <= libc.so.6
+- getpid@GLIBC_2.17 <= libc.so.6
+- getpwent@GLIBC_2.17 <= libc.so.6
+- getpwuid@GLIBC_2.17 <= libc.so.6
+- glob@GLIBC_2.27 <= libc.so.6
+- globfree@GLIBC_2.17 <= libc.so.6
+- halfdelay@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- has_colors@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- init_pair@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- initscr@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- ioctl@GLIBC_2.17 <= libc.so.6
+- isatty@GLIBC_2.17 <= libc.so.6
+- isendwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- iswalnum@GLIBC_2.17 <= libc.so.6
+- iswalpha@GLIBC_2.17 <= libc.so.6
+- iswblank@GLIBC_2.17 <= libc.so.6
+- iswpunct@GLIBC_2.17 <= libc.so.6
+- key_defined@NCURSES6_TINFO_5.4.20040208 <= libtinfo.so.6
+- keypad@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- kill@GLIBC_2.17 <= libc.so.6
+- lstat@GLIBC_2.33 <= libc.so.6
+- malloc@GLIBC_2.17 <= libc.so.6
+- mbstowcs@GLIBC_2.17 <= libc.so.6
+- memcpy@GLIBC_2.17 <= libc.so.6
+- memmove@GLIBC_2.17 <= libc.so.6
+- memset@GLIBC_2.17 <= libc.so.6
+- mkdir@GLIBC_2.17 <= libc.so.6
+- mkstemp@GLIBC_2.17 <= libc.so.6
+- mkstemps@GLIBC_2.17 <= libc.so.6
+- mouseinterval@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- mousemask@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- mvwprintw@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- napms@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- newwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- nl_langinfo@GLIBC_2.17 <= libc.so.6
+- nodelay@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- noecho@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- nonl@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- open@GLIBC_2.17 <= libc.so.6
+- opendir@GLIBC_2.17 <= libc.so.6
+- optarg@GLIBC_2.17 <= libc.so.6
+- optind@GLIBC_2.17 <= libc.so.6
+- pipe@GLIBC_2.17 <= libc.so.6
+- putc@GLIBC_2.17 <= libc.so.6
+- putchar@GLIBC_2.17 <= libc.so.6
+- putenv@GLIBC_2.17 <= libc.so.6
+- puts@GLIBC_2.17 <= libc.so.6
+- qsort@GLIBC_2.17 <= libc.so.6
+- raw@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- read@GLIBC_2.17 <= libc.so.6
+- readdir@GLIBC_2.17 <= libc.so.6
+- realloc@GLIBC_2.17 <= libc.so.6
+- realpath@GLIBC_2.17 <= libc.so.6
+- regcomp@GLIBC_2.17 <= libc.so.6
+- regerror@GLIBC_2.17 <= libc.so.6
+- regexec@GLIBC_2.17 <= libc.so.6
+- regfree@GLIBC_2.17 <= libc.so.6
+- rewinddir@GLIBC_2.17 <= libc.so.6
+- scrollok@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- set_escdelay@NCURSESW6_5.7.20081102 <= libncursesw.so.6
+- setlocale@GLIBC_2.17 <= libc.so.6
+- sigaction@GLIBC_2.17 <= libc.so.6
+- sigaddset@GLIBC_2.17 <= libc.so.6
+- sigemptyset@GLIBC_2.17 <= libc.so.6
+- sigfillset@GLIBC_2.17 <= libc.so.6
+- sigprocmask@GLIBC_2.17 <= libc.so.6
+- snprintf@GLIBC_2.17 <= libc.so.6
+- start_color@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- stat@GLIBC_2.33 <= libc.so.6
+- stderr@GLIBC_2.17 <= libc.so.6
+- stdout@GLIBC_2.17 <= libc.so.6
+- stdscr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- stpcpy@GLIBC_2.17 <= libc.so.6
+- strcasecmp@GLIBC_2.17 <= libc.so.6
+- strcasestr@GLIBC_2.17 <= libc.so.6
+- strcat@GLIBC_2.17 <= libc.so.6
+- strchr@GLIBC_2.17 <= libc.so.6
+- strcmp@GLIBC_2.17 <= libc.so.6
+- strcpy@GLIBC_2.17 <= libc.so.6
+- strerror@GLIBC_2.17 <= libc.so.6
+- strlen@GLIBC_2.17 <= libc.so.6
+- strncasecmp@GLIBC_2.17 <= libc.so.6
+- strncmp@GLIBC_2.17 <= libc.so.6
+- strncpy@GLIBC_2.17 <= libc.so.6
+- strpbrk@GLIBC_2.17 <= libc.so.6
+- strrchr@GLIBC_2.17 <= libc.so.6
+- strstr@GLIBC_2.17 <= libc.so.6
+- strtok@GLIBC_2.17 <= libc.so.6
+- tcgetattr@GLIBC_2.17 <= libc.so.6
+- tcsetattr@GLIBC_2.17 <= libc.so.6
+- textdomain@GLIBC_2.17 <= libc.so.6
+- tgetstr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- tigetstr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- time@GLIBC_2.17 <= libc.so.6
+- towlower@GLIBC_2.17 <= libc.so.6
+- typeahead@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6
+- ungetch@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- unlink@GLIBC_2.17 <= libc.so.6
+- use_default_colors@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- waddch@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- waddnstr@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wait@GLIBC_2.17 <= libc.so.6
+- waitpid@GLIBC_2.17 <= libc.so.6
+- wattr_off@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wattr_on@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wclrtoeol@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wctomb@GLIBC_2.17 <= libc.so.6
+- wcwidth@GLIBC_2.17 <= libc.so.6
+- wenclose@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wgetch@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wmouse_trafo@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wmove@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wnoutrefresh@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wprintw@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wredrawln@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wrefresh@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+- wscrl@NCURSESW6_5.1.20000708 <= libncursesw.so.6
+
+Exported Symbols
+----------------
+(none)
+
+Dynamic Entries
+---------------
+- DT_NEEDED (1) = 0x698 -> libncursesw.so.6
+- DT_NEEDED (1) = 0x6A9 -> libtinfo.so.6
+- DT_NEEDED (1) = 0x6B7 -> libc.so.6
+- DT_NEEDED (1) = 0x6C1 -> ld-linux-aarch64.so.1
+- DT_INIT (12) = 0x5928 -> addr=0x5928, file_off=0x5928, section=.init
+- DT_FINI (13) = 0x3AAE8 -> addr=0x3AAE8, file_off=0x3AAE8, section=.fini
+- DT_INIT_ARRAY (25) = 0x5EC78 -> addr=0x5EC78, file_off=0x4EC78, section=.init_array
+- DT_INIT_ARRAYSZ (27) = 0x8 -> size=8 (0x8), entries=1
+- DT_FINI_ARRAY (26) = 0x5EC80 -> addr=0x5EC80, file_off=0x4EC80, section=.fini_array
+- DT_FINI_ARRAYSZ (28) = 0x8 -> size=8 (0x8), entries=1
+- DT_GNU_HASH (1879047925) = 0x340 -> addr=0x340, file_off=0x340, section=.gnu.hash
+- DT_STRTAB (5) = 0x1578 -> addr=0x1578, file_off=0x1578, section=.dynstr
+- DT_SYMTAB (6) = 0x360 -> addr=0x360, file_off=0x360, section=.dynsym
+- DT_STRSZ (10) = 0x774 -> size=1908 (0x774)
+- DT_SYMENT (11) = 0x18 -> entry_size=24
+- DT_DEBUG (21) = 0x0
+- DT_PLTGOT (3) = 0x5F2E8 -> addr=0x5F2E8, file_off=0x4F2E8, section=.got
+- DT_PLTRELSZ (2) = 0x10B0 -> size=4272 (0x10B0)
+- DT_PLTREL (20) = 0x7 -> DT_RELA
+- DT_JMPREL (23) = 0x4878 -> addr=0x4878, file_off=0x4878, section=.rela.plt
+- DT_RELA (7) = 0x1F50 -> addr=0x1F50, file_off=0x1F50, section=.rela.dyn
+- DT_RELASZ (8) = 0x2928 -> size=10536 (0x2928), entries=439
+- DT_RELAENT (9) = 0x18 -> entry_size=24
+- DT_AARCH64_BTI_PLT (1879048193) = 0x0 -> disabled
+- DT_FLAGS (30) = 0x8 -> DF_BIND_NOW
+- DT_FLAGS_1 (1879048187) = 0x8000001 -> DF_1_NOW|DF_1_PIE
+- DT_VERNEED (1879048190) = 0x1E70 -> addr=0x1E70, file_off=0x1E70, section=.gnu.version_r
+- DT_VERNEEDNUM (1879048191) = 0x4 -> count=4
+- DT_VERSYM (1879048176) = 0x1CEC -> addr=0x1CEC, file_off=0x1CEC, section=.gnu.version
+- DT_RELACOUNT (1879048185) = 0x1A7 -> 423; count=423
+- DT_NULL (0) = 0x0
+
+Relocations (resolved)
+----------------------
+- 0x5EC78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.init_array, loader=GENERAL, addend=34144
+- 0x5EC80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.fini_array, loader=GENERAL, addend=34060
+- 0x5EC88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262344
+- 0x5EC98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266184
+- 0x5ECA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262488
+- 0x5ECB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266632
+- 0x5ECC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262504
+- 0x5ECD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262624
+- 0x5ECE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262776
+- 0x5ECF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262568
+- 0x5ED08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262584
+- 0x5ED18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262360
+- 0x5ED28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262672
+- 0x5ED38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262808
+- 0x5ED48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262664
+- 0x5ED58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262592
+- 0x5ED68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262856
+- 0x5ED78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262608
+- 0x5ED88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266176
+- 0x5ED98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262424
+- 0x5EDA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262456
+- 0x5EDB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262392
+- 0x5EDC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262520
+- 0x5EDD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=264120
+- 0x5EDE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262640
+- 0x5EDF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262632
+- 0x5EE08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263032
+- 0x5EE18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266648
+- 0x5EE28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262936
+- 0x5EE38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262968
+- 0x5EE48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262728
+- 0x5EE58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262736
+- 0x5EE68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262840
+- 0x5EE78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263048
+- 0x5EE88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263000
+- 0x5EE98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262952
+- 0x5EEA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262792
+- 0x5EEB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=259832
+- 0x5EEC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262984
+- 0x5EED8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262768
+- 0x5EEE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266032
+- 0x5EEF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263080
+- 0x5EF08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262824
+- 0x5EF18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262544
+- 0x5EF28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262712
+- 0x5EF38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262872
+- 0x5EF48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263064
+- 0x5EF58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262888
+- 0x5EF68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262752
+- 0x5EF78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262408
+- 0x5EF88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263024
+- 0x5EF98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266120
+- 0x5EFA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262896
+- 0x5EFB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262912
+- 0x5EFC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=262928
+- 0x5EFD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=263088
+- 0x5EFE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265840
+- 0x5EFF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265856
+- 0x5F008: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265872
+- 0x5F018: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265888
+- 0x5F028: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265904
+- 0x5F038: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265920
+- 0x5F048: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265936
+- 0x5F058: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265952
+- 0x5F068: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265968
+- 0x5F078: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=265984
+- 0x5F088: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266000
+- 0x5F098: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data.rel.ro, loader=GENERAL, addend=266016
+- 0x5F898: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=120904
+- 0x5F8A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396704
+- 0x5F8A8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393289
+- 0x5F8B0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393296
+- 0x5F8B8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396888
+- 0x5F8C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78448
+- 0x5F8C8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=118400
+- 0x5F8D0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=124428
+- 0x5F8D8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397036
+- 0x5F8E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=180932
+- 0x5F8E8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78496
+- 0x5F8F0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78480
+- 0x5F8F8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397204
+- 0x5F900: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=166404
+- 0x5F908: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396952
+- 0x5F910: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=123236
+- 0x5F918: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396272
+- 0x5F920: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396688
+- 0x5F928: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397076
+- 0x5F938: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397201
+- 0x5F940: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397052
+- 0x5F948: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=121040
+- 0x5F950: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78504
+- 0x5F958: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396948
+- 0x5F960: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396296
+- 0x5F968: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396576
+- 0x5F970: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397084
+- 0x5F978: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397108
+- 0x5F980: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78568
+- 0x5F988: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=120776
+- 0x5F998: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=34192
+- 0x5F9A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396856
+- 0x5F9B0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393272
+- 0x5F9B8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=60328
+- 0x5F9C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396872
+- 0x5F9C8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396288
+- 0x5F9D0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78380
+- 0x5F9D8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397056
+- 0x5F9E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=126592
+- 0x5F9E8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=53600
+- 0x5F9F0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396768
+- 0x5FA00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=119600
+- 0x5FA08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396848
+- 0x5FA10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=171528
+- 0x5FA18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78592
+- 0x5FA20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396648
+- 0x5FA28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=126048
+- 0x5FA30: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396280
+- 0x5FA38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=171916
+- 0x5FA40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78512
+- 0x5FA48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396240
+- 0x5FA50: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397080
+- 0x5FA58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396992
+- 0x5FA60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397060
+- 0x5FA68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396960
+- 0x5FA70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=53740
+- 0x5FA78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396880
+- 0x5FA88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397192
+- 0x5FA90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397008
+- 0x5FA98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=173120
+- 0x5FAA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=166376
+- 0x5FAB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=52928
+- 0x5FAB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397040
+- 0x5FAC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396984
+- 0x5FAC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396920
+- 0x5FAD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78472
+- 0x5FAD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=213024
+- 0x5FAE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=119912
+- 0x5FAE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=118448
+- 0x5FAF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396944
+- 0x5FAF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397112
+- 0x5FB00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393288
+- 0x5FB08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=53380
+- 0x5FB10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=120132
+- 0x5FB20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=206312
+- 0x5FB28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=53192
+- 0x5FB30: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=122112
+- 0x5FB38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396904
+- 0x5FB40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78600
+- 0x5FB50: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78464
+- 0x5FB58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393290
+- 0x5FB60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=191692
+- 0x5FB68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=75684
+- 0x5FB70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396208
+- 0x5FB78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396656
+- 0x5FB80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396760
+- 0x5FB88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=52840
+- 0x5FB90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=195392
+- 0x5FB98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78440
+- 0x5FBA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=55392
+- 0x5FBA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=55008
+- 0x5FBB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=124232
+- 0x5FBB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396680
+- 0x5FBC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=171584
+- 0x5FBC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396640
+- 0x5FBD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397092
+- 0x5FBD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78528
+- 0x5FBE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397176
+- 0x5FBE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=232420
+- 0x5FBF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397020
+- 0x5FBF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396736
+- 0x5FC00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393280
+- 0x5FC08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397032
+- 0x5FC10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397100
+- 0x5FC18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393264
+- 0x5FC20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=119268
+- 0x5FC28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396996
+- 0x5FC48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=75628
+- 0x5FC58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=120544
+- 0x5FC60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396713
+- 0x5FC68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78408
+- 0x5FC70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=198952
+- 0x5FC78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397072
+- 0x5FC80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397064
+- 0x5FC88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=228864
+- 0x5FC90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=199968
+- 0x5FC98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78336
+- 0x5FCA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=34176
+- 0x5FCA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397000
+- 0x5FCB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396728
+- 0x5FCB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397144
+- 0x5FCC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396968
+- 0x5FCC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397120
+- 0x5FCD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397096
+- 0x5FCD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=173024
+- 0x5FCE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397152
+- 0x5FCE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393256
+- 0x5FCF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396715
+- 0x5FCF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=54240
+- 0x5FD00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=219136
+- 0x5FD08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=53000
+- 0x5FD10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=180672
+- 0x5FD18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397024
+- 0x5FD20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=122176
+- 0x5FD28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397208
+- 0x5FD30: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393260
+- 0x5FD40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=108896
+- 0x5FD48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397160
+- 0x5FD50: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396312
+- 0x5FD58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396192
+- 0x5FD60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397004
+- 0x5FD68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=123920
+- 0x5FD70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397203
+- 0x5FD78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=177280
+- 0x5FD80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=125028
+- 0x5FD88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=120392
+- 0x5FD90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=200548
+- 0x5FD98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396352
+- 0x5FDA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=67712
+- 0x5FDA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=175468
+- 0x5FDB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=60356
+- 0x5FDB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396248
+- 0x5FDC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396936
+- 0x5FDC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397012
+- 0x5FDD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397016
+- 0x5FDD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=27200
+- 0x5FDE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397168
+- 0x5FDE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396304
+- 0x5FDF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396664
+- 0x5FDF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396236
+- 0x5FE00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=228844
+- 0x5FE08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397044
+- 0x5FE18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396328
+- 0x5FE20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396896
+- 0x5FE28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78416
+- 0x5FE30: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396832
+- 0x5FE38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=195840
+- 0x5FE40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396400
+- 0x5FE48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397116
+- 0x5FE50: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=171492
+- 0x5FE58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78400
+- 0x5FE60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396752
+- 0x5FE68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78576
+- 0x5FE70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=180240
+- 0x5FE78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396712
+- 0x5FE80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=199328
+- 0x5FE88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=121248
+- 0x5FE90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78560
+- 0x5FE98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396714
+- 0x5FEA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=184384
+- 0x5FEA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396256
+- 0x5FEB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397128
+- 0x5FEB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397172
+- 0x5FEC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396840
+- 0x5FED0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=123568
+- 0x5FED8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396744
+- 0x5FEE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=122752
+- 0x5FEE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=393304
+- 0x5FEF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=137096
+- 0x5FEF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396496
+- 0x5FF00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=191680
+- 0x5FF08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396336
+- 0x5FF10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397028
+- 0x5FF18: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397136
+- 0x5FF20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396696
+- 0x5FF28: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396320
+- 0x5FF30: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=173216
+- 0x5FF38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396216
+- 0x5FF40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396672
+- 0x5FF48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396720
+- 0x5FF58: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396976
+- 0x5FF60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=67664
+- 0x5FF68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397173
+- 0x5FF70: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=181252
+- 0x5FF78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397068
+- 0x5FF80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78432
+- 0x5FF88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=122256
+- 0x5FF90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396864
+- 0x5FF98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397202
+- 0x5FFA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396912
+- 0x5FFA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=172584
+- 0x5FFB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=396928
+- 0x5FFB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78544
+- 0x5FFC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=124064
+- 0x5FFC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=78536
+- 0x5FFD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397048
+- 0x5FFD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397200
+- 0x5FFE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397088
+- 0x5FFE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=171456
+- 0x5FFF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397104
+- 0x5FFF8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.got, loader=GOT, addend=397184
+- 0x60008: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=393224
+- 0x60018: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=267888
+- 0x60020: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=243624
+- 0x60050: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=250464
+- 0x60058: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=250456
+- 0x60080: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262344
+- 0x600A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262360
+- 0x600C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262376
+- 0x600E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262392
+- 0x60100: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262408
+- 0x60120: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262424
+- 0x60140: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262440
+- 0x60160: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262456
+- 0x60180: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262472
+- 0x601A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262480
+- 0x601C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262488
+- 0x601E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262504
+- 0x60200: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262520
+- 0x60220: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262536
+- 0x60240: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262544
+- 0x60260: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262560
+- 0x60280: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262568
+- 0x602A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262584
+- 0x602C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262592
+- 0x602E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262608
+- 0x60300: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262624
+- 0x60320: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262632
+- 0x60340: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262640
+- 0x60360: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262656
+- 0x60380: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262664
+- 0x603A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262672
+- 0x603C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262680
+- 0x603E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262696
+- 0x60400: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262712
+- 0x60420: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262728
+- 0x60440: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262736
+- 0x60460: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262752
+- 0x60480: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262768
+- 0x604A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262776
+- 0x604C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262792
+- 0x604E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262808
+- 0x60500: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262824
+- 0x60520: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262840
+- 0x60540: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262856
+- 0x60560: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262872
+- 0x60580: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262888
+- 0x605A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262896
+- 0x605C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262912
+- 0x605E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262928
+- 0x60600: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262936
+- 0x60620: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262952
+- 0x60640: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262968
+- 0x60660: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262984
+- 0x60680: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263000
+- 0x606A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263016
+- 0x606C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=259832
+- 0x606E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263024
+- 0x60700: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263032
+- 0x60720: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263048
+- 0x60740: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263064
+- 0x60760: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263080
+- 0x60780: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263088
+- 0x60858: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=126592
+- 0x60860: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=126592
+- 0x60868: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=126592
+- 0x60870: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=78600
+- 0x60880: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266560
+- 0x60888: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266568
+- 0x60890: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263360
+- 0x60898: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266576
+- 0x608A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266592
+- 0x608A8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263472
+- 0x608B0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263264
+- 0x608B8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263296
+- 0x608C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263392
+- 0x608C8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262560
+- 0x608D0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266600
+- 0x608D8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=263432
+- 0x608E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=264312
+- 0x608E8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266608
+- 0x608F0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=264320
+- 0x608F8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=266624
+- 0x60920: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=241032
+- 0x60928: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60938: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269632
+- 0x60940: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269656
+- 0x60948: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269680
+- 0x60950: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269704
+- 0x60958: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269720
+- 0x60960: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269744
+- 0x60968: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269760
+- 0x60970: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269776
+- 0x60978: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269792
+- 0x60980: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269808
+- 0x60988: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269824
+- 0x60990: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269840
+- 0x60998: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269856
+- 0x609A0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269872
+- 0x609A8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269896
+- 0x609B0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269912
+- 0x609B8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269928
+- 0x609C0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269944
+- 0x609C8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269960
+- 0x609D0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x609E0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269976
+- 0x609E8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270008
+- 0x609F0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270040
+- 0x609F8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270064
+- 0x60A00: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270080
+- 0x60A08: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270096
+- 0x60A10: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270120
+- 0x60A20: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270136
+- 0x60A38: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270152
+- 0x60A40: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270168
+- 0x60A48: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270184
+- 0x60A50: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270200
+- 0x60A60: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60A68: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60A78: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60A80: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60A88: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270216
+- 0x60A90: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270232
+- 0x60A98: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60AA0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=255568
+- 0x60AA8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=270264
+- 0x60AB0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269416
+- 0x60AB8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=262472
+- 0x60AC0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269440
+- 0x60AC8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269464
+- 0x60AD0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269488
+- 0x60AD8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269520
+- 0x60AE0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269552
+- 0x60AE8: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269568
+- 0x60AF0: R_AARCH64_RELATIVE (1027) [RELA] -> sym#0, source=.rela.dyn, section=.data, loader=GENERAL, addend=269600
+- 0x5F930: R_AARCH64_GLOB_DAT (1025) [RELA] -> _ITM_deregisterTMCloneTable, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5F990: R_AARCH64_GLOB_DAT (1025) [RELA] -> __cxa_finalize@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5F9A8: R_AARCH64_GLOB_DAT (1025) [RELA] -> stderr@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5F9F8: R_AARCH64_GLOB_DAT (1025) [RELA] -> optarg@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FA80: R_AARCH64_GLOB_DAT (1025) [RELA] -> fclose@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FAA0: R_AARCH64_GLOB_DAT (1025) [RELA] -> optind@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FB18: R_AARCH64_GLOB_DAT (1025) [RELA] -> stdout@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FB48: R_AARCH64_GLOB_DAT (1025) [RELA] -> stdscr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FC30: R_AARCH64_GLOB_DAT (1025) [RELA] -> __gmon_start__, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FC38: R_AARCH64_GLOB_DAT (1025) [RELA] -> curscr@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FC40: R_AARCH64_GLOB_DAT (1025) [RELA] -> __stack_chk_guard@GLIBC_2.17 <= ld-linux-aarch64.so.1, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FC50: R_AARCH64_GLOB_DAT (1025) [RELA] -> COLORS@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FD38: R_AARCH64_GLOB_DAT (1025) [RELA] -> COLS@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FE10: R_AARCH64_GLOB_DAT (1025) [RELA] -> fflush@GLIBC_2.17 <= libc.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FEC0: R_AARCH64_GLOB_DAT (1025) [RELA] -> LINES@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5FF50: R_AARCH64_GLOB_DAT (1025) [RELA] -> _ITM_registerTMCloneTable, source=.rela.dyn, section=.got, loader=GOT, addend=0
+- 0x5F300: R_AARCH64_JUMP_SLOT (1026) [RELA] -> newwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F308: R_AARCH64_JUMP_SLOT (1026) [RELA] -> start_color@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F310: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memcpy@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F318: R_AARCH64_JUMP_SLOT (1026) [RELA] -> use_default_colors@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F320: R_AARCH64_JUMP_SLOT (1026) [RELA] -> nodelay@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F328: R_AARCH64_JUMP_SLOT (1026) [RELA] -> memmove@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F330: R_AARCH64_JUMP_SLOT (1026) [RELA] -> noecho@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F338: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wmove@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F340: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mkstemps@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F348: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strtok@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F350: R_AARCH64_JUMP_SLOT (1026) [RELA] -> strlen@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F358: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getmouse@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F360: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __sprintf_chk@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F368: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mbstowcs@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F370: R_AARCH64_JUMP_SLOT (1026) [RELA] -> exit@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F378: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __libc_start_main@GLIBC_2.34 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F380: R_AARCH64_JUMP_SLOT (1026) [RELA] -> execl@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F388: R_AARCH64_JUMP_SLOT (1026) [RELA] -> flockfile@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F390: R_AARCH64_JUMP_SLOT (1026) [RELA] -> halfdelay@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F398: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigprocmask@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wattr_on@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> geteuid@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __isoc23_sscanf@GLIBC_2.38 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> curs_set@NCURSES6_TINFO_5.0.19991023 <= libtinfo.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> has_colors@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __cxa_finalize@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> pipe@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> putc@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> opendir@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3E8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fputc@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3F0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> waddnstr@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F3F8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> qsort@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F400: R_AARCH64_JUMP_SLOT (1026) [RELA] -> delwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F408: R_AARCH64_JUMP_SLOT (1026) [RELA] -> kill@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F410: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fork@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F418: R_AARCH64_JUMP_SLOT (1026) [RELA] -> iswpunct@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F420: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigfillset@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F428: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __ctype_tolower_loc@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F430: R_AARCH64_JUMP_SLOT (1026) [RELA] -> snprintf@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F438: R_AARCH64_JUMP_SLOT (1026) [RELA] -> tcgetattr@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F440: R_AARCH64_JUMP_SLOT (1026) [RELA] -> stpcpy@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F448: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fileno@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F450: R_AARCH64_JUMP_SLOT (1026) [RELA] -> iswblank@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F458: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __snprintf_chk@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F460: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fclose@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F468: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fsync@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F470: R_AARCH64_JUMP_SLOT (1026) [RELA] -> mvwprintw@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F478: R_AARCH64_JUMP_SLOT (1026) [RELA] -> getpid@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F480: R_AARCH64_JUMP_SLOT (1026) [RELA] -> nl_langinfo@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F488: R_AARCH64_JUMP_SLOT (1026) [RELA] -> fopen@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F490: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __vsnprintf_chk@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F498: R_AARCH64_JUMP_SLOT (1026) [RELA] -> time@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4A0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> malloc@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4A8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> wcwidth@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4B0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> chmod@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4B8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> funlockfile@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4C0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> open@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4C8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> __strncpy_chk@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4D0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> isendwin@NCURSESW6_5.1.20000708 <= libncursesw.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4D8: R_AARCH64_JUMP_SLOT (1026) [RELA] -> sigemptyset@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+- 0x5F4E0: R_AARCH64_JUMP_SLOT (1026) [RELA] -> futimens@GLIBC_2.17 <= libc.so.6, source=.rela.plt, section=.got, loader=PLT+GOT, addend=0
+... 117 more
+
+Notes
+-----
+- GNU NT_GNU_PROPERTY_TYPE_0 (5) -> GNU_PROPERTY_AARCH64_FEATURE_1_AND=BTI|PAC (0x3)
+- GNU NT_GNU_BUILD_ID (3) -> 95388a51f16ad60962e80ce58304f91cca850445
+- GNU NT_GNU_ABI_TAG (1) -> Linux 3.7.0
