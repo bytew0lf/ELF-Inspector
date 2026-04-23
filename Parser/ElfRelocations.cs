@@ -128,7 +128,7 @@ public static partial class ElfReader
 		EnsureReadableRange(data, section.Offset, section.Size, "REL section");
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCount = section.Size / entrySize;
-		EnsureReasonableEntryCount(entryCount, "REL section");
+		EnsureReasonableEntryCount(entryCount, "REL section", elf.ParseOptions);
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
@@ -169,7 +169,7 @@ public static partial class ElfReader
 		EnsureReadableRange(data, section.Offset, section.Size, "RELA section");
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var entryCount = section.Size / entrySize;
-		EnsureReasonableEntryCount(entryCount, "RELA section");
+		EnsureReasonableEntryCount(entryCount, "RELA section", elf.ParseOptions);
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
@@ -209,7 +209,7 @@ public static partial class ElfReader
 
 		EnsureReadableRange(data, section.Offset, section.Size, "RELR section");
 		var entryCount = section.Size / entrySize;
-		EnsureReasonableEntryCount(entryCount, "RELR section");
+		EnsureReasonableEntryCount(entryCount, "RELR section", elf.ParseOptions);
 
 		var wordBitCount = (int)(wordSize * 8);
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
@@ -279,7 +279,7 @@ public static partial class ElfReader
 
 		EnsureReadableRange(data, tableFileOffset, tableSize, $"DT_{encoding} relocation table");
 		var entryCount = tableSize / entrySize;
-		EnsureReasonableEntryCount(entryCount, $"DT_{encoding} relocation entries");
+		EnsureReasonableEntryCount(entryCount, $"DT_{encoding} relocation entries", elf.ParseOptions);
 
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
@@ -347,7 +347,7 @@ public static partial class ElfReader
 
 		EnsureReadableRange(data, tableFileOffset, tableSize, $"DT_JMPREL {encoding} relocation table");
 		var entryCount = tableSize / entrySize;
-		EnsureReasonableEntryCount(entryCount, $"DT_JMPREL {encoding} relocation entries");
+		EnsureReasonableEntryCount(entryCount, $"DT_JMPREL {encoding} relocation entries", elf.ParseOptions);
 
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		for (ulong i = 0; i < entryCount; i++)
@@ -392,7 +392,7 @@ public static partial class ElfReader
 
 		EnsureReadableRange(data, relrFileOffset, relrSize, "DT_RELR relocation table");
 		var entryCount = relrSize / entrySize;
-		EnsureReasonableEntryCount(entryCount, "DT_RELR relocation entries");
+		EnsureReasonableEntryCount(entryCount, "DT_RELR relocation entries", elf.ParseOptions);
 
 		var wordBitCount = (int)(wordSize * 8);
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);

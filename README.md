@@ -168,6 +168,52 @@ dotnet run --project ELF-Inspector.csproj -- \
   --compat-header-validation
 ```
 
+## Security Hardening Defaults
+
+Recent parser hardening changes affect compressed-section decoding:
+
+* External `zstd` process fallback is now disabled by default.
+* If external fallback is enabled, `ExternalZstdToolPath` must be an absolute path (no `PATH` lookup).
+* Native `libzstd` loading now uses absolute candidate paths only (no unqualified library-name loads).
+* ZLIB and external-ZSTD decompression output is streamed with a hard safety cap to prevent unbounded memory growth.
+
+P1 hardening updates:
+
+* Parser entry-count safety gates now honor `ElfParseOptions.MaxParserEntryCount` across section/program headers, dynamic tables, symbol/version tables, relocation tables, and section groups.
+* Input-size safety gate now honors `ElfParseOptions.MaxInputBytes` for file, stream, span, and internal data-source parse entry points.
+* NOTE parsing now enforces `ElfParseOptions.MaxNoteCount` and fails with a controlled parse error when exceeded.
+* NOTE deduplication now keys descriptors by SHA-256 fingerprint instead of full descriptor hex payload to reduce memory-amplification risk.
+
+Additional parser safety limits are configurable in `ElfParseOptions`:
+
+* `MaxInputBytes` (default `4 GiB`, set `0` to disable)
+* `MaxParserEntryCount` (default `1,000,000`, set `0` to disable)
+* `MaxNoteCount` (default `100,000`, set `0` to disable)
+* `MaxStringTableStringBytes` (default `65,536`, set `0` to disable)
+
+P2 hardening updates:
+
+* String-table entry decoding now truncates per-entry reads at `MaxStringTableStringBytes`.
+* Memory-mapped reads validate `offset` against platform pointer range before pointer arithmetic.
+
+When limits are hit, parsing aborts with `InvalidDataException` and does not continue in a partially trusted state.
+
+Example:
+
+```csharp
+var options = new ElfParseOptions
+{
+    EnableExternalZstdToolFallback = true,
+    ExternalZstdToolPath = "/usr/bin/zstd",
+    MaxInputBytes = 4UL * 1024UL * 1024UL * 1024UL,
+    MaxParserEntryCount = 1_000_000UL,
+    MaxNoteCount = 100_000,
+    MaxStringTableStringBytes = 65_536UL
+};
+
+var elf = ElfReader.Parse("samples/nano", options);
+```
+
 ## Golden Reports (P0)
 
 Generate baseline reports:

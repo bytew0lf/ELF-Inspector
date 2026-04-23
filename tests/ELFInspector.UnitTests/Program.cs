@@ -54,6 +54,128 @@ public sealed class ElfReaderTests
 	}
 
 	[Fact]
+	public void ParseOptions_StrictDefault_DisablesExternalZstdToolFallback()
+	{
+		Assert.False(ElfParseOptions.StrictDefault.EnableExternalZstdToolFallback);
+	}
+
+	[Fact]
+	public void ParseSectionSpecialCases_ResolveZstdExecutablePath_RejectsRelativePath()
+	{
+		var method = typeof(ElfReader).GetMethod("ResolveZstdExecutablePath", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+
+		var args = new object[] { "zstd", string.Empty };
+		var result = method!.Invoke(null, args);
+		Assert.Equal(string.Empty, Assert.IsType<string>(result));
+		var error = Assert.IsType<string>(args[1]);
+		Assert.Contains("absolute", error, StringComparison.OrdinalIgnoreCase);
+	}
+
+	[Fact]
+	public void ParseSectionSpecialCases_GetZstdLibraryCandidates_AreAbsolutePaths()
+	{
+		var method = typeof(ElfReader).GetMethod("GetZstdLibraryCandidates", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+
+		var result = method!.Invoke(null, Array.Empty<object>());
+		var candidates = Assert.IsAssignableFrom<IReadOnlyList<string>>(result);
+		Assert.NotEmpty(candidates);
+		Assert.All(candidates, candidate =>
+		{
+			Assert.True(
+				Path.IsPathFullyQualified(candidate),
+				$"Expected absolute libzstd candidate path, got '{candidate}'.");
+		});
+	}
+
+	[Fact]
+	public void ParseSectionSpecialCases_StreamCopyLimit_RejectsOversizedOutput()
+	{
+		var method = typeof(ElfReader).GetMethod("TryReadStreamToArrayWithLimit", BindingFlags.Static | BindingFlags.NonPublic);
+		Assert.NotNull(method);
+
+		using var stream = new MemoryStream(new byte[512]);
+		var args = new object[] { stream, 128UL, Array.Empty<byte>(), string.Empty };
+		var result = method!.Invoke(null, args);
+		Assert.False(Assert.IsType<bool>(result));
+		Assert.Empty(Assert.IsType<byte[]>(args[2]));
+		Assert.Contains("safety limit", Assert.IsType<string>(args[3]), StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void Parse_ReadOnlySpan_RespectsConfiguredMaxInputBytes()
+	{
+		var data = BuildMinimalElf64Header();
+		var options = new ElfParseOptions
+		{
+			MaxInputBytes = (ulong)data.Length - 1UL
+		};
+
+		var ex = Assert.Throws<InvalidDataException>(() => ElfReader.Parse(data, options));
+		Assert.Contains("input size limit", ex.Message, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void Parse_StreamMode_RespectsConfiguredMaxInputBytes()
+	{
+		var source = new byte[256];
+		using var stream = new MemoryStream(source, writable: false);
+		var options = new ElfParseOptions
+		{
+			DataSourceMode = ElfDataSourceMode.Stream,
+			MaxInputBytes = 64
+		};
+
+		var ex = Assert.Throws<InvalidDataException>(() => ElfReader.Parse(stream, options));
+		Assert.Contains("input size limit", ex.Message, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void Parse_SectionHeaderCountAboveConfiguredLimit_IsRejected()
+	{
+		var header = BuildMinimalElf64Header();
+		WriteUInt64(header.AsSpan(40, 8), 64UL, littleEndian: true); // e_shoff
+		WriteUInt16(header.AsSpan(58, 2), 64, littleEndian: true); // e_shentsize
+		WriteUInt16(header.AsSpan(60, 2), 2, littleEndian: true); // e_shnum
+
+		var data = new byte[64 + (2 * 64)];
+		Buffer.BlockCopy(header, 0, data, 0, header.Length);
+
+		var options = new ElfParseOptions
+		{
+			MaxParserEntryCount = 1
+		};
+
+		var ex = Assert.Throws<InvalidDataException>(() => ElfReader.Parse(data, options));
+		Assert.Contains("entry count", ex.Message, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void ParseSymbolTable_ReadStringFromFileOffset_RespectsConfiguredMaxStringTableStringBytes()
+	{
+		var method = typeof(ElfReader).GetMethod(
+			"ReadStringFromFileOffset",
+			BindingFlags.Static | BindingFlags.NonPublic,
+			null,
+			new[] { typeof(IEndianDataSource), typeof(ulong), typeof(ulong), typeof(ulong), typeof(ElfParseOptions) },
+			null);
+		Assert.NotNull(method);
+
+		var prefix = Enumerable.Repeat((byte)'A', 2048).ToArray();
+		var source = new SparseEndianDataSource((ulong)prefix.Length, prefix);
+		var options = new ElfParseOptions
+		{
+			MaxStringTableStringBytes = 64
+		};
+
+		var value = method!.Invoke(null, new object[] { source, 0UL, (ulong)prefix.Length, 0UL, options });
+		var text = Assert.IsType<string>(value);
+		Assert.Equal(64, text.Length);
+		Assert.All(text, c => Assert.Equal('A', c));
+	}
+
+	[Fact]
 	public void Parse_FilePath_StreamMode_SparseFileOverIntMax_Succeeds()
 	{
 		var tempFile = Path.Combine(Path.GetTempPath(), $"elf-large-{Guid.NewGuid():N}.bin");
@@ -1800,6 +1922,41 @@ public sealed class ElfReaderTests
 		Assert.Equal(64, note.Descriptor.Length);
 		Assert.Contains("descriptor truncated", note.DecodedDescription, StringComparison.Ordinal);
 		Assert.Contains("bytes=", note.DecodedDescription, StringComparison.Ordinal);
+	}
+
+	[Fact]
+	public void ParseNotes_MaxNoteCountLimit_IsEnforced()
+	{
+		var noteSectionData = BuildNoteSection(
+			CreateNote("GNU", 3, new byte[] { 0x01 }),
+			CreateNote("GNU", 4, new byte[] { 0x02 }));
+
+		var elfData = new byte[0x200];
+		const int sectionOffset = 0x80;
+		Array.Copy(noteSectionData, 0, elfData, sectionOffset, noteSectionData.Length);
+
+		var elf = new ElfFile
+		{
+			Header = new ElfHeader
+			{
+				Class = ElfClass.Elf64,
+				DataEncoding = ElfData.LittleEndian
+			}
+		};
+		elf.Sections.Add(new ElfSectionHeader
+		{
+			Type = 7, // SHT_NOTE
+			Offset = (ulong)sectionOffset,
+			Size = (ulong)noteSectionData.Length,
+			AddressAlign = 4
+		});
+
+		var parseOptionsProperty = typeof(ElfFile).GetProperty("ParseOptions", BindingFlags.Instance | BindingFlags.NonPublic);
+		Assert.NotNull(parseOptionsProperty);
+		parseOptionsProperty!.SetValue(elf, new ElfParseOptions { MaxNoteCount = 1 });
+
+		var ex = Assert.Throws<InvalidDataException>(() => ElfReader.ParseNotes(elfData, elf));
+		Assert.Contains("NOTE entry count exceeds configured safety limit", ex.Message, StringComparison.Ordinal);
 	}
 
 	[Fact]

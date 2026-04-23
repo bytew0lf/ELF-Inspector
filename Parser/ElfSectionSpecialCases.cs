@@ -15,6 +15,7 @@ public static partial class ElfReader
 	private const uint GrpComdat = 0x1;
 	private const uint ShtGroup = 17;
 	private const ulong MaxSectionDecompressionSize = 256UL * 1024UL * 1024UL;
+	private const int StreamingCopyBufferSize = 64 * 1024;
 	private const uint ZstdFrameMagic = 0xFD2FB528;
 	private const uint ZstdSkippableFrameMagicStart = 0x184D2A50;
 	private const uint ZstdSkippableFrameMagicEnd = 0x184D2A5F;
@@ -167,7 +168,7 @@ public static partial class ElfReader
 
 			EnsureReadableRange(data, section.Offset, section.Size, "SHT_GROUP section");
 			var entryCount = section.Size / 4UL;
-			EnsureReasonableEntryCount(entryCount, "SHT_GROUP entries");
+			EnsureReasonableEntryCount(entryCount, "SHT_GROUP entries", elf.ParseOptions);
 
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian)
 			{
@@ -367,15 +368,8 @@ public static partial class ElfReader
 		{
 			using var input = new MemoryStream(compressedPayload.ToArray());
 			using var stream = new ZLibStream(input, CompressionMode.Decompress, leaveOpen: false);
-			using var output = new MemoryStream();
-			stream.CopyTo(output);
-
-			var decompressed = output.ToArray();
-			if ((ulong)decompressed.Length > MaxSectionDecompressionSize)
-			{
-				error = $"Uncompressed payload exceeds safety limit ({MaxSectionDecompressionSize} bytes).";
+			if (!TryReadStreamToArrayWithLimit(stream, MaxSectionDecompressionSize, out var decompressed, out error))
 				return false;
-			}
 
 			if (expectedSize != 0 && (ulong)decompressed.Length != expectedSize)
 			{
@@ -391,6 +385,39 @@ public static partial class ElfReader
 			error = ex.Message;
 			return false;
 		}
+	}
+
+	private static bool TryReadStreamToArrayWithLimit(Stream stream, ulong maxBytes, out byte[] payload, out string error)
+	{
+		payload = Array.Empty<byte>();
+		error = string.Empty;
+
+		if (stream == null)
+		{
+			error = "Stream is null.";
+			return false;
+		}
+
+		var buffer = new byte[StreamingCopyBufferSize];
+		using var output = new MemoryStream();
+		while (true)
+		{
+			var read = stream.Read(buffer, 0, buffer.Length);
+			if (read <= 0)
+				break;
+
+			var readCount = (ulong)read;
+			if (readCount > maxBytes || (ulong)output.Length > maxBytes - readCount)
+			{
+				error = $"Uncompressed payload exceeds safety limit ({maxBytes} bytes).";
+				return false;
+			}
+
+			output.Write(buffer, 0, read);
+		}
+
+		payload = output.ToArray();
+		return true;
 	}
 
 	private static bool TryDecompressZstdPayload(ReadOnlySpan<byte> compressedPayload, ulong expectedSize, ElfParseOptions parseOptions, out byte[] payload, out string error)
@@ -641,7 +668,22 @@ public static partial class ElfReader
 
 			foreach (var candidate in candidateNames)
 			{
-				if (!NativeLibrary.TryLoad(candidate, out var handle))
+				if (!Path.IsPathFullyQualified(candidate))
+					continue;
+
+				string normalizedCandidate;
+				try
+				{
+					normalizedCandidate = Path.GetFullPath(candidate);
+				}
+				catch
+				{
+					continue;
+				}
+
+				if (!File.Exists(normalizedCandidate))
+					continue;
+				if (!NativeLibrary.TryLoad(normalizedCandidate, out var handle))
 					continue;
 
 				if (!NativeLibrary.TryGetExport(handle, "ZSTD_getFrameContentSize", out var frameSizePtr)
@@ -653,6 +695,7 @@ public static partial class ElfReader
 					|| !NativeLibrary.TryGetExport(handle, "ZSTD_initDStream", out var initDStreamPtr)
 					|| !NativeLibrary.TryGetExport(handle, "ZSTD_decompressStream", out var decompressStreamPtr))
 				{
+					NativeLibrary.Free(handle);
 					continue;
 				}
 
@@ -681,10 +724,14 @@ public static partial class ElfReader
 	{
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 		{
+			var systemDirectory = Environment.SystemDirectory;
+			if (string.IsNullOrWhiteSpace(systemDirectory))
+				return Array.Empty<string>();
+
 			return new[]
 			{
-				"zstd.dll",
-				"libzstd.dll"
+				Path.Combine(systemDirectory, "zstd.dll"),
+				Path.Combine(systemDirectory, "libzstd.dll")
 			};
 		}
 
@@ -692,23 +739,20 @@ public static partial class ElfReader
 		{
 			return new[]
 			{
-				"libzstd.dylib",
 				"/opt/homebrew/lib/libzstd.dylib",
 				"/usr/local/lib/libzstd.dylib",
-				"/usr/lib/libzstd.dylib",
-				"libzstd"
+				"/usr/lib/libzstd.dylib"
 			};
 		}
 
 		return new[]
 		{
-			"libzstd.so.1",
-			"libzstd.so",
 			"/usr/lib/x86_64-linux-gnu/libzstd.so.1",
 			"/usr/lib/aarch64-linux-gnu/libzstd.so.1",
 			"/lib/x86_64-linux-gnu/libzstd.so.1",
 			"/lib/aarch64-linux-gnu/libzstd.so.1",
-			"libzstd"
+			"/usr/lib64/libzstd.so.1",
+			"/lib64/libzstd.so.1"
 		};
 	}
 
@@ -741,10 +785,10 @@ public static partial class ElfReader
 			return false;
 		}
 
-		var executable = ResolveZstdExecutablePath(parseOptions.ExternalZstdToolPath);
+		var executable = ResolveZstdExecutablePath(parseOptions.ExternalZstdToolPath, out var resolveError);
 		if (string.IsNullOrEmpty(executable))
 		{
-			error = "zstd executable not found.";
+			error = resolveError;
 			return false;
 		}
 
@@ -774,20 +818,16 @@ public static partial class ElfReader
 			process.StandardInput.BaseStream.Write(compressedPayload);
 			process.StandardInput.Close();
 
-			using var output = new MemoryStream();
-			process.StandardOutput.BaseStream.CopyTo(output);
+			if (!TryReadStreamToArrayWithLimit(process.StandardOutput.BaseStream, MaxSectionDecompressionSize, out var decompressed, out error))
+			{
+				TryTerminateProcess(process);
+				return false;
+			}
 			var stderr = process.StandardError.ReadToEnd();
 
 			if (!process.WaitForExit((int)timeout.TotalMilliseconds))
 			{
-				try
-				{
-					process.Kill(entireProcessTree: true);
-				}
-				catch
-				{
-					// Ignore kill failures for already-exited processes.
-				}
+				TryTerminateProcess(process);
 				error = $"External zstd process timed out after {timeout.TotalSeconds:0.#}s.";
 				return false;
 			}
@@ -795,13 +835,6 @@ public static partial class ElfReader
 			if (process.ExitCode != 0)
 			{
 				error = $"External zstd failed (exit={process.ExitCode}): {stderr}".Trim();
-				return false;
-			}
-
-			var decompressed = output.ToArray();
-			if ((ulong)decompressed.Length > MaxSectionDecompressionSize)
-			{
-				error = $"Uncompressed payload exceeds safety limit ({MaxSectionDecompressionSize} bytes).";
 				return false;
 			}
 
@@ -821,37 +854,41 @@ public static partial class ElfReader
 		}
 	}
 
-	private static string ResolveZstdExecutablePath(string preferredPath)
+	private static void TryTerminateProcess(Process process)
 	{
-		if (!string.IsNullOrWhiteSpace(preferredPath))
+		try
 		{
-			var fullPreferredPath = Path.GetFullPath(preferredPath);
-			if (File.Exists(fullPreferredPath))
-				return fullPreferredPath;
+			if (!process.HasExited)
+				process.Kill(entireProcessTree: true);
 		}
+		catch
+		{
+			// Ignore kill failures for already-exited processes.
+		}
+	}
 
-		var envPath = Environment.GetEnvironmentVariable("PATH");
-		if (string.IsNullOrWhiteSpace(envPath))
+	private static string ResolveZstdExecutablePath(string preferredPath, out string error)
+	{
+		error = string.Empty;
+		if (string.IsNullOrWhiteSpace(preferredPath))
+		{
+			error = "External zstd fallback requires an absolute ExternalZstdToolPath.";
 			return string.Empty;
-
-		var candidateNames = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-			? new[] { "zstd.exe", "zstd" }
-			: new[] { "zstd" };
-		var pathSeparators = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-			? ';'
-			: ':';
-
-		foreach (var directory in envPath.Split(pathSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+		}
+		if (!Path.IsPathFullyQualified(preferredPath))
 		{
-			foreach (var name in candidateNames)
-			{
-				var fullPath = Path.Combine(directory, name);
-				if (File.Exists(fullPath))
-					return fullPath;
-			}
+			error = "External zstd tool path must be absolute.";
+			return string.Empty;
 		}
 
-		return string.Empty;
+		var fullPreferredPath = Path.GetFullPath(preferredPath);
+		if (!File.Exists(fullPreferredPath))
+		{
+			error = "Configured external zstd tool path does not exist.";
+			return string.Empty;
+		}
+
+		return fullPreferredPath;
 	}
 
 	private static bool TryDecompressZstdPayloadRawRleFallback(ReadOnlySpan<byte> compressedPayload, ulong expectedSize, out byte[] payload, out string error)

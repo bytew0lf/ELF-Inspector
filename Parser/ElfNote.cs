@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace ELFInspector.Parser;
 
 /// <summary>
@@ -185,6 +187,7 @@ public static partial class ElfReader
 	private static void ParseNoteBlock(IEndianDataSource data, ElfFile elf, ulong start, ulong end, ulong align, HashSet<string> dedupeKeys)
 	{
 		var cursor = start;
+		var maxNoteCount = elf.ParseOptions?.MaxNoteCount ?? 0;
 
 		while (cursor + 12 <= end)
 		{
@@ -209,6 +212,8 @@ public static partial class ElfReader
 
 			var descriptor = ReadNoteDescriptor(data, cursor, descSize, out var descriptorDecodeOverride);
 			cursor = AlignUp(cursor + descSize, align);
+			if (maxNoteCount > 0 && dedupeKeys.Count >= maxNoteCount)
+				throw new InvalidDataException($"ELF NOTE entry count exceeds configured safety limit ({maxNoteCount}).");
 
 			var note = new ElfNote
 			{
@@ -258,7 +263,9 @@ public static partial class ElfReader
 
 	private static void AddNoteDeduplicated(ElfFile elf, ElfNote note, HashSet<string> dedupeKeys)
 	{
-		var key = string.Concat(note.Name, "\0", note.Type.ToString(), "\0", Convert.ToHexString(note.Descriptor));
+		var descriptor = note.Descriptor ?? Array.Empty<byte>();
+		var descriptorHash = SHA256.HashData(descriptor);
+		var key = string.Concat(note.Name, "\0", note.Type.ToString(), "\0", Convert.ToHexString(descriptorHash));
 		if (dedupeKeys.Add(key))
 			elf.Notes.Add(note);
 	}

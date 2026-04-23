@@ -121,6 +121,8 @@ internal sealed unsafe class MemoryMappedElfDataSource : IDisposableEndianDataSo
 			throw new ObjectDisposedException(nameof(MemoryMappedElfDataSource));
 		if (offset > Length || (ulong)destination.Length > Length - offset)
 			throw new InvalidDataException("Read exceeds data bounds.");
+		if (offset > (ulong)nint.MaxValue)
+			throw new InvalidDataException("Offset exceeds platform pointer range.");
 		if (offset > long.MaxValue)
 			throw new InvalidDataException("Offset exceeds supported memory map range.");
 

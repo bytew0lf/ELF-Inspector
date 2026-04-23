@@ -202,7 +202,7 @@ public static partial class ElfReader
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 		var neededEntries = new List<ulong>();
 		var entryCount = section.Size / entrySize;
-		EnsureReasonableEntryCount(entryCount, "dynamic entries");
+		EnsureReasonableEntryCount(entryCount, "dynamic entries", elf.ParseOptions);
 
 		for (ulong i = 0; i < entryCount; i++)
 		{
@@ -262,7 +262,7 @@ public static partial class ElfReader
 
 			EnsureReadableRange(data, programHeader.Offset, programHeader.FileSize, "PT_DYNAMIC");
 			var entryCount = programHeader.FileSize / entrySize;
-			EnsureReasonableEntryCount(entryCount, "dynamic entries");
+			EnsureReasonableEntryCount(entryCount, "dynamic entries", elf.ParseOptions);
 
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 			for (ulong i = 0; i < entryCount; i++)
@@ -321,7 +321,7 @@ public static partial class ElfReader
 			if (!string.IsNullOrEmpty(entry.StringValue))
 				continue;
 
-			var stringValue = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, entry.Value);
+			var stringValue = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, entry.Value, elf.ParseOptions);
 			entry.StringValue = stringValue;
 
 			if (entry.Tag == DtNeeded && !string.IsNullOrEmpty(stringValue) && !elf.ImportLibraries.Contains(stringValue))

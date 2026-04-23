@@ -45,7 +45,7 @@ public static partial class ElfReader
 
 		var sectionTableSize = checked(sectionCount * header.SectionHeaderEntrySize);
 		EnsureReadableRange(data, header.SectionHeaderOffset, sectionTableSize, "section header table");
-		EnsureReasonableEntryCount(sectionCount, "section headers");
+		EnsureReasonableEntryCount(sectionCount, "section headers", elf.ParseOptions);
 
 		for (ulong i = 0; i < sectionCount; i++)
 		{
@@ -121,7 +121,7 @@ public static partial class ElfReader
 
 		var programTableSize = checked(programHeaderCount * header.ProgramHeaderEntrySize);
 		EnsureReadableRange(data, header.ProgramHeaderOffset, programTableSize, "program header table");
-		EnsureReasonableEntryCount(programHeaderCount, "program headers");
+		EnsureReasonableEntryCount(programHeaderCount, "program headers", elf.ParseOptions);
 
 		for (ulong i = 0; i < programHeaderCount; i++)
 		{

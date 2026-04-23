@@ -234,7 +234,7 @@ public static partial class ElfReader
 
 			EnsureReadableRange(data, section.Offset, section.Size, "SHT_SYMTAB_SHNDX");
 			var entryCount = section.Size / entrySize;
-			EnsureReasonableEntryCount(entryCount, "SHT_SYMTAB_SHNDX");
+			EnsureReasonableEntryCount(entryCount, "SHT_SYMTAB_SHNDX", elf.ParseOptions);
 
 			var values = new uint[GetManagedArrayLength(entryCount, "SHT_SYMTAB_SHNDX")];
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
@@ -266,7 +266,7 @@ public static partial class ElfReader
 
 		EnsureReadableRange(data, tableSection.Offset, tableSection.Size, "symbol table");
 		var entryCount = tableSection.Size / entrySize;
-		EnsureReasonableEntryCount(entryCount, "symbol table");
+		EnsureReasonableEntryCount(entryCount, "symbol table", elf.ParseOptions);
 
 		var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
 
@@ -357,7 +357,7 @@ public static partial class ElfReader
 		if (symbolCount == 0)
 			return;
 
-		EnsureReasonableEntryCount(symbolCount, "dynamic symbol table");
+		EnsureReasonableEntryCount(symbolCount, "dynamic symbol table", elf.ParseOptions);
 		var totalSymbolBytes = checked(symbolCount * entrySize);
 		EnsureReadableRange(data, symTabFileOffset, totalSymbolBytes, "dynamic symbol table");
 		EnsureReadableRange(data, strTabFileOffset, stringTableSize, "dynamic string table");
@@ -395,7 +395,7 @@ public static partial class ElfReader
 				size = reader.ReadUInt64();
 			}
 
-			var symbolName = ReadStringFromFileOffset(data, strTabFileOffset, stringTableSize, nameIndex);
+			var symbolName = ReadStringFromFileOffset(data, strTabFileOffset, stringTableSize, nameIndex, elf.ParseOptions);
 			elf.Symbols.Add(new ElfSymbol
 			{
 				Name = symbolName,
@@ -604,7 +604,7 @@ public static partial class ElfReader
 
 			EnsureReadableRange(data, section.Offset, section.Size, "GNU version symbols");
 			var count = section.Size / entrySize;
-			EnsureReasonableEntryCount(count, "GNU version symbols");
+			EnsureReasonableEntryCount(count, "GNU version symbols", elf.ParseOptions);
 
 			var versions = new ushort[GetManagedArrayLength(count, "GNU version symbols")];
 			var reader = new EndianDataReader(data, elf.Header.IsLittleEndian);
@@ -641,7 +641,7 @@ public static partial class ElfReader
 		if (entryCount == 0)
 			return;
 
-		EnsureReasonableEntryCount(entryCount, "DT_VERSYM entries");
+		EnsureReasonableEntryCount(entryCount, "DT_VERSYM entries", elf.ParseOptions);
 		EnsureReadableRange(data, versionTableFileOffset, checked(entryCount * 2UL), "DT_VERSYM");
 
 		var versions = new ushort[GetManagedArrayLength(entryCount, "DT_VERSYM entries")];
@@ -772,7 +772,7 @@ public static partial class ElfReader
 			var auxOffset = reader.ReadUInt32();
 			var nextOffset = reader.ReadUInt32();
 
-			var libraryName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, fileNameOffset);
+			var libraryName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, fileNameOffset, elf.ParseOptions);
 			if (auxOffset != 0 && auxOffset <= versionNeedsEnd - entryCursor)
 			{
 				var auxCursor = entryCursor + auxOffset;
@@ -787,7 +787,7 @@ public static partial class ElfReader
 
 					if (versionIndex is not (SymbolVersionLocal or SymbolVersionGlobal) && !result.ContainsKey(versionIndex))
 					{
-						var versionName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, versionNameOffset);
+							var versionName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, versionNameOffset, elf.ParseOptions);
 						result[versionIndex] = (libraryName, versionName);
 					}
 
@@ -904,7 +904,7 @@ public static partial class ElfReader
 				{
 					reader.Position = auxCursor;
 					var nameOffset = reader.ReadUInt32();
-					var versionName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, nameOffset);
+						var versionName = ReadStringFromFileOffset(data, strTabFileOffset, strTabSize, nameOffset, elf.ParseOptions);
 					if (!result.ContainsKey(versionIndex))
 						result[versionIndex] = versionName;
 				}
@@ -966,10 +966,15 @@ public static partial class ElfReader
 			return string.Empty;
 
 		var strSection = elf.Sections[(int)strIndex];
-		return ReadStringFromFileOffset(data, strSection.Offset, strSection.Size, offset);
+		return ReadStringFromFileOffset(data, strSection.Offset, strSection.Size, offset, elf.ParseOptions);
 	}
 
-	private static string ReadStringFromFileOffset(IEndianDataSource data, ulong tableOffset, ulong tableSize, ulong offset)
+	private static string ReadStringFromFileOffset(
+		IEndianDataSource data,
+		ulong tableOffset,
+		ulong tableSize,
+		ulong offset,
+		ElfParseOptions? options = null)
 	{
 		if (tableSize == 0 || offset >= tableSize)
 			return string.Empty;
@@ -983,23 +988,40 @@ public static partial class ElfReader
 		if (endLimit > data.Length)
 			endLimit = data.Length;
 
+		var maxStringBytes = options?.MaxStringTableStringBytes ?? ElfParseOptions.StrictDefault.MaxStringTableStringBytes;
 		const int chunkSize = 256;
 		using var buffer = new MemoryStream();
 		var cursor = start;
+		ulong totalWritten = 0;
 		while (cursor < endLimit)
 		{
+			if (maxStringBytes != 0 && totalWritten >= maxStringBytes)
+				break;
+
 			var remaining = endLimit - cursor;
 			var currentSize = (ulong)Math.Min(chunkSize, remaining);
+			if (maxStringBytes != 0)
+			{
+				var remainingBudget = maxStringBytes - totalWritten;
+				if (remainingBudget == 0)
+					break;
+
+				currentSize = Math.Min(currentSize, remainingBudget);
+			}
 			var chunk = ReadBytes(data, cursor, currentSize, "string table content");
 			var terminator = Array.IndexOf(chunk, (byte)0);
 			if (terminator >= 0)
 			{
 				if (terminator > 0)
+				{
 					buffer.Write(chunk, 0, terminator);
+					totalWritten += (ulong)terminator;
+				}
 				break;
 			}
 
 			buffer.Write(chunk, 0, chunk.Length);
+			totalWritten += (ulong)chunk.Length;
 			cursor = checked(cursor + currentSize);
 		}
 

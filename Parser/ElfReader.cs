@@ -5,7 +5,7 @@ namespace ELFInspector.Parser;
 /// </summary>
 public static partial class ElfReader
 {
-	private const ulong MaxParserEntryCount = 10_000_000;
+	private const ulong MaxParserEntryCount = 1_000_000;
 	private const byte ElfCurrentVersion = 1;
 	private const ushort Elf32HeaderSize = 52;
 	private const ushort Elf64HeaderSize = 64;
@@ -33,6 +33,8 @@ public static partial class ElfReader
 			throw new FileNotFoundException("ELF file not found.", filePath);
 
 		options ??= ElfParseOptions.StrictDefault;
+		var fileLength = checked((ulong)Math.Max(0L, new FileInfo(filePath).Length));
+		ValidateInputSizeLimit(fileLength, options, "ELF file");
 		switch (options.DataSourceMode)
 		{
 			case ElfDataSourceMode.InMemory:
@@ -86,9 +88,15 @@ public static partial class ElfReader
 			throw new ArgumentException("ELF stream must be readable.", nameof(stream));
 
 		options ??= ElfParseOptions.StrictDefault;
+		if (stream.CanSeek)
+		{
+			var remaining = checked((ulong)Math.Max(0L, stream.Length - stream.Position));
+			ValidateInputSizeLimit(remaining, options, "ELF stream");
+		}
+
 		if (options.DataSourceMode == ElfDataSourceMode.InMemory)
 		{
-			using var source = ElfDataSourceFactory.CreateInMemory(ReadAllBytes(stream));
+			using var source = ElfDataSourceFactory.CreateInMemory(ReadAllBytes(stream, options.MaxInputBytes));
 			return Parse(source, options);
 		}
 
@@ -97,7 +105,7 @@ public static partial class ElfReader
 		{
 			using (var tempFile = new FileStream(tempFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 128 * 1024, FileOptions.SequentialScan))
 			{
-				stream.CopyTo(tempFile);
+				CopyStreamWithLimit(stream, tempFile, options.MaxInputBytes, "ELF stream");
 			}
 
 			return Parse(tempFilePath, options);
@@ -130,12 +138,14 @@ public static partial class ElfReader
 	public static ElfFile Parse(ReadOnlySpan<byte> data, ElfParseOptions? options)
 	{
 		options ??= ElfParseOptions.StrictDefault;
+		ValidateInputSizeLimit((ulong)data.Length, options, "ELF data span");
 		using var source = ElfDataSourceFactory.CreateInMemory(data);
 		return Parse(source, options);
 	}
 
 	private static ElfFile Parse(IEndianDataSource data, ElfParseOptions options)
 	{
+		ValidateInputSizeLimit(data.Length, options, "ELF data source");
 		var ident = ReadBytes(data, 0, 16, "identification");
 
 		if (ident[0] != 0x7F || ident[1] != (byte)'E' || ident[2] != (byte)'L' || ident[3] != (byte)'F')
@@ -233,10 +243,18 @@ public static partial class ElfReader
 			throw new InvalidDataException($"ELF {blockName} exceeds file bounds.");
 	}
 
-	private static void EnsureReasonableEntryCount(ulong count, string blockName)
+	private static void EnsureReasonableEntryCount(ulong count, string blockName, ElfParseOptions? options = null)
 	{
-		if (count > MaxParserEntryCount)
+		var limit = options?.MaxParserEntryCount ?? MaxParserEntryCount;
+		if (limit != 0 && count > limit)
 			throw new InvalidDataException($"ELF {blockName} entry count is unreasonably large.");
+	}
+
+	private static void ValidateInputSizeLimit(ulong inputLength, ElfParseOptions options, string sourceName)
+	{
+		var limit = options.MaxInputBytes;
+		if (limit != 0 && inputLength > limit)
+			throw new InvalidDataException($"{sourceName} exceeds configured input size limit ({limit} bytes).");
 	}
 
 	private static ulong AlignUp(ulong value, ulong align)
@@ -407,10 +425,29 @@ public static partial class ElfReader
 		return true;
 	}
 
-	private static byte[] ReadAllBytes(Stream stream)
+	private static byte[] ReadAllBytes(Stream stream, ulong maxBytes)
 	{
 		using var memoryStream = new MemoryStream();
-		stream.CopyTo(memoryStream);
+		CopyStreamWithLimit(stream, memoryStream, maxBytes, "ELF stream");
 		return memoryStream.ToArray();
+	}
+
+	private static void CopyStreamWithLimit(Stream source, Stream destination, ulong maxBytes, string sourceName)
+	{
+		var buffer = new byte[128 * 1024];
+		ulong totalBytes = 0;
+		while (true)
+		{
+			var read = source.Read(buffer, 0, buffer.Length);
+			if (read <= 0)
+				break;
+
+			var readCount = (ulong)read;
+			if (maxBytes != 0 && (readCount > maxBytes || totalBytes > maxBytes - readCount))
+				throw new InvalidDataException($"{sourceName} exceeds configured input size limit ({maxBytes} bytes).");
+
+			destination.Write(buffer, 0, read);
+			totalBytes += readCount;
+		}
 	}
 }
